@@ -1,0 +1,516 @@
+{
+  "chapterId": 7,
+  "chapterName": "STL",
+  "questions": [
+    {
+      "id": 700,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "有STL容器，设其对象为 obj，其类型为 T，容器的元素为整型。该容器不能直接使用标准库算法 std::sort(obj.begin(), obj.end()) 进行排序。则 T 可以是：\n1. vector\n2. list\n3. deque\n4. set",
+      "options": [
+        "A. 1和2",
+        "B. 1和4",
+        "C. 2和4",
+        "D. 1和3"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "list使用双向迭代器，不支持sort；set本身已排序，无需sort。故2(list)和4(set)不能用std::sort。"
+    },
+    {
+      "id": 701,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列操作哪一个真正从容器中删除元素，即改变容器的size()？",
+      "options": [
+        "A. 对vector使用算法remove()",
+        "B. 对vector使用算法unique()",
+        "C. 调用list的remove()成员函数",
+        "D. 对vector使用算法remove_if()"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "std::remove/remove_if/unique是算法，只移动元素不改变容器size；list::remove()是成员函数，真正删除元素改变size。"
+    },
+    {
+      "id": 702,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于 STL容器迭代器的说法，正确的是",
+      "options": [
+        "A. 通过set的迭代器可以修改其指向元素的值",
+        "B. deque容器支持通过下标运算符[]直接访问任意位置的元素",
+        "C. list的迭代器可以直接用于sort算法进行排序",
+        "D. vector的end()方法返回指向最后一个元素的迭代器"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "set迭代器是const_iterator不能修改值；deque支持随机访问和[]；list迭代器是双向迭代器不能用于sort；end()返回尾后迭代器。"
+    },
+    {
+      "id": 703,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "在 STL 框架下，set 能够支持容纳下列哪些对象作为其元素：\n①    同时重载了能判断两个对象相等的==和能判断两个对象大小的<\n②    重载了能判断两个对象大小的<，但是没重载==\n③    重载了能判断两个对象相等的==，但是没重载<\n④    既没重载==，也没重载<",
+      "options": [
+        "A. ①",
+        "B. ①②",
+        "C. ①③",
+        "D. ①②③④"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "set只需要比较运算符<（用于红黑树排序），不需要==。所以①和②都可以。"
+    },
+    {
+      "id": 704,
+      "chapterId": 7,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "关于vector<int> a的说法，以下说法正确的是：",
+      "options": [
+        "A. 若it是在a中指向x的迭代器，当a使用push_back插入新元素时，it一定会继续指向x",
+        "B. 在使用remove(a.begin(), a.end(), a[0])后，a的size()一定会降低",
+        "C. k是a中一个int类型元素，lower_bound(a.begin(), a.end(), k)一定会给出最小的不小于k的元素的位置",
+        "D. stable_sort(a.begin(), a.end())对a进行排序后一定会保持其中相等元素的相对顺序不变"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "push_back可能重新分配导致迭代器失效；remove不改变size；lower_bound要求容器已排序；stable_sort保持相等元素相对顺序。"
+    },
+    {
+      "id": 705,
+      "chapterId": 7,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下操作有几种的平均（均摊）时间复杂度是O(1)的？\n1. vector的push_back操作\n2. deque的pop_front操作\n3. priority_queue的pop操作\n4. map的find操作",
+      "options": [
+        "A. 1种",
+        "B. 2种",
+        "C. 3种",
+        "D. 4种"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "vector push_back均摊O(1)；deque pop_front O(1)；priority_queue pop O(log n)；map find O(log n)。共2种。"
+    },
+    {
+      "id": 706,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "双向迭代器p不支持以下哪种操作？",
+      "options": [
+        "A. p++",
+        "B. p--",
+        "C. p[0]",
+        "D. *p"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "双向迭代器支持++、--、*，但不支持随机访问[]操作。"
+    },
+    {
+      "id": 707,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "有STL容器，设其类型为 T，但是其上的迭代器T::iterator it不支持 it[5] 操作。则 T 可以是：\n(1. vector  2. list  3. deque  4. set)",
+      "options": [
+        "A. 1和2",
+        "B. 1和4",
+        "C. 2和4",
+        "D. 1和3"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "vector和deque支持随机访问迭代器（支持it[5]），list和set不支持（双向迭代器或前向迭代器）。"
+    },
+    {
+      "id": 708,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列有关STL的说法正确的是：",
+      "options": [
+        "A. 若x是set<int>类型的对象，则 x.insert(8)的返回值是一个迭代器",
+        "B. multimap重载了[ ]运算符",
+        "C. list在任何位置插入/删除都是常数时间，支持随机存取。",
+        "D. deque是一个顺序容器，支持随机访问"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "set::insert返回pair<iterator, bool>；multimap没有重载[]；list不支持随机存取；deque支持随机访问。"
+    },
+    {
+      "id": 709,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下几个操作，有几种平均时间复杂度是O(1):\n1.在deque两端增删元素\n2.删除priority_queue队头的元素\n3.在map中插入元素\n4.删除list头部的元素",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "deque两端增删和list头部删除是O(1)；priority_queue删除队头是O(log n)；map插入是O(log n)。共2种。"
+    },
+    {
+      "id": 710,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "如下代码无法通过编译，其根本原因是\n#include <iostream>\n#include <set>\nusing namespace std;\nclass A {  };\nint main() {\n    std::multiset<A> s;\n    s.insert(A());\n    return 0;\n}",
+      "options": [
+        "A. 类A没有默认构造函数",
+        "B. 不能用< 对类A对象比较大小",
+        "C. 类A对象 无法被复制",
+        "D. multiset 只接受指针类型元素"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "multiset需要元素可比较，类A没有定义operator<，因此无法编译。"
+    },
+    {
+      "id": 711,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "STL 的find算法适用于以下几种容器或容器适配器？\n1.vector 2. set 3. deque 4. queue",
+      "options": [
+        "A. 1种",
+        "B. 2种",
+        "C. 3种",
+        "D. 4种"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "find算法需要迭代器。vector、set、deque都有迭代器；queue是容器适配器，没有迭代器。共3种。"
+    },
+    {
+      "id": 712,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下容器中, 元素的插入位置与元素的值有关的有几个?\nmap, set, list, vector, deque, multiset.",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "map、set、multiset是关联容器，插入位置由值决定；list、vector、deque是顺序容器，插入位置由用户指定。共3个。"
+    },
+    {
+      "id": 713,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下若干容器或容器适配器，有几种的元素是不可修改的？\n1. map 2. vector 3. priority_queue 4. stack",
+      "options": [
+        "A. 0",
+        "B. 1",
+        "C. 2",
+        "D. 3"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "priority_queue和stack没有提供修改元素的接口；vector元素可以修改；map的值可以修改（key不可）。共2种。"
+    },
+    {
+      "id": 714,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于STL的叙述，错误的个数是：\n(1) queue支持双向访问迭代器\n(2) set的insert成员函数返回值是被插入元素的迭代器\n(3) 所有适用于vector的算法（STL的函数模板）都适用于deque\n(4) 不可以对multiset中的元素进行修改，只能添加或者删除",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "(1)错误：queue没有迭代器；(2)错误：返回pair<iterator,bool>；(4)错误：multiset的值可以通过迭代器修改（不破坏排序的前提下）。(3)正确。共3个错误。"
+    },
+    {
+      "id": 715,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下有关STL的叙述，错误的是：",
+      "options": [
+        "A. vector本质上是一个动态数组，在尾部添加速度很快，但向中间插入较慢。",
+        "B. list在任何位置插入/删除都是常数时间，支持随机存取。",
+        "C. deque是一个顺序容器，元素的插入位置和元素的值无关。",
+        "D. map同multimap的不同在于是否允许相同key的元素出现。"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "list不支持随机存取（不支持it[n]），只能顺序访问。"
+    },
+    {
+      "id": 716,
+      "chapterId": 7,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下STL常见容器的用法，一定不会导致错误的是：",
+      "options": [
+        "A. Alice同学希望创建一个priority_queue用来维护自定义类A的对象，为此她细心地给没有重载任何运算符的类A重载了>运算符。",
+        "B. Bob同学希望创建一个map用来实现int到vector<int>的映射，但是他忘记了重载运算符来比较两个vector。",
+        "C. Carol同学希望在一个排好序的vector(记作vv)中查找第一个大于等于x的数字（如果不存在输出-1），她不想写太多代码，于是直接输出了*lower_bound(vv.begin(),vv.end(),x)。",
+        "D. Dave同学希望将一个list(记作lst)从小到大排序，刚学会std::sort的他不假思索地写下了std::sort(lst.begin(),lst.end())。"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "map的key是int，不需要自定义比较；value是vector，也不需要比较。priority_queue默认需要<；lower_bound可能返回end()；list不能用std::sort。"
+    },
+    {
+      "id": 717,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "给定如下 stl 容器 T，其包含迭代器 T::iterator a，但是其迭代器 T::iterator a 不支持 a = a + 10 操作。则 T 可以是：",
+      "options": [
+        "A. set",
+        "B. queue",
+        "C. deque",
+        "D. stack"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "set的迭代器是双向迭代器，不支持+运算。deque支持随机访问；queue和stack没有迭代器（题目说有迭代器，所以排除）。"
+    },
+    {
+      "id": 718,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下STL中的函数模板哪个可以作用于vector",
+      "options": [
+        "A. lower_bound",
+        "B. random_shuffle",
+        "C. unique",
+        "D. 都可以"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "lower_bound（需要有序）、random_shuffle、unique都可以作用于vector。"
+    },
+    {
+      "id": 719,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下STL容器中，支持随机访问迭代器的是：",
+      "options": [
+        "A. set",
+        "B. list",
+        "C. deque",
+        "D. multimap"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "deque支持随机访问迭代器；set、multimap是双向迭代器；list也是双向迭代器。"
+    },
+    {
+      "id": 720,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "小明定义了 queue<int> q; 下面的说法中正确的是：",
+      "options": [
+        "A. 可以用迭代器访问q中的元素",
+        "B. 可以用sort算法对q进行排序",
+        "C. 可以使用q.push_front(1)在队头插入整数1",
+        "D. q是先进先出的"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "queue是FIFO容器，没有迭代器，不支持sort和push_front。"
+    },
+    {
+      "id": 721,
+      "chapterId": 7,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下说法正确的是：",
+      "options": [
+        "A. 对于set<int> s;，可通过s.end()-s.begin()计算s中的元素个数。",
+        "B. 对于deque<vector<int>> d;可通过sort(d.begin(),d.end())进行排序。",
+        "C. 对于multimap<int,double> m，可通过m[3]访问key 3 对应的value。",
+        "D. 对于int a[]={1,3,2};，调用next_permutation(a,a+3)会返回false."
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "deque支持随机访问迭代器，可以用sort。set迭代器不支持-；multimap没有[]；1,3,2的下一个排列存在(2,1,3)。"
+    },
+    {
+      "id": 722,
+      "chapterId": 7,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下面关于容器的说法中，不正确的有哪些\n① map和multimap都是关联容器，其中multimap根据first值从小到大对元素排序，当出现first值相同的元素时，根据second值从小到大对元素排序\n② 可以对priority_queue进行top操作，操作返回的是最大元素的引用，可以方便地对其进行读取和更改\n③ list容器不支持STL的算法sort，可以使用成员函数sort进行排序，这里的排序默认是将元素从小到大排序的\n④ 当需要找出一个vector<int> v中与1相等的元素时，可以使用STL中的find算法，具体用法是用find(v.begin(), v.end(), 1)获得指向该元素的迭代器",
+      "options": [
+        "A. ①②",
+        "B. ①④",
+        "C. ②③",
+        "D. ③④"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "①错误：multimap不保证second的排序顺序；②错误：top()返回const引用，不能修改。③④正确。"
+    },
+    {
+      "id": 723,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "STL的算法find可以用于以下几种容器或容器适配器？\n① set ② vector ③ list ④ stack",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "set、vector、list都有迭代器，可以使用find；stack没有迭代器。共3种。"
+    },
+    {
+      "id": 724,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列说法错误的是",
+      "options": [
+        "A. 不可以用随机访问迭代器访问list容器",
+        "B. 可以用随机访问迭代器访问deque容器",
+        "C. 容器适配器priority_queue默认的元素比较器是less<T>",
+        "D. unique算法会修改vector的大小"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "unique算法不修改容器大小，只移动元素。list不支持随机访问；deque支持；priority_queue默认用less<T>（大顶堆）。"
+    },
+    {
+      "id": 725,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面哪个STL函数可以被用于关联容器set？",
+      "options": [
+        "A. find",
+        "B. random_shuffle",
+        "C. sort",
+        "D. 以上都不可以"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "find算法可以用于任何提供迭代器的容器，包括set。random_shuffle和sort需要随机访问迭代器。"
+    },
+    {
+      "id": 726,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下列说法正确的是",
+      "options": [
+        "A. vector容器可以使用\"[]\"访问，在vector的头部和尾部插入元素是常数时间。",
+        "B. list容器元素在内存中是连续存储的，在list的任何位置插入删除元素都是常数时间。",
+        "C. 不可以用标准库的sort函数对list容器排序。",
+        "D. deque容器不可以使用\"[]\"访问"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "list不支持随机访问迭代器，因此不能用std::sort（需要随机访问迭代器），只能用成员函数sort。vector头部插入是O(n)；list元素不连续；deque支持[]。"
+    },
+    {
+      "id": 727,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "假设有 std::string s，以下表达式中，不能用==运算符比较的是：",
+      "options": [
+        "(A) s.data() 和 s.c_str()",
+        "(B) s[1] 和 s.at(1)",
+        "(C) s.find('a') 和 std::find(s.begin(), s.end(), 'a')",
+        "(D) s.capacity() 和 s.empty()"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "s.find返回size_t类型，std::find返回迭代器，两种不同类型不能用==比较。"
+    },
+    {
+      "id": 728,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列关于 C++ STL 的说法中，正确的一项是：",
+      "options": [
+        "(A) q.top() 返回 priority_queue q 中元素的最小值",
+        "(B) *s.end() 返回 set s 中元素的最大值",
+        "(C) m.rbegin()->second 返回 map<int, int> m 中关键字最大的元素的值",
+        "(D) v.insert(v.begin(), 5) 和 q.push_front(5) 可以实现在 vector v 和 deque q 的头部插入元素 5，并且它们的时间复杂度也是相同的"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "m.rbegin()指向map中关键字最大的元素（反向迭代器的begin），->second获取其值。top()默认返回最大值；*s.end()不可解引用；vector头部插入O(n)，deque头部插入O(1)。"
+    },
+    {
+      "id": 729,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "i1,i2是某STL容器上X的迭代器，如下代码能通过编译，则X可能是：\nprintf(\"%d\", int(i1-i2));",
+      "options": [
+        "A. queue",
+        "B. stack",
+        "C. vector",
+        "D. map"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "i1-i2要求随机访问迭代器。vector支持；queue和stack没有迭代器；map是双向迭代器，不支持-运算。"
+    },
+    {
+      "id": 730,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面的说法中正确的是：",
+      "options": [
+        "A. 可以用迭代器指向priority_queue 中的元素",
+        "B. 可以用sort算法对list进行排序",
+        "C. deque支持用 [i] 来访问第i个元素的引用",
+        "D. vector, deque, list 都是顺序容器，迭代器类型都是随机访问迭代器"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "deque支持随机访问（operator[]）。priority_queue没有迭代器；list不能用std::sort；list是双向迭代器。"
+    },
+    {
+      "id": 731,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面哪个操作可以将 bitset<114> x; 设置为全 0 bitset?",
+      "options": [
+        "A. x.clear();",
+        "B. x.reset();",
+        "C. x.flip();",
+        "D. x.none();"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "bitset::reset()将所有位设为0。clear()不是bitset成员；flip()翻转位；none()返回是否全为0。"
+    },
+    {
+      "id": 732,
+      "chapterId": 7,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下支持[]运算符的类模板共多少个？\nvector,deque,list,set,multiset,map,multimap,stack,queue,priority_queue",
+      "options": [
+        "A. 3",
+        "B. 4",
+        "C. 5",
+        "D. 6"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "支持[]的有vector、deque、map，共3个。"
+    },
+    {
+      "id": 733,
+      "chapterId": 7,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下正确的是：",
+      "options": [
+        "A. 一个最小值优先的优先队列类型定义为priority_queue < int, greater < int> >",
+        "B. end()返回指向容器中最后一个元素的迭代器",
+        "C. 在vector里面插入新元素一定是常数时间",
+        "D. unique算法不会修改vector的大小"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "unique不修改容器大小。最小值优先队列定义缺少容器参数；end()返回尾后迭代器；vector插入可能扩容。"
+    }
+  ]
+}

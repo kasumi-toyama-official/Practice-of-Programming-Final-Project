@@ -1,0 +1,276 @@
+{
+  "chapterId": 6,
+  "chapterName": "输入输出、文件IO与模板",
+  "questions": [
+    {
+      "id": 500,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法不正确的是：",
+      "options": [
+        "A) 函数模板中可以有不止一个类型参数",
+        "B) 函数模板可以重载",
+        "C) 函数模板中的类型参数也可以用来表示函数模板的返回值类型",
+        "D) 函数模板中的类型参数不能用于定义局部变量"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "函数模板的类型参数完全可以用来定义局部变量，例如：template<class T> void print(T arg){ T locVar = arg; ... }。因此D选项说法错误。"
+    },
+    {
+      "id": 501,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "若有如下调用：func(a, b, f); 其中a是int*类型，b是int*类型，f是void (*)(int)类型（即指向参数为int、返回值为void的函数的指针）。将模板类型参数实例化的结果是：",
+      "options": [
+        "A) T1: int, T2: int*, T3: void (*)(int)",
+        "B) T1: int*, T2: int*, T3: void (*)(int)",
+        "C) T1: int, T2: int, T3: void (int)",
+        "D) T1: int*, T2: int, T3: void (int)"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "a的类型是int*，所以T1推导为int*。b的类型是int*，所以T2推导为int*。f是函数指针，类型为void (*)(int)，所以T3推导为void (*)(int)。"
+    },
+    {
+      "id": 502,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列关于C++模板的说法，错误的是：",
+      "options": [
+        "A. 模板是C++实现泛型编程的基础，允许编写与数据类型无关的代码",
+        "B. 编译器在处理模板时，只有在模板被实例化时才会生成具体的类或函数代码",
+        "C. 调用函数模板时，必须显式地在尖括号 `< >` 中指定所有的模板参数类型，编译器无法自动推导",
+        "D. 类模板可以包含静态成员变量，且该静态变量在同一类型的实例化对象之间共享，不同类型的实例化对象之间不共享"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "函数模板调用时编译器可以自动推导模板参数类型，不需要显式指定。"
+    },
+    {
+      "id": 503,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下关于类模板中静态成员的说法，正确的有几项？\n①    只要类模板被定义，其静态成员就已经在内存中分配了空间\n②    如果不使用inline关键字修饰，类模板的静态成员和普通类的静态成员类似，需要在类外进行初始化\n③    从同一个类模板实例化得到的不同模板类共享同一份静态成员变量\n④    对于特定的某个模板类，由它创建的对象共享同一份静态成员变量",
+      "options": [
+        "A. 1项",
+        "B. 2项",
+        "C. 3项",
+        "D. 4项"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "①错误（实例化后才分配）；②正确（需要类外初始化）；③错误（不同模板类不共享）；④正确（同一模板类实例共享）。正确2项。"
+    },
+    {
+      "id": 504,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面四句话中正确的有多少个\n1. 函数模板的类型参数可以用于函数的参数类型、返回值类型以及函数体内的局部变量类型。\n2. 编译器必须通过函数模板调用语句中的实参类型，来实例化函数模板中的类型参数\n3. 如果函数模板和普通函数能完全匹配调用参数，编译器会优先选择普通函数。\n4. 函数模板的类型参数只能是内置类型（如 int、double），不能是自定义类型（如类或结构体）",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和3正确。2错误（可以通过返回值推断）；4错误（模板参数可以是自定义类型）。"
+    },
+    {
+      "id": 505,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "在C++的输入输出及文件操作机制中，哪个说法是正确的？",
+      "options": [
+        "A. 打开文件时，如果文件不存在，系统会自动创建一个新文件。",
+        "B. Unix/Linux下打开文件进行读写, 用不用 ios::binary 没区别",
+        "C. cin和cout是预定义的流对象，分别用于从标准输入读取和向标准输出写入数据，它们都是文件流对象。",
+        "D. istream和ostream是基类，cin和cout是它们的派生类对象。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "cin是istream的派生类对象，cout是ostream的派生类对象。打开文件不自动创建；binary模式有影响；cin/cout不是文件流对象。"
+    },
+    {
+      "id": 506,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "有关函数模板和模板函数说法错误的是:",
+      "options": [
+        "A. 函数模板只是对函数的描述，编译器不为其产生任何执行代码",
+        "B. 模板函数可以由编译系统在遇到具体函数调用时所生成，并调用执行",
+        "C. 函数模板需要实例化为模板函数后才能执行",
+        "D. 当函数模板和一般函数同名时，系统先去匹配函数模板，将其实例化后进行调用"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "当函数模板和普通函数都能匹配时，编译器优先选择普通函数，而不是实例化模板。"
+    },
+    {
+      "id": 507,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "在C++的输入输出及文件操作机制中，哪个说法是正确的？",
+      "options": [
+        "A. 打开文件时，如果文件不存在，系统会自动创建一个新文件。",
+        "B. 可以用 ios::binary 模式打开文本文件进行读写",
+        "C. cin和cout是预定义的流对象，分别用于从标准输入读取和向标准输出写入数据，它们都是文件流对象。",
+        "D. istream和ostream是基类，cin和cout是它们的派生类对象。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "cin和cout分别是istream和ostream的派生类对象。打开文件不会自动创建；binary模式可以打开文本文件但不常见；cin/cout不是文件流。"
+    },
+    {
+      "id": 508,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "有如下定义\ntemplate < class T1,class T2,class T3 >\nT1 func(T1 *a, T2 b, T3 c){}\nchar a[8], b[8];\nvoid f(char* n){}\n则func(a,b,f); 将模版类型参数实例化的结果是：",
+      "options": [
+        "A. T1: char, T2: char*, T3: void(char*)",
+        "B. T1: char*, T2: char, T3: void(char*)",
+        "C. T1: char, T2: char*, T3: void(*)(char*)",
+        "D. T1: char*, T2: char, T3: void(*)(char*)"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "a是char[8]，退化为char*，故T1*=char*，T1=char；b退化为char*，故T2=char*；f退化为函数指针void(*)(char*)，故T3=void(*)(char*)。"
+    },
+    {
+      "id": 509,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下说法正确的有（）个：\n1. 可以利用istream_iterator和ostream_iterator进行输入和输出\n2. 小明定义了class A以及对应的对象a。为了能够实现++a，小明需要定义成员函数 A operator ++ (int){...};\n3. 对于string类的数组，可以用memcpy进行正确复制。\n4. 对于string类的对象s，可以这样进行赋值： s = \"Are you OK?\";",
+      "options": [
+        "A. 3",
+        "B. 2",
+        "C. 1",
+        "D. 0"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和4正确。++a是前置++，不需要int参数；string类含指针成员，memcpy会导致浅拷贝问题。"
+    },
+    {
+      "id": 510,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列哪个选项描述了类模板的特点？",
+      "options": [
+        "A. 类模板不可以定义静态成员变量。",
+        "B. 类模板必须有默认构造函数。",
+        "C. 类模板可以指定非类型模板参数",
+        "D. 类模板不能被继承和重载。"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "类模板可以指定非类型模板参数（如template<int N>）。类模板可以有静态成员、默认构造，也可以被继承。"
+    },
+    {
+      "id": 511,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下哪个说法是正确的？",
+      "options": [
+        "A. 类模板可以有多个类型参数，函数模板只能有一个类型参数。",
+        "B. 类模板可以有默认的类型参数，函数模板不能有默认的类型参数。",
+        "C. 函数模板可以有多个非类型参数，类模板只能有一个非类型参数。",
+        "D. 函数模板可以被重载，而两个类模板名字不能相同。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "函数模板可以重载，类模板不能同名（但可以特化）。函数模板也可以有多个类型参数和非类型参数；C++11起函数模板也可以有默认模板参数。"
+    },
+    {
+      "id": 512,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列四句话中正确的有多少个 ?\n1. 函数模板中可以有不止一个类型参数\n2. 编译器必须通过函数模板调用语句中的实参类型，来实例化函数模板的中的类型参数\n3. 在多个函数和函数模板名字相同的情况下，编译器最优先选择完全匹配的普通函数，最后匹配经过自动类型转换后可以匹配的模板函数。\n4. 不允许用模板的类型参数表示函数模板的返回值类型",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和3正确。2错误（可以通过返回值推断）；4错误（模板参数可以用于返回值类型）。"
+    },
+    {
+      "id": 513,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下列关于类模板的说法正确的有几个\n1. 类模板的<类型参数表>中可以出现非类型参数\n2. 函数模板不能作为类模板的成员出现\n3. 类模板不可以从模板类中派生，但是类模板可以从类模板中派生。\n4. 类模板中可以定义友元函数f，那么从该类模板实例化得到的所有类，都将f视为友元。",
+      "options": [
+        "A. 1个",
+        "B. 2个",
+        "C. 3个",
+        "D. 4个"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和4正确，共2个。类模板可以有成员函数模板；类模板可以从模板类派生。"
+    },
+    {
+      "id": 514,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "类C1和类C2都是类模板CT的模板类，下列说法正确的是：",
+      "options": [
+        "A. C1的成员函数可以访问C2的私有成员",
+        "B. C1对象和C2对象的大小是相同的",
+        "C. C1的静态成员变量和C2的静态成员变量拥有不同的存储空间",
+        "D. C1的对象，可以赋值给C2类型的变量"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "不同模板实例化（C1和C2）是完全不同的类，它们的静态成员变量有独立的存储空间。"
+    },
+    {
+      "id": 515,
+      "chapterId": 6,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面说法正确的是",
+      "options": [
+        "A. 流操作算子也同样适用于文件流",
+        "B. fstream 只能从文件读取数据，不能向文件写入数据。",
+        "C. iostream类可以用于读写文件。",
+        "D. istream 是用于输出的流类。"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "流操作算子（如setw、setprecision）适用于所有流，包括文件流。fstream可读写；iostream用于标准IO；istream用于输入。"
+    },
+    {
+      "id": 516,
+      "chapterId": 6,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列四句话中正确的有___个。\n1.函数模板中可以有不⽌⼀个类型参数。\n2.编译器必须通过函数模板调用语句中的实参类型，来实例化函数模板的中的类型参数\n3.不可以定义和函数模板同名的函数。\n4.函数模板中的类型参数可以⽤来表示函数模板的返回值类型。",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和4正确。2错误（可通过返回值推断）；3错误（可以同名，普通函数优先匹配）。"
+    },
+    {
+      "id": 517,
+      "chapterId": 6,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下函数或类使用时一定不会出现二义性的有：",
+      "options": [
+        "A. void x(int y); void x(int p, int q=0);",
+        "B. class x{public: int p;}; class y{public:int p;}; class z: public x, public y{};",
+        "C. template<class Foo> int print(Foo x); template<class Bar> void print(Bar y);",
+        "D. template<class Foo> int print(Foo x); void print(int y);"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "D中调用print(int)时优先匹配普通函数，无二义性。A中x(1)有二义性；B中z.p访问有二义性；C中模板函数返回值不同但调用时无法区分，有二义性。"
+    }
+  ]
+}

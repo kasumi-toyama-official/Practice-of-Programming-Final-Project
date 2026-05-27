@@ -1,0 +1,365 @@
+{
+  "chapterId": 2,
+  "chapterName": "类与对象深入",
+  "questions": [
+    {
+      "id": 100,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法哪个是错误的？",
+      "options": [
+        "A) 静态成员函数内部不能访问同类的非静态成员变量，也不能调用同类的非静态成员函数",
+        "B) 非静态成员函数不能访问静态成员变量",
+        "C) 静态成员变量被所有对象所共享",
+        "D) 在没有任何对象存在的情况下，也可以访问类的静态成员"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "非静态成员函数完全可以访问静态成员变量。A、C、D均为正确描述：静态成员函数只能访问静态成员；静态成员变量属于类而非对象；静态成员可通过类名直接访问。"
+    },
+    {
+      "id": 101,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于友元的说法哪个是错误的？",
+      "options": [
+        "A) 一个类的友元函数中可以访问该类对象的私有成员",
+        "B) 友元类关系是相互的，即若类A是类B的友元，则类B也是类A的友元",
+        "C) 在一个类中可以将另一个类的成员函数声明为友元",
+        "D) 类之间的友元关系不能传递"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "友元关系不是相互的，也不是传递的。A正确：友元的本质就是打破封装，访问私有成员；C正确：可以将另一个类的成员函数声明为友元；D正确：友元关系不能传递。"
+    },
+    {
+      "id": 102,
+      "chapterId": 2,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下说法正确的是？",
+      "options": [
+        "A) 成员对象都是用无参构造函数初始化的",
+        "B) 封闭类中成员对象的构造函数先于封闭类的构造函数被调用",
+        "C) 封闭类中成员对象的析构函数先于封闭类的析构函数被调用",
+        "D) 若封闭类有多个成员对象，则它们的初始化顺序取决于封闭类构造函数中的成员初始化列表"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "构造顺序遵循'先成员、后封闭'原则。A错：成员对象可用有参构造初始化；C错：析构顺序与构造相反，封闭类析构先于成员对象；D错：多个成员对象的初始化顺序取决于它们在类中的声明顺序，而非初始化列表中的顺序。"
+    },
+    {
+      "id": 103,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法哪个是错误的？",
+      "options": [
+        "A) 静态成员函数中不能使用this指针",
+        "B) this指针就是指向成员函数所作用的对象的指针",
+        "C) 每个对象的空间中都存放着一个this指针",
+        "D) 类的非静态成员函数，真实的参数比所写的参数多1"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "this指针是编译器隐式传入的参数，不占用对象本身的内存空间。A正确：静态成员函数没有this指针；B正确：this指向当前对象；D正确：非静态成员函数多一个隐式的this参数。"
+    },
+    {
+      "id": 104,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于C++类和对象，下列说法正确的是：",
+      "options": [
+        "A. 构造函数可以被声明为虚函数（virtual）",
+        "B. 静态成员函数中可以使用 this 指针",
+        "C. const 成员函数不能修改类中未被mutable关键字修饰的非静态成员变量",
+        "D. 析构函数不能被重载，但可以有参数"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "构造函数不能是虚函数；静态成员函数无this指针；const成员函数确实不能修改非mutable非静态成员；析构函数不能重载也不能有参数。"
+    },
+    {
+      "id": 105,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面关于构造函数与析构函数的说法错误的是：",
+      "options": [
+        "A. 类的构造函数名是确定的",
+        "B. 定义类时必须要显式定义构造函数",
+        "C. 一个类可以有多个构造函数",
+        "D. 一个类至多有一个析构函数"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "编译器会自动生成默认构造函数，定义类时不必显式定义构造函数。"
+    },
+    {
+      "id": 106,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下关于 C++ 中 this 指针的说法，错误的是",
+      "options": [
+        "A. this 指针指向成员函数所作用的当前对象",
+        "B. 静态成员函数中不能使用 this 指针",
+        "C. 构造函数中可以使用this 指针",
+        "D. this 指针可以在友元函数中使用"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "友元函数不是成员函数，没有this指针。"
+    },
+    {
+      "id": 107,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法哪个是正确的？",
+      "options": [
+        "A. 封闭类的所有成员对象都需要在构造函数的初始化列表中给出初始化方式",
+        "B. 封闭类的成员对象的构造函数先于封闭类的基类的构造函数被执行",
+        "C. 当封闭类对象消亡时，封闭类的成员对象的析构函数晚于封闭类的基类的析构函数被执行",
+        "D. 封闭类的析构函数中可以访问成员对象"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "封闭类析构函数中可以访问成员对象。有默认构造函数的成员对象不需要在初始化列表中显式初始化；构造顺序是基类先于成员对象；析构顺序与构造相反。"
+    },
+    {
+      "id": 108,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于C++析构函数的叙述，正确的有：\n(1) 析构函数可以被重载\n(2) 析构函数可以被声明为虚函数\n(3) 派生类的析构函数先于基类的析构函数被调用\n(4) 如果一个类定义了析构函数，它就不能生成默认的构造函数",
+      "options": [
+        "A. (1)(3)",
+        "B. (2)(3)",
+        "C. (2)(4)",
+        "D. (1)(4)"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "(2)正确：析构函数可以是虚函数；(3)正确：析构时派生类部分先于基类部分销毁。(1)错误：析构函数不能重载；(4)错误：定义析构函数不影响默认构造函数的生成。"
+    },
+    {
+      "id": 109,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下列关于类和对象，说法错误的是：",
+      "options": [
+        "A. 静态成员函数内部不能访问同类的非静态成员变量, 也不能调用同类的非静态成员函数。",
+        "B. 静态成员函数中可以使用this指针。",
+        "C. 一个类可以有多个构造函数，但最多只能有一个析构函数。",
+        "D. 封闭类对象生成时，先执行所有成员对象的构造函数，再执行封闭类的构造函数。"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "静态成员函数没有this指针。"
+    },
+    {
+      "id": 110,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下四个说法，正确的是：",
+      "options": [
+        "A. 对于一个含有静态变量的类，只要没有这个类型的对象，静态变量就不存在。",
+        "B. 用 struct 定义类和用 class 定义类的唯一区别就是：未说明是公有还是私有的成员，就是公有。",
+        "C. 构造函数和析构函数中不可以使用this指针",
+        "D. 编译器总是会给每个类生成一个默认的无参数的构造函数。"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "struct和class的唯一区别是默认访问权限。静态变量不依赖于对象；构造/析构可以用this；定义了其他构造函数后不会生成默认构造。"
+    },
+    {
+      "id": 111,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于静态成员的叙述，正确的有：\n(1) 静态成员可以使用\"指针->成员名\"的方式访问\n(2) 静态成员函数内部可以使用 this指针\n(3) 静态成员变量可以被定义为private\n(4) 同类的不同对象的静态成员变量可以有不同值",
+      "options": [
+        "A. (1)(2)",
+        "B. (1)(3)",
+        "C. (2)(4)",
+        "D. (3)(4)"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "(1)正确；(3)正确。静态成员函数没有this指针；静态成员变量同类共享。"
+    },
+    {
+      "id": 112,
+      "chapterId": 2,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下关于构造函数和析构函数的叙述，错误的是：",
+      "options": [
+        "A. 构造函数可以是private的。",
+        "B. 一个类只能有一个析构函数。",
+        "C. 构造函数不可以是虚函数。",
+        "D. 析构函数不可以是纯虚函数。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "析构函数可以是纯虚函数（但必须有函数体定义）。构造函数可以是private（单例模式）；析构函数不能重载；构造函数不能是虚函数。"
+    },
+    {
+      "id": 113,
+      "chapterId": 2,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "在能够正确编译的情况下，以下有几种情况属于成员函数的重载?\n① 基类和派生类具有同名同参数表的函数\n② 一个类的两个成员函数名字和返回值相同\n③ 一个类的两个成员函数名字和参数表都相同，但返回值不同\n④ 一个类的两个成员函数名字和参数表都相同，但一个是const，另外一个不是",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "只有④是重载（const vs 非const）。①是覆盖/隐藏；②③返回值不能区分重载。"
+    },
+    {
+      "id": 114,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下关于封闭类的说法哪个是正确的?",
+      "options": [
+        "A. 定义封闭类时一定要写构造函数",
+        "B. 定义封闭类时一定要写析构函数",
+        "C. 封闭类对象初始化时，成员对象都是用默认构造函数初始化的",
+        "D. 封闭类对象初始化时，成员对象的构造函数先于封闭类自身的构造函数被执行"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "封闭类对象初始化时，先调用成员对象的构造函数，再执行封闭类自身的构造函数体。"
+    },
+    {
+      "id": 115,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面关于类和对象的说法错误的是",
+      "options": [
+        "A. 类的构造函数不能被定义为private的",
+        "B. 如果定义类时没写构造函数，编译器生成一个默认无参数的构造函数",
+        "C. 如果定义的自己的复制构造函数, 则默认的复制构造函数不存在",
+        "D. 一个类最多只能有一个析构函数，但是可以有多个构造函数"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "构造函数可以是private的（如单例模式）。"
+    },
+    {
+      "id": 116,
+      "chapterId": 2,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "class A { };\nconst A func(A &c) { return c; }\nint main() {\n    A a, b = a;\n    a = func(b);\n    return 0;\n}\n请问上面这段程序中，如果不考虑优化，调用了几次A的复制构造函数:",
+      "options": [
+        "A. 0次",
+        "B. 1次",
+        "C. 2次",
+        "D. 3次"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "b = a调用复制构造（初始化b）；func(b)返回const A时调用复制构造（将b复制给返回值）。共2次。"
+    },
+    {
+      "id": 117,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面程序执行了几次A的析构函数？\nclass A {\npublic:\n    ~A() { }\n};\nint main() {\n    A * p = new A[2];\n    A * a = new A();\n    A aa;\n    delete a;\n    return 0;\n}",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "delete a析构1次；aa离开main作用域自动析构1次。new A[2]没有delete[]，不会析构。共2次。"
+    },
+    {
+      "id": 118,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "关于this指针的说法，错误的是",
+      "options": [
+        "A. this指针指向成员函数所作用的对象",
+        "B. this指针不能用在静态成员函数中",
+        "C. this指针不能用在析构函数中"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "this指针可以在析构函数中使用（但对象正在销毁，需谨慎）。"
+    },
+    {
+      "id": 119,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列说法错误的是：",
+      "options": [
+        "A. 对于内联函数，编译器会将整个函数的代码插入到调用语句处 , 而不会生出调用函数的语句。",
+        "B. 如果静态成员变量是public的，那么在没有对象生成的时候也能直接访问。",
+        "C. 常量对象只能使用构造函数, 析构函数和有const说明的函数（常量方法）。",
+        "D. 所有成员函数中都可以用this来代表指向该函数作用的对象的指针。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "静态成员函数中没有this指针。内联函数只是建议，编译器不一定采纳；静态成员变量可通过类名访问；常量对象受限访问。"
+    },
+    {
+      "id": 120,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "关于静态成员函数，哪些说法是对的？\n1）它可以访问非静态成员\n2）它可以访问其他静态成员函数\n3）它可以访问全局数据和函数\n4）它可以访问this指针",
+      "options": [
+        "A. 全都对",
+        "B. 只有 2",
+        "C. 只有 2, 3, 4",
+        "D. 只有 2, 3"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "静态成员函数可以访问其他静态成员和全局数据/函数，但不能访问非静态成员（没有this指针）。"
+    },
+    {
+      "id": 121,
+      "chapterId": 2,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "在以下哪种情形，复制构造函数会被调用?",
+      "options": [
+        "A. 当一个对象采用引用方式，作为参数传递给一个函数",
+        "B. 当一个函数返回一个对象",
+        "C. 当一个对象赋值给另一个对象",
+        "D. 以上答案都不对"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "引用传递不调用复制构造；返回值优化/移动语义使得B不一定调用复制构造；赋值调用赋值运算符而非复制构造。"
+    },
+    {
+      "id": 122,
+      "chapterId": 2,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "关于析构函数说法正确的是：",
+      "options": [
+        "A. 无形参，也不可重载",
+        "B. 其名与类名完全相同",
+        "C. 函数体中必须有delete语句",
+        "D. 返回类型是void"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "析构函数没有参数、不能重载、没有返回值，名称是~类名。"
+    },
+    {
+      "id": 123,
+      "chapterId": 2,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "class Foo1 {public int x;};\nclass Foo2 {static int x;};\nclass Foo3 {const int x;};\nclass Foo5 {virtual int x;};\n其中错误的定义有多少条：",
+      "options": [
+        "A. 0",
+        "B. 1",
+        "C. 2",
+        "D. 3"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "Foo1中\"public int x\"缺少冒号，语法错误；Foo5中virtual不能修饰数据成员。Foo2和Foo3定义正确。共2条错误。"
+    }
+  ]
+}

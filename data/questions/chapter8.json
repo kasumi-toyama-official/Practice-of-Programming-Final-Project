@@ -1,0 +1,186 @@
+{
+  "chapterId": 8,
+  "chapterName": "综合练习",
+  "questions": [
+    {
+      "id": 800,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下列关于 C++11 std::shared_ptr的描述中，符合 ISO C++11 标准规定的是",
+      "options": [
+        "A. 当多个shared_ptr对象托管同一个动态分配的对象时，每个shared_ptr独立维护一个引用计数，当自身计数归零时释放对象",
+        "B. 通过同一个原始裸指针，分别构造两个独立的shared_ptr对象，属于未定义行为，编译器不要求必须给出编译错误",
+        "C. 对一个shared_ptr对象调用reset()成员函数，会释放该对象当前托管的动态内存",
+        "D. 调用get()成员函数获取原始指针后，可手动通过delete释放该指针，不会影响shared_ptr的正常行为"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "shared_ptr共享控制块和引用计数；同一裸指针构造两个独立shared_ptr是未定义行为（双重释放）；reset()可能用于切换托管对象；手动delete get()的指针会导致双重释放。"
+    },
+    {
+      "id": 801,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下列关于 C++11 右值引用与移动语义的描述中，不符合ISO C++11 标准规定的是",
+      "options": [
+        "A. 右值引用只能绑定到右值，不能直接绑定到左值，但可以通过std::move()将左值转换为右值后绑定",
+        "B. 对于函数返回值为对象的 return 语句，返回函数内的局部非静态对象时，编译器总是会优先选择拷贝构造函数，而非移动构造函数",
+        "C. 若一个类同时提供了复制构造函数和移动构造函数，则函数返回该类的全局对象时会调用复制构造函数",
+        "D. 非 const 的右值引用可以修改绑定的临时对象，const 左值引用可以绑定到右值，但不能通过该引用修改绑定的对象"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "返回局部对象时编译器会优先选择移动构造（如果可用），而非拷贝构造，这是C++11的移动语义和RVO/NRVO优化。"
+    },
+    {
+      "id": 802,
+      "chapterId": 8,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法正确的是：",
+      "options": [
+        "A. 若类A是类B的友元类，则类B也是类A的友元类",
+        "B. 基类中重载的类型转换运算符，不可用于转换派生类对象",
+        "C. 抽象类没有成员变量",
+        "D. 抽象类的基类可以不是抽象类"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "友元关系不是相互的；基类类型转换运算符可用于派生类；抽象类可以有成员变量；抽象类的基类可以不是抽象类。"
+    },
+    {
+      "id": 803,
+      "chapterId": 8,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于lambda表达式，以下说法哪个不正确？",
+      "options": [
+        "A. lambda表达式可以作为调用函数时给的实际参数",
+        "B. lambda表达式可以作为函数返回值",
+        "C. lambda表达式可以作为类的成员函数",
+        "D. lambda表达式本质上是函数对象"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "lambda本质是匿名函数对象，可以作为参数、返回值，但不能直接作为类的成员函数（成员函数需要声明在类体内）。"
+    },
+    {
+      "id": 804,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下几种场合有可能因为使用右值引用和移动语义提高了程序运行效率？\n1.函数的返回值是string对象\n2.函数的返回值是vector对象\n3.下面的程序片段：string a = \"this\"; string b(a);\n4.下面的程序片段：vector<int> a; a = vector<int> { 1,2,3};",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "1和2：函数返回值可能通过移动语义避免拷贝；3是左值拷贝构造，不涉及移动语义；4是移动赋值。共3种场合。"
+    },
+    {
+      "id": 805,
+      "chapterId": 8,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下关于Lambda表达式正确的说法是：",
+      "options": [
+        "A. Lambda表达式中不可以修改在表达式外部定义的变量",
+        "B. Lambda表达式中不能包含多条语句",
+        "C. Lambda表达式必须有返回值",
+        "D. 可以将Lambda表达式赋值给一个变量"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "Lambda可以赋值给auto变量；可以用mutable修改捕获变量；可以有多条语句；返回值可以自动推导。"
+    },
+    {
+      "id": 806,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下列有关位运算符的叙述，正确的个数是：\n(1)若a^b=c，则b^c=a。\n(2)对于有符号数，右移n位相当于左操作数除以2的n次方，且将结果向零取整。\n(3)^可以用于实现不通过临时变量就交换两个整型变量的值。\n(4)由负整数的二进制形式算出其绝对值的方法为先加1，再将所有位取反。",
+      "options": [
+        "A. 4",
+        "B. 3",
+        "C. 2",
+        "D. 1"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "(1)正确：XOR的性质；(3)正确：a=a^b; b=a^b; a=a^b。(2)错误：有符号数算术右移是向负无穷取整；(4)错误：应先取反再加1。"
+    },
+    {
+      "id": 807,
+      "chapterId": 8,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "关于lambda表达式，以下哪个描述是错误的？",
+      "options": [
+        "A. 可以将lambda表达式赋值给一个变量。",
+        "B. 在lambda表达式中只能读取，不能修改在该表达式外部定义的变量。",
+        "C. lambda表达式可以没有参数，也可以有任意数量和类型的参数。",
+        "D. lambda表达式可以没有返回值"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "Lambda中可以用mutable修改按值捕获的变量，也可以修改按引用捕获的变量。"
+    },
+    {
+      "id": 808,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下关于C++ 11特性说法中，正确的有哪些\n① 类型为auto的变量在定义时必须初始化\n② 智能指针shared_ptr对象可以托管一个new运算符返回的指针，也可以正确托管指向动态分配的数组的指针，系统会为原始的指针维护一个托管计数\n③ 右值引用和move的主要目的是提高程序运行的效率，减少需要进行深拷贝的对象进行深拷贝的次数，左值可以用来初始化右值引用，右值不能用来初始化左值引用。\n④ 无序容器unordered_map又称哈希表；和map、multimap不同，unordered_map内部的元素是无序的，但是插入和查询的时间复杂度几乎是常数",
+      "options": [
+        "A. ①②",
+        "B. ①④",
+        "C. ②③",
+        "D. ③④"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "①正确：auto必须初始化；④正确。②错误：shared_ptr默认用delete，不能正确释放数组（需用shared_ptr<T[]>）；③错误：const左值引用可以绑定右值。"
+    },
+    {
+      "id": 809,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "以下关于lambda表达式的说法有几项正确？\n① lambda表达式无法递归调用自身\n② lambda表达式中不可修改其外部的变量的值\n③ 可以用lambda表达式对变量进行赋值\n④ lambda表达式可以作为类的成员函数",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "只有③正确。lambda可以通过std::function递归（①错）；可以用mutable或引用捕获修改外部变量（②错）；lambda是对象不是成员函数（④错）。"
+    },
+    {
+      "id": 810,
+      "chapterId": 8,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下面的说法有几个是正确的?\n1. shared_ptr模板实例化出来的智能指针对象在消亡的时候会delete 其托管的指针\n2. 可以用变量初始化右值引用\n3. lambda 表达式也可以递归调用自身\n4. 如果没写移动构造函数，编译器会自动生成一个",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "1和3正确。shared_ptr默认用delete释放；lambda可以通过std::function实现递归。2错误（需要std::move）；4错误（有自定义复制构造/析构时不会自动生成）。"
+    },
+    {
+      "id": 811,
+      "chapterId": 8,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列说法错误的是：",
+      "options": [
+        "A. 右值引用能够避免不需要的深拷贝。",
+        "B. 智能指针shared_ptr对象需要使用reset方法托管指向动态分配的数组的指针。",
+        "C. 无序容器的优势是查询和插入的速度快，但是无法按照键值大小顺序访问。",
+        "D. Lambda表达式中如果没有用->指定返回值类型，则编译器自动判断返回值类型"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "shared_ptr默认使用delete释放，不能正确释放数组（需用shared_ptr<T[]>或自定义删除器），reset方法也不能改变这一点。"
+    }
+  ]
+}

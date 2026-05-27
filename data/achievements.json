@@ -1,0 +1,37 @@
+[
+  {
+    "id": "ch1_clear",
+    "name": "初出茅庐",
+    "description": "通关第1章",
+    "category": "learning",
+    "iconPath": ":/icons/ach_ch1.png"
+  },
+  {
+    "id": "ch2_clear",
+    "name": "稳步前行",
+    "description": "通关第2章",
+    "category": "learning",
+    "iconPath": ":/icons/ach_ch2.png"
+  },
+  {
+    "id": "ch3_clear",
+    "name": "渐入佳境",
+    "description": "通关第3章",
+    "category": "learning",
+    "iconPath": ":/icons/ach_ch3.png"
+  },
+  {
+    "id": "perfect_clear",
+    "name": "完美主义者",
+    "description": "在满足配置阈值条件下通关任意章节",
+    "category": "learning",
+    "iconPath": ":/icons/ach_perfect.png"
+  },
+  {
+    "id": "first_blood",
+    "name": "首战告捷",
+    "description": "在战斗中首次击败敌人",
+    "category": "combat",
+    "iconPath": ":/icons/ach_combat1.png"
+  }
+]

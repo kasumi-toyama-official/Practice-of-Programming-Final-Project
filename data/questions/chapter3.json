@@ -1,0 +1,306 @@
+{
+  "chapterId": 3,
+  "chapterName": "运算符重载",
+  "questions": [
+    {
+      "id": 200,
+      "chapterId": 3,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "如果将某运算符重载成一个类的成员函数，则该重载函数有几个参数？",
+      "options": [
+        "A) 0",
+        "B) 1",
+        "C) 2",
+        "D) 3"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "成员函数重载二元运算符时，左操作数由隐式的this指针提供，因此只需1个显式参数。若重载一元运算符（如前置++），则参数个数为0。"
+    },
+    {
+      "id": 201,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于运算符重载，下列表达中正确的是",
+      "options": [
+        "A) C++已有的任何运算符都可以重载",
+        "B) 运算符函数的返回类型不能声明为基本数据类型",
+        "C) 在类中，一个运算符可以对应多个不同的重载函数",
+        "D) 可以通过运算符重载来创建C++中原来没有的运算符"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "运算符重载本质上是函数重载，一个运算符可以有多个重载版本（参数表不同）。A错：`.`、`::`、`?:`、`sizeof`等不能重载；B错：返回类型可以是基本类型；D错：不能创造新运算符。"
+    },
+    {
+      "id": 202,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于赋值运算符重载的说法，正确的是：",
+      "options": [
+        "A) 赋值运算符重载成全局函数时，应该有两个参数",
+        "B) 赋值运算符重载的唯一目的就是使得可以用其他类型的变量或常量给对象复制",
+        "C) 赋值运算符重载时，返回值设为其所作用的对象的引用，是符合赋值运算符使用习惯的做法",
+        "D) 赋值运算符重载时，返回值设为void是符合赋值运算符使用习惯的做法"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "返回引用是为了支持连续赋值（如`a = b = c`）。A错：赋值运算符只能重载为成员函数；B错：还可处理深拷贝、自赋值等问题；D错：返回void无法连续赋值。"
+    },
+    {
+      "id": 203,
+      "chapterId": 3,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "如果将运算符`*`重载为某个类的成员运算符（也即成员函数），则该成员函数的参数个数是：",
+      "options": [
+        "A) 0个",
+        "B) 1个",
+        "C) 2个",
+        "D) 0个1个均可"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "`*`是二元运算符，作为成员函数重载时，左操作数由this指针提供，只需1个显式参数（右操作数）。"
+    },
+    {
+      "id": 204,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "如何区分自增运算符重载的前置形式和后置形式？",
+      "options": [
+        "A) 重载时，前置形式的函数名是`++operator`，后置形式的函数名是`operator ++`",
+        "B) 后置形式比前置形式多一个int类型的参数",
+        "C) 无法区分，使用时不管前置形式还是后置形式，都调用相同的重载函数",
+        "D) 前置形式比后置形式多了一个int类型的参数"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "后置形式带一个无用的int参数（如`operator++(int)`），前置形式不带（如`operator++()`）。编译器根据调用方式（`++a`或`a++`）自动匹配。"
+    },
+    {
+      "id": 205,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于 C++ 中运算符重载的说法，下列正确的是：",
+      "options": [
+        "A. 重载后的运算符，其操作数个数可以与原运算符不同",
+        "B. =、[]、()、-> 这几个运算符必须重载为成员函数",
+        "C. 友元函数形式重载 << 时，左操作数必须是自定义类对象",
+        "D. 将 ++ 重载为成员函数时，前置 ++ 和后置 ++ 的函数返回类型必须相同"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "=、[]、()、-> 必须重载为成员函数；操作数个数不能变；<<左操作数是ostream；前置++返回引用，后置返回对象。"
+    },
+    {
+      "id": 206,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于运算符重载，正确的是？",
+      "options": [
+        "A. 可以重载所有运算符，包括 :: 和 ?:",
+        "B. operator= 必须返回 void",
+        "C. operator+ 只能重载为成员函数",
+        "D. 可以重载 << 使之作用于cin"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "不能重载::和?:；operator=通常返回引用；operator+可以是成员或非成员；可以为istream重载<<运算符。"
+    },
+    {
+      "id": 207,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下4个关于运算符重载的叙述，错误的个数是：\n(1) 只能对已有运算符进行重载，不能通过运算符重载定义原本没有的新运算符\n(2) 被重载的运算符的操作数可以都不是对象\n(3) 运算符可以根据参数类型的不同进行多次重载\n(4) 有些运算符只能重载为成员函数",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "只有(2)错误：被重载的运算符至少有一个操作数必须是类类型。(1)(3)(4)正确。"
+    },
+    {
+      "id": 208,
+      "chapterId": 3,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下面说法哪个是正确的？",
+      "options": [
+        "A. 若要将int类型的值赋值给类A的对象，则必须为类A对象编写能接受int类型实参的类型转换构造函数",
+        "B. 若要将类A的对象赋值给int类型的变量，可以通过将\"=\"重载一个全局的operator = 函数来实现。",
+        "C. 可以通过重载\"=\"运算符，让语句 int n = \"this\"; 编译通过。",
+        "D. 对于类A的对象a, 不重载 '*' 运算符也有办法让表达式 '*a' 能够编译通过"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "类型转换构造函数可以将int转为类对象。operator=必须是成员函数；不能重载内置类型的运算符；D选项需要重载类型转换运算符。"
+    },
+    {
+      "id": 209,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列关于运算符重载的描述中,正确的是:",
+      "options": [
+        "A. 如果在某个类中使用成员函数对运算符重载，其左操作数必须是该类的对象",
+        "B. 一元运算符只能作为成员函数重载",
+        "C. 二元运算符重载为非成员函数时,参数表中只有一个参数",
+        "D. 被重载的运算符的操作数可以都不是对象"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "成员函数重载运算符时，左操作数就是this指向的对象。一元运算符也可以是非成员；二元非成员需要两个参数；至少一个操作数必须是类类型。"
+    },
+    {
+      "id": 210,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列关于运算符重载的说法中，正确的是：",
+      "options": [
+        "A. 可以通过运算符重载来创建C++中原来没有的运算符。",
+        "B. 重载时，前置形式的自增运算符比后置形式的自增运算符多了一个int类型的参数。",
+        "C. 重载运算符应该作用于对象，不允许操作数都不是对象。",
+        "D. 运算符函数的返回类型不能声明为基本数据类型"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "被重载的运算符至少有一个操作数必须是类类型。不能创建新运算符；后置++才多一个int参数；返回类型可以是基本类型。"
+    },
+    {
+      "id": 211,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下关于运算符重载的叙述，错误的个数是：\n(1) 只能对已有运算符进行重载，不能通过运算符重载定义原本没有的新运算符\n(2) 被重载的运算符的操作数可以都不是对象\n(3) 运算符可以根据参数类型的不同进行多次重载\n(4) 有些运算符只能重载为成员函数",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 4"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "只有(2)错误：被重载的运算符至少有一个操作数必须是类类型。"
+    },
+    {
+      "id": 212,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下说法正确的是：",
+      "options": [
+        "A. 构造函数必须返回当前对象",
+        "B. 常量成员函数不能修改任何成员变量，包括静态成员变量",
+        "C. 重载赋值运算符\"=\"可以重载为全局函数",
+        "D. ()运算符不能重载为友元函数。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "operator()必须是成员函数，不能是友元。构造函数没有返回值；const成员函数可以修改静态成员；operator=必须是成员。"
+    },
+    {
+      "id": 213,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下列哪种情况运算符不能重载为类的成员函数：",
+      "options": [
+        "A. 重载 << 用于将对象通过std::cout输出",
+        "B. 重载相等运算符==",
+        "C. 重载括号运算符()",
+        "D. 重载运算符[]"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "<<的左操作数是ostream对象，不是类对象，因此不能作为类成员函数重载（除非在ostream类中，但不可行）。"
+    },
+    {
+      "id": 214,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "要求只能用成员函数重载的运算符是",
+      "options": [
+        "A. =",
+        "B. ==",
+        "C. <=",
+        "D. ++"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "operator=、operator[]、operator()、operator-> 必须是成员函数。"
+    },
+    {
+      "id": 215,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于运算符重载说明，下面四个选项中哪个是正确的",
+      "options": [
+        "A. 运算符函数作为成员函数重载时，最左边操作数必须是运算符的一个类对象（或者是对该类对象的引用）",
+        "B. 流输入输出运算符<<、>>一般作为成员函数重载",
+        "C. 当重载了+、=运算符时，则+=运算符会自动重载",
+        "D. 重载二元运算符时，必须声明两个形参"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "成员函数重载时，左操作数必须是类对象（this指针）。流运算符一般作为非成员；+=不会自动重载；二元运算符作为成员时只有一个形参。"
+    },
+    {
+      "id": 216,
+      "chapterId": 3,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "设X是一个类，现在想重载X的赋值运算符\"=\"，则其返回值最好是：",
+      "options": [
+        "A. void",
+        "B. X*",
+        "C. X",
+        "D. X&"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "赋值运算符返回引用（X&），以支持连续赋值（a = b = c）。"
+    },
+    {
+      "id": 217,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面哪个选项是错误的：",
+      "options": [
+        "A. 运算符重载不改变运算符的优先级",
+        "B. 以下运算符不能被重载:sizeof, ->, ::",
+        "C. 赋值运算符 = 只能重载为类的成员函数",
+        "D. 后置++和--运算符作为二元运算符重载，前置++和--运算符作为一元运算符重载"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "-> 运算符可以被重载（如智能指针）。sizeof和::不能重载；=必须是成员函数；后置++/--通过额外的int参数区分。"
+    },
+    {
+      "id": 218,
+      "chapterId": 3,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "以下的运算符中哪个不能重载",
+      "options": [
+        "A. ?:",
+        "B. ++",
+        "C. <<=",
+        "D. =="
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "?:（三目运算符）不能被重载。"
+    },
+    {
+      "id": 219,
+      "chapterId": 3,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下正确的是：",
+      "options": [
+        "A. 运算符只能重载为成员函数或友元函数",
+        "B. cout<<a里面的<<运算符可以重载为a的成员函数",
+        "C. 一个函数可以同时作为多个类的友元函数",
+        "D. 一个类的友元函数可以同时是这个类的虚函数"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "一个函数可以同时是多个类的友元。运算符也可以重载为普通非成员函数；<<左操作数是ostream不能是成员；友元不是成员不能是虚函数。"
+    }
+  ]
+}

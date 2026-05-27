@@ -1,0 +1,141 @@
+{
+  "chapterId": 1,
+  "chapterName": "C++基础与类入门",
+  "questions": [
+    {
+      "id": 1,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面程序片段哪个没错？",
+      "options": [
+        "A. int n = 4; int &r = n * 5;",
+        "B. int n = 6; const int &r = n; r = 7;",
+        "C. int n = 8; const int &r1 = n; int &r2 = r1;",
+        "D. int n = 8; int &r1 = n; const int r2 = r1;"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "A错误：n*5是临时值（右值），不能绑定到非const引用。B错误：const引用r不能修改。C错误：不能用const引用初始化非const引用。D正确：r2是一个const int变量（非引用），用r1的值初始化，完全合法。"
+    },
+    {
+      "id": 2,
+      "chapterId": 1,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "下面程序片段输出结果是什么？\nint a = 1, b = 2;\nint &r = a;\nr = b;\nr = 7;\ncout << a << endl;",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 7",
+        "D. 都不是"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "r是a的引用，r=b相当于a=b（a变为2），r=7相当于a=7（a变为7）。因此cout输出7。"
+    },
+    {
+      "id": 3,
+      "chapterId": 1,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "下面说法哪种是对的？",
+      "options": [
+        "A. 常引用所引用的变量，其值不能被修改",
+        "B. 不能通过常量指针，去修改其指向的变量",
+        "C. 常量指针一旦指向某个变量，就不能再指向其他变量",
+        "D. 以上都不对"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "A错误：const引用只是不能通过引用本身修改，但变量可以通过其他方式修改。B正确：常量指针（const int* p）意味着不能通过p修改其指向的内容。C错误：描述的是'指针常量'（int* const p），而非'常量指针'。"
+    },
+    {
+      "id": 4,
+      "chapterId": 1,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "表达式 \"new int\" 的返回值类型是：",
+      "options": [
+        "A. int",
+        "B. int *",
+        "C. int &",
+        "D. void"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "new运算符动态分配内存后，返回指向该内存地址的指针。因此 new int 的返回值类型是 int*。"
+    },
+    {
+      "id": 5,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面小段程序，哪个是正确的：",
+      "options": [
+        "A. char *p = new int; delete p;",
+        "B. int *p = new int[25]; p[10] = 100; delete p;",
+        "C. char *p = new char[10]; p[0] = 'K'; delete []p;",
+        "D. 都不对"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "A错误：类型不匹配（char*接收int*）。B错误：new[]分配的数组必须用delete[]释放，不能用delete。C正确：类型匹配，且new[]与delete[]正确配对。"
+    },
+    {
+      "id": 6,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "下面说法正确的是：",
+      "options": [
+        "A. 多个重载函数的参数个数必须不同。",
+        "B. 两个函数，参数表相同，返回值类型不同，它们是重载关系。",
+        "C. 调用一个第二个和第三个参数都有缺省值的函数时，可以不写第二个实参而写第三个实参。",
+        "D. 使用内联函数的目的是提高程序的运行速度。"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "A错误：参数类型不同也可以构成重载。B错误：仅返回值不同不能构成重载（编译器无法区分调用哪个）。C错误：C++缺省参数必须从右往左连续省略，不能跳过中间参数。D正确：内联函数用空间换时间，减少函数调用开销。"
+    },
+    {
+      "id": 7,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "关于C++中的指针和引用，以下哪些说法是正确的？\n(1) 指针和引用在本质上是一样的，都是变量的别名。\n(2) 指针可以值为NULL，但引用必须始终引用一个变量。\n(3) 指针可以被重新赋值以指向另一个对象，但引用一旦初始化后就不能将其改为引用别的变量。\n(4) const指针指向的对象和const引用引用的对象的值都不可以被修改。",
+      "options": [
+        "A. (1)(2)(3)",
+        "B. (1)(2)(3)(4)",
+        "C. (1)(4)",
+        "D. (2)(3)"
+      ],
+      "correctOptionIndex": 3,
+      "explanation": "(2)(3)正确。指针存储地址，引用是别名；const引用仅限制通过引用修改，不限制对象本身。"
+    },
+    {
+      "id": 8,
+      "chapterId": 1,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "系统在调用重载函数时，往往根据一些条件确定哪个重载函数被调用，在下列选项中，不能作为依据的是_____。",
+      "options": [
+        "A. 参数个数",
+        "B. 参数的类型",
+        "C. 函数的返回值的类型",
+        "D. 函数名称"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "函数重载的匹配依据是参数个数、参数类型和函数名称。返回值类型不能作为重载依据。"
+    },
+    {
+      "id": 9,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "以下语法正确的是：",
+      "options": [
+        "A. void foo(int a=0, int b){}",
+        "B. int arr[]{1,2,3};",
+        "C. int & r = 2+3;",
+        "D. template < class T1, T2>"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "C++11支持int arr[]{1,2,3}。A默认参数必须从右向左；C不能将右值绑定到非const引用；D中T2前缺少class/typename。"
+    }
+  ]
+}
