@@ -1,9 +1,21 @@
 # 项目计划和进度文件（不上传）
 元学习项目开发计划.md
 progress.md
+progress.txt
 
 # 课程资料（不上传）
 资料/
 
 # 编译产物
 app/build/
+*.Makefile
+object_script.*
+.qmake.stash
+*.pro.user*
+
+# macOS 垃圾
+__MACOSX/
+.DS_Store
+
+# 原始代码包备份
+big_project.zip
