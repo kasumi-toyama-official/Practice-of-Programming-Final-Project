@@ -2,7 +2,8 @@
 
 void PlayerState::resetToInitial()
 {
-    *this = createInitial();
+    // this = createInitial();
+
 }
 
 void PlayerState::applyBuff(const QString& attribute, int value)

@@ -12,7 +12,7 @@
         "A) 通过基类指针调用基类和派生类里的同名同参函数，是多态",
         "B) 通过基类对象调用基类和派生类里的同名同参函数，不是多态",
         "C) 通过基类引用调用基类和派生类里的同名同参函数，是多态",
-        "D) 以上都不对"
+        "D) 其余都不对"
       ],
       "correctOptionIndex": 1,
       "explanation": "多态必须通过基类指针或引用调用虚函数才能实现。A、C缺少'虚函数'这一关键前提，表述不严谨；而通过基类对象调用时，编译器进行静态绑定，确实不是多态，因此B是唯一明确正确的表述。"
@@ -22,7 +22,7 @@
       "chapterId": 5,
       "difficulty": 2,
       "type": 0,
-      "questionText": "阅读下面程序，输出结果是：\\n#include <iostream>\\nusing namespace std;\\nclass A {\\npublic:\\n    virtual void Func(){cout <<\\\"A::Func\\\"<<endl;}\\n};\\nclass B:public A {\\npublic:\\n    virtual void Func(){cout <<\\\"B::Func\\\"<<endl;}\\n};\\nint main(){\\n    A a;\\n    A *pa = new B();\\n    pa->Func();\\n    long *p1 = (long *)&a;\\n    long *p2 = (long *)pa;\\n    *p2 = *p1;\\n    pa->Func();\\n    return 0;\\n}",
+      "questionText": "阅读下面程序，输出结果是：\\n#include <iostream>\\nusing namespace std;\\nclass A {\\npublic:\\n    virtual void Func(){cout <<\"A::Func\"<<endl;}\\n};\\nclass B:public A {\\npublic:\\n    virtual void Func(){cout <<\"B::Func\"<<endl;}\\n};\\nint main(){\\n    A a;\\n    A *pa = new B();\\n    pa->Func();\\n    long *p1 = (long *)&a;\\n    long *p2 = (long *)pa;\\n    *p2 = *p1;\\n    pa->Func();\\n    return 0;\\n}",
       "options": [
         "A. B::Func A::Func",
         "B. B::Func B::Func",

@@ -7,8 +7,6 @@ namespace RandomUtils {
 
 void initSeed()
 {
-    // Qt 5.10+ 的 QRandomGenerator::global() 已自动使用系统熵池初始化，
-    // 无需手动播种。此处保留接口，如需固定种子可在测试中替换实现。
     Q_UNUSED(QTime::currentTime().msec())
 }
 
@@ -18,8 +16,6 @@ int randomInt(int min, int max)
     if (min >= max) {
         return min;
     }
-    // bounded(highest) 返回 [0, highest) 范围内的整数
-    // 因此 [min, max] 等价于 min + bounded(max - min + 1)
     return min + QRandomGenerator::global()->bounded(max - min + 1);
 }
 

@@ -1,55 +1,42 @@
 #include "ChapterArchive.h"
 
-#include <QJsonArray>
-
-bool ChapterArchive::meetsTrophyCondition() const
-{
-    return config.meetsThreshold();
-}
-
 ChapterArchive ChapterArchive::createEmpty(int chapterId)
 {
-    ChapterArchive archive;
-    archive.chapterId = chapterId;
-    archive.hasActiveArchive = false;
-    return archive;
+    ChapterArchive a;
+    a.chapterId = chapterId;
+    a.hasActiveArchive = false;
+    return a;
 }
 
 QJsonObject ChapterArchive::toJson() const
 {
     QJsonObject obj;
     obj["chapterId"] = chapterId;
-    obj["player"] = player.toJson();
-    obj["enemy"] = enemy.toJson();
-    obj["config"] = config.toJson();
+    obj["playerData"] = playerData;
+    obj["enemyData"] = enemyData;
 
-    QJsonArray usedIdsArr;
-    for (int id : usedQuestionIds) {
-        usedIdsArr.append(id);
-    }
-    obj["usedQuestionIds"] = usedIdsArr;
+    QJsonArray ids;
+    for (int id : usedQuestionIds)
+        ids.append(id);
+    obj["usedQuestionIds"] = ids;
 
     obj["normalRoundCount"] = normalRoundCount;
     obj["hasActiveArchive"] = hasActiveArchive;
-
     return obj;
 }
 
 ChapterArchive ChapterArchive::fromJson(const QJsonObject& obj)
 {
-    ChapterArchive archive;
-    archive.chapterId = obj["chapterId"].toInt(0);
-    archive.player = PlayerState::fromJson(obj["player"].toObject());
-    archive.enemy = EnemyState::fromJson(obj["enemy"].toObject());
-    archive.config = GameConfig::fromJson(obj["config"].toObject());
+    ChapterArchive a;
+    a.chapterId = obj["chapterId"].toInt(0);
+    a.playerData = obj["playerData"].toObject();
+    a.enemyData = obj["enemyData"].toObject();
 
-    QJsonArray usedIdsArr = obj["usedQuestionIds"].toArray();
-    for (const auto& val : usedIdsArr) {
-        archive.usedQuestionIds.append(val.toInt());
-    }
+    QJsonArray ids = obj["usedQuestionIds"].toArray();
+    for (const auto& v : ids)
+        a.usedQuestionIds.insert(v.toInt());
 
-    archive.normalRoundCount = obj["normalRoundCount"].toInt(0);
-    archive.hasActiveArchive = obj["hasActiveArchive"].toBool(false);
-
-    return archive;
+    a.normalRoundCount = obj["normalRoundCount"].toInt(0);
+    a.hasActiveArchive = obj["hasActiveArchive"].toBool(false);
+    return a;
 }

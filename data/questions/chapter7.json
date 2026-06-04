@@ -387,7 +387,7 @@
         "A. find",
         "B. random_shuffle",
         "C. sort",
-        "D. 以上都不可以"
+        "D. 其余都不可以"
       ],
       "correctOptionIndex": 0,
       "explanation": "find算法可以用于任何提供迭代器的容器，包括set。random_shuffle和sort需要随机访问迭代器。"
