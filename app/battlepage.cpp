@@ -300,7 +300,7 @@ void BattlePage::showNextQuestion()
         for (const QString& opt : m_currentQuestionData.options) {
             QString t = opt.trimmed();
             int cut = 0;
-            if (t.length() >= 2 && t[0].isLetter() && (t[1] == QLatin1Char('.') || t[1] == QLatin1Char(')') || t[1] == QLatin1Char('、')))
+            if (t.length() >= 2 && t[0].isLetter() && (t[1] == QLatin1Char('.') || t[1] == QLatin1Char(')') || t[1] == QChar(0x3001)))
                 cut = (t.length() >= 3 && t[2] == ' ') ? 3 : 2;
             clean.append(t.mid(cut).trimmed());
         }
