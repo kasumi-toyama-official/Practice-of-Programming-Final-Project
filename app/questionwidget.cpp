@@ -3,6 +3,7 @@
 #include <QScrollArea>
 #include <QFrame>
 #include <QMouseEvent>
+#include <QTextEdit>
 
 QuestionWidget::QuestionWidget(QWidget *parent)
     : QWidget{parent}, m_currentType(QuestionType::Choice), m_codeTemplate(""), m_selectedChoice(-1)
@@ -13,7 +14,8 @@ QuestionWidget::QuestionWidget(QWidget *parent)
         "QPushButton:hover { background-color: #5a5a8a; }"
         "QPushButton:checked { background-color: #2a7a2a; border: 2px solid #4caf50; }"
         "QLineEdit { color: white; background-color: #1e1e3a; border: 1px solid #555; border-radius: 3px; padding: 4px; }"
-        "QPlainTextEdit { color: white; background-color: #1e1e3a; border: 1px solid #555; }");
+        "QPlainTextEdit { color: white; background-color: #1e1e3a; border: 1px solid #555; }"
+        "QTextEdit { color: white; background-color: #1e1e3a; border: 1px solid #555; }");
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     m_stackedWidget = new QStackedWidget(this);
@@ -21,7 +23,7 @@ QuestionWidget::QuestionWidget(QWidget *parent)
     setLayout(mainLayout);
 
     setupChoicePanel();
-    setupFillBlankPanel();
+    setupCodeCompletionPanel();
     setupCodingPanel();
 
     m_stackedWidget->setCurrentWidget(m_choicePanel);
@@ -60,37 +62,39 @@ void QuestionWidget::setupChoicePanel()
     m_stackedWidget->addWidget(m_choicePanel);
 }
 
-void QuestionWidget::setupFillBlankPanel()
+void QuestionWidget::setupCodeCompletionPanel()
 {
-    m_fillBlankPanel = new QWidget;
-    QVBoxLayout* layout = new QVBoxLayout(m_fillBlankPanel);
+    m_codeCompletionPanel = new QWidget;
+    QVBoxLayout* layout = new QVBoxLayout(m_codeCompletionPanel);
 
-    QLabel* descLabel = new QLabel("填空题描述");
-    descLabel->setObjectName("fillDescLabel");
+    QLabel* descLabel = new QLabel("代码补全题描述");
+    descLabel->setObjectName("codeCompletionDescLabel");
     descLabel->setWordWrap(true);
-    layout->addWidget(descLabel, 3);
+    layout->addWidget(descLabel, 1);
 
-    m_fillToleranceLabel = new QLabel("剩余容错次数：0");
-    m_fillToleranceLabel->setObjectName("fillToleranceLabel");
-    layout->addWidget(m_fillToleranceLabel);
+    m_codeCompletionToleranceLabel = new QLabel("剩余容错次数：0");
+    m_codeCompletionToleranceLabel->setObjectName("codeCompletionToleranceLabel");
+    layout->addWidget(m_codeCompletionToleranceLabel);
 
-    QVBoxLayout* inputsLayout = new QVBoxLayout;
-    for (int i = 0; i < 3; ++i)
-    {
-        QLineEdit* edit = new QLineEdit;
-        edit->setPlaceholderText(QString("第%1空").arg(i+1));
-        edit->hide();
-        inputsLayout->addWidget(edit);
-        m_fillInputs.append(edit);
-    }
-    layout->addLayout(inputsLayout);
+    m_codeCompletionTemplateEdit = new QTextEdit;
+    m_codeCompletionTemplateEdit->setObjectName("codeCompletionTemplateEdit");
+    m_codeCompletionTemplateEdit->setReadOnly(true);
+    m_codeCompletionTemplateEdit->setPlaceholderText("代码模板");
+    m_codeCompletionTemplateEdit->setStyleSheet("font-family: monospace;");
+    layout->addWidget(m_codeCompletionTemplateEdit, 2);
+
+    m_codeCompletionEditor = new QPlainTextEdit;
+    m_codeCompletionEditor->setObjectName("codeCompletionEditor");
+    m_codeCompletionEditor->setPlaceholderText("请在此处输入补全的代码片段...");
+    m_codeCompletionEditor->setStyleSheet("font-family: monospace;");
+    layout->addWidget(m_codeCompletionEditor, 1);
 
     QPushButton* submitBtn = new QPushButton("确认提交");
-    submitBtn->setObjectName("fillSubmitBtn");
+    submitBtn->setObjectName("codeCompletionSubmitBtn");
     connect(submitBtn, &QPushButton::clicked, this, &QuestionWidget::answerSubmitted);
     layout->addWidget(submitBtn);
 
-    m_stackedWidget->addWidget(m_fillBlankPanel);
+    m_stackedWidget->addWidget(m_codeCompletionPanel);
 }
 
 void QuestionWidget::setupCodingPanel()
@@ -174,25 +178,21 @@ void QuestionWidget::setQuestion(const QuestionData &data)
             }
         }
         break;
-    case QuestionType::FillBlank:
-        m_stackedWidget->setCurrentWidget(m_fillBlankPanel);
+    case QuestionType::CodeCompletion:
+        m_stackedWidget->setCurrentWidget(m_codeCompletionPanel);
         {
             QString desc = data.description;
             desc.replace("\\n", "\n");
-            m_fillBlankPanel->findChild<QLabel*>("fillDescLabel")->setText(desc);
+            m_codeCompletionPanel->findChild<QLabel*>("codeCompletionDescLabel")->setText(desc);
         }
-        for (int i = 0; i < m_fillInputs.size(); ++i)
         {
-            if (i < data.blankAnswers.size())
-            {
-                m_fillInputs[i]->show();
-                m_fillInputs[i]->clear();
-            }
-            else
-            {
-                m_fillInputs[i]->hide();
-            }
+            QString tpl = data.codeTemplate;
+            tpl.replace("\\n", "\n");
+            // 使用显式占位提示，方便用户定位需要补全的位置
+            tpl.replace("{{BLANK}}", "/* 在此处补充你的代码 */");
+            m_codeCompletionPanel->findChild<QTextEdit*>("codeCompletionTemplateEdit")->setPlainText(tpl);
         }
+        m_codeCompletionPanel->findChild<QPlainTextEdit*>("codeCompletionEditor")->clear();
         break;
     case QuestionType::Coding:
         m_stackedWidget->setCurrentWidget(m_codingPanel);
@@ -216,12 +216,8 @@ QString QuestionWidget::getAnswer() const
             return m_choiceLabels[m_selectedChoice]->text();
         return QString();
     }
-    case QuestionType::FillBlank: {
-        QStringList answers;
-        for (const QLineEdit* edit : m_fillInputs)
-            answers << edit->text().trimmed();
-        return answers.join("|");
-    }
+    case QuestionType::CodeCompletion:
+        return m_codeCompletionEditor->toPlainText();
     case QuestionType::Coding:
         return m_codeEditor->toPlainText();
     }
@@ -253,9 +249,8 @@ void QuestionWidget::reset()
             l->setStyleSheet(
                 "QLabel { color: white; background-color: #3a3a6a; border: 1px solid #777;"
                 " border-radius: 4px; padding: 6px; font-size: 15px; }");
-    } else if (m_currentType == QuestionType::FillBlank) {
-        for (QLineEdit* edit : m_fillInputs)
-            edit->clear();
+    } else if (m_currentType == QuestionType::CodeCompletion) {
+        m_codeCompletionEditor->clear();
     } else if (m_currentType == QuestionType::Coding) {
         m_codeEditor->clear();
     }
@@ -263,8 +258,8 @@ void QuestionWidget::reset()
 
 void QuestionWidget::setRemainingTolerance(int remain)
 {
-    if (m_currentType == QuestionType::FillBlank && m_fillToleranceLabel)
-        m_fillToleranceLabel->setText(QString("剩余容错次数：%1").arg(remain));
+    if (m_currentType == QuestionType::CodeCompletion && m_codeCompletionToleranceLabel)
+        m_codeCompletionToleranceLabel->setText(QString("剩余容错次数：%1").arg(remain));
     else if (m_currentType == QuestionType::Coding && m_codingToleranceLabel)
         m_codingToleranceLabel->setText(QString("剩余容错次数：%1").arg(remain));
 }

@@ -338,7 +338,7 @@ void BattlePage::onAnswerSubmitted()
         if (q.type == QuestionType::Choice && q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         } else {
-            // 填空题、编程题、代码补全题暂由后续判题模块处理，此处随机判定占位
+            // 代码补全题、编程题暂由后续判题模块处理，此处随机判定占位
             correct = (QRandomGenerator::global()->bounded(2) == 1);
         }
 
@@ -389,7 +389,7 @@ void BattlePage::onAnswerSubmitted()
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         }
     } else {
-        // 填空题、编程题、代码补全题暂由后续判题模块处理，此处随机判定占位
+        // 代码补全题、编程题暂由后续判题模块处理，此处随机判定占位
         correct = (QRandomGenerator::global()->bounded(2) == 1);
     }
 
@@ -616,13 +616,13 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
         else                    bonus = chosenSkill.hardBonus;
         m_currentSkillBonus = bonus;
 
-        // 出一道填空题
+        // 出一道代码补全题
         QuestionData q;
-        q.type = QuestionType::FillBlank;
-        q.description = QString("竞技：%1 (难度：%2)").arg(chosenSkill.name)
+        q.type = QuestionType::CodeCompletion;
+        q.description = QString("竞技：%1 (难度：%2) - 请补全代码").arg(chosenSkill.name)
                             .arg(diff == Difficulty::Easy ? "简单" : (diff == Difficulty::Medium ? "中等" : "困难"));
-        q.blankAnswers = QStringList() << "test";  // 临时答案，以后接真实题库
-        q.tolerance = 1;  // 填空题无容忍
+        q.codeTemplate = "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    {{BLANK}}\n    cout << a + b << endl;\n    return 0;\n}";
+        q.tolerance = 1;  // 代码补全题无容错
         m_questionWidget->setQuestion(q);
         m_questionWidget->show();
 

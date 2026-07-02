@@ -30,6 +30,7 @@ SOURCES += \
     ../src/managers/RankingManager.cpp \
     ../src/models/ChapterArchive.cpp \
     ../src/models/Question.cpp \
+    ../src/models/CodeCompletionQuestion.cpp \
     ../src/models/WrongBookEntry.cpp \
     ../src/models/Achievement.cpp \
     ../src/models/RankingEntry.cpp \

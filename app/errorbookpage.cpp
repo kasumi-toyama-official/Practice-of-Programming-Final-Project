@@ -273,6 +273,7 @@ void ErrorBookPage::onRedoClicked()
     d.correctOptionIndex = q.correctOptionIndex;
     d.id = q.id;
     d.explanation = q.explanation;
+    d.codeTemplate = q.codeTemplate;
     for (const QString& opt : q.options) {
         d.options.append(opt);
     }

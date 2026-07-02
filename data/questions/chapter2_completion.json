@@ -1,0 +1,111 @@
+{
+  "chapterId": 2,
+  "chapterName": "类与对象深入",
+  "questions": [
+    {
+      "id": 101,
+      "chapterId": 2,
+      "difficulty": 1,
+      "title": "Apple",
+      "description": "程序填空，使其输出\\n4\\n5\\n1。注意需要统计Apple对象的总数。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass Apple {\n{{BLANK}}\nstatic void PrintTotal() {\n\t\tcout << nTotalNumber << endl; \n\t}\n\n};\nint Apple::nTotalNumber = 0;\nApple Fun(const Apple & a) {\n\ta.PrintTotal();\n\treturn a;\n}\nint main()\n{\n\tApple * p = new Apple[4];\n\tFun(p[2]);\n\tApple p1,p2;\n\tApple::PrintTotal ();\n\tdelete [] p;\n\tp1.PrintTotal ();\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "public:\n    static int nTotalNumber;\n    Apple() { nTotalNumber++; }\n    ~Apple() { nTotalNumber--; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "4\n5\n1"
+        }
+      ],
+      "requiredKeywords": [
+        "static",
+        "nTotalNumber"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "用静态成员nTotalNumber统计对象总数。构造函数增加计数，析构函数减少计数。Fun返回临时对象时会调用拷贝构造（默认拷贝不改动计数），临时对象析构时减少计数。"
+    },
+    {
+      "id": 102,
+      "chapterId": 2,
+      "difficulty": 1,
+      "title": "返回什么才好呢",
+      "description": "程序填空，使其按要求输出。先输出一行123，然后对每组输入m n，输出m和n。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A {\npublic:\n\tint val;\n\n\tA(int\n{{BLANK}}\n};\nint main()\n{\n\tint m,n;\n\tA a;\n\tcout << a.val << endl;\n\twhile(cin >> m >> n) {\n\t\ta.GetObj() = m;\n\t\tcout << a.val << endl;\n\t\ta.GetObj() = A(n);\n\t\tcout << a.val<< endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "n): val(n) {}\n    A(): val(123) {}\n    A& GetObj() { return *this; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2 3\n4 5",
+          "output": "123\n2\n3\n4\n5"
+        },
+        {
+          "input": "10 20\n100 200",
+          "output": "123\n10\n20\n100\n200"
+        },
+        {
+          "input": "0 0\n-5 -8",
+          "output": "123\n0\n0\n-5\n-8"
+        }
+      ],
+      "requiredKeywords": [
+        "GetObj"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "默认构造函数将val初始化为123；带int参数的构造函数将val初始化为n；GetObj返回*this的引用，使a.GetObj()=m能够修改a.val。"
+    },
+    {
+      "id": 103,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "奇怪的类复制",
+      "description": "程序填空，使其输出\\n9\\n22\\n5。注意类复制行为比较特殊。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass Sample {\npublic:\n\tint v;\n{{BLANK}}\n};\nvoid PrintAndDouble(Sample o)\n{\n\tcout << o.v;\n\tcout << endl;\n}\nint main()\n{\n\tSample a(5);\n\tSample b = a;\n\tPrintAndDouble(b);\n\tSample c = 20;\n\tPrintAndDouble(c);\n\tSample d;\n\td = a;\n\tcout << d.v;\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "private:\n    static inline int cnt = 0;\npublic:\n    Sample(int n): v(n) {}\n    Sample() {}\n    Sample(const Sample& o): v(o.v) {\n        cnt++;\n        if (cnt == 1) v += 4;\n        else if (cnt == 3) v += 2;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "9\n22\n5"
+        }
+      ],
+      "requiredKeywords": [
+        "Sample(const Sample"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "通过静态计数器控制拷贝构造行为：第一次拷贝（b=a）将5变为9，第三次拷贝（PrintAndDouble(c)的参数）将20变为22，其余拷贝保持原值。"
+    },
+    {
+      "id": 104,
+      "chapterId": 2,
+      "difficulty": 1,
+      "title": "Big & Base 封闭类问题",
+      "description": "程序填空，输出指定结果。对每组输入整数n，输出两行，每行把n打印两遍。",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\nclass Base {\npublic:\n\tint k;\n\tBase(int n):k(n) { }\n};\nclass Big\n{\npublic:\n\tint v;\n\tBase b;\n{{BLANK}}\n};\nint main()\n{\n\tint n;\n\twhile(cin >> n) {\n\t\tBig a1(n);\n\t\tBig a2 = a1;\n\t\tcout << a1.v << \",\" << a1.b.k << endl;\n\t\tcout << a2.v << \",\" << a2.b.k << endl;\n\t}\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "\tBig(int n): v(n), b(n) {}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3\n4",
+          "output": "3,3\n3,3\n4,4\n4,4"
+        },
+        {
+          "input": "1\n2\n10",
+          "output": "1,1\n1,1\n2,2\n2,2\n10,10\n10,10"
+        }
+      ],
+      "requiredKeywords": [
+        "Base"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Big类包含Base对象b，Base没有默认构造函数，因此Big的构造函数必须用初始化列表同时初始化v和b。默认拷贝构造会自动复制v和b.k。"
+    }
+  ]
+}

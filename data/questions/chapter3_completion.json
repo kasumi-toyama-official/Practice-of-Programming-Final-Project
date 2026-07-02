@@ -1,0 +1,140 @@
+{
+  "chapterId": 3,
+  "chapterName": "运算符重载",
+  "questions": [
+    {
+      "id": 101,
+      "chapterId": 3,
+      "difficulty": 1,
+      "title": "MyString",
+      "description": "补足MyString类，使程序输出指定结果。\n输入：多组数据，每组一行，是两个不带空格的字符串。\n输出：对每组数据，先输出一行打印第一个字符串三次，再输出一行打印第二个字符串三次。",
+      "codeTemplate": "#include <iostream>\n#include <cstring>\nusing namespace std;\nclass MyString {\n\tchar * p;\npublic:\n\tMyString(const char * s) {\n\t\tif( s) {\n\t\t\tp = new char[strlen(s) + 1];\n\t\t\tstrcpy(p,s);\n\t\t}\n\t\telse\n\t\t\tp = NULL;\n\n\t}\n\t~MyString() { if(p) delete [] p; }\n{{BLANK}}\n};\nint main()\n{\n\tchar w1[200],w2[100];\n\twhile( cin >> w1 >> w2) {\n\t\tMyString s1(w1),s2 = s1;\n\t\tMyString s3(NULL);\n\t\ts3.Copy(w1);\n\t\tcout << s1 << \",\" << s2 << \",\" << s3 << endl;\n\n\t\ts2 = w2;\n\t\ts3 = s2;\n\t\ts1 = s3;\n\t\tcout << s1 << \",\" << s2 << \",\" << s3 << endl;\n\t\t\n\t}\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "public:\n    MyString() { p = NULL; }\n    MyString(const MyString& s) {\n        if (s.p) {\n            p = new char[strlen(s.p) + 1];\n            strcpy(p, s.p);\n        } else p = NULL;\n    }\n    void Copy(const char* s) {\n        if (p) delete [] p;\n        if (s) {\n            p = new char[strlen(s) + 1];\n            strcpy(p, s);\n        } else p = NULL;\n    }\n    MyString& operator=(const char* s) {\n        Copy(s); return *this;\n    }\n    MyString& operator=(const MyString& s) {\n        if (this != &s) Copy(s.p);\n        return *this;\n    }\n    friend ostream& operator<<(ostream& os, const MyString& s) {\n        if (s.p) os << s.p;\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "abc def\n123 456",
+          "output": "abc,abc,abc\ndef,def,def\n123,123,123\n456,456,456"
+        },
+        {
+          "input": "hello world\nx y",
+          "output": "hello,hello,hello\nworld,world,world\nx,x,x\ny,y,y"
+        }
+      ],
+      "requiredKeywords": [
+        "operator="
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "需要补全默认构造、拷贝构造、Copy、赋值运算符和输出运算符，以支持深拷贝和链式输出。"
+    },
+    {
+      "id": 102,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "看上去好坑的运算符重载",
+      "description": "程序填空。\n输入：多组数据，每组一行，整数n。\n输出：对每组数据，输出一行，包括两个整数，n-5和n-8。",
+      "codeTemplate": "#include <iostream> \nusing namespace std;\nclass MyInt \n{ \n\tint nVal; \n\tpublic: \n\tMyInt( int n) { nVal = n ;}\n{{BLANK}}\n}; \nint Inc(int n) {\n\treturn n + 1;\n}\nint main () { \n\tint n;\n\twhile(cin >> n) {\n\t\tMyInt objInt(n); \n\t\tobjInt-2-1-3; \n\t\tcout << Inc(objInt);\n\t\tcout <<\",\"; \n\t\tobjInt-2-1; \n\t\tcout << Inc(objInt) << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "    MyInt& operator-(int n) {\n        nVal -= n;\n        return *this;\n    }\n    operator int() { return nVal; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "20\n30",
+          "output": "15,12\n25,22"
+        },
+        {
+          "input": "10\n100",
+          "output": "5,2\n95,92"
+        }
+      ],
+      "requiredKeywords": [
+        "operator-"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "重载减号运算符使其能连续减多次并返回自身引用，同时提供到int的类型转换以配合Inc函数。"
+    },
+    {
+      "id": 103,
+      "chapterId": 3,
+      "difficulty": 1,
+      "title": "惊呆！Point竟然能这样输入输出",
+      "description": "程序填空。\n输入：多组数据，每组两个整数。\n输出：对每组数据，输出一行，就是输入的两个整数。",
+      "codeTemplate": "#include <iostream> \nusing namespace std;\nclass Point { \n\tprivate: \n\t\tint x; \n\t\tint y; \n\tpublic: \n\t\tPoint() { };\n{{BLANK}}\n}; \nint main() \n{ \n \tPoint p;\n \twhile(cin >> p) {\n \t\tcout << p << endl;\n\t }\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "        friend istream& operator>>(istream& is, Point& p) {\n            is >> p.x >> p.y;\n            return is;\n        }\n        friend ostream& operator<<(ostream& os, const Point& p) {\n            os << p.x << \",\" << p.y;\n            return os;\n        }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2 3\n4 5",
+          "output": "2,3\n4,5"
+        },
+        {
+          "input": "-1 -2\n0 0",
+          "output": "-1,-2\n0,0"
+        }
+      ],
+      "requiredKeywords": [
+        "operator>>",
+        "operator<<"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "重载输入和输出流运算符，友元函数可以访问私有成员x和y。"
+    },
+    {
+      "id": 104,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "二维数组类",
+      "description": "写一个二维数组类Array2，使程序按要求输出两个3x4矩阵。",
+      "codeTemplate": "#include <iostream>\n#include <cstring>\nusing namespace std;\n\nclass Array2 {\n{{BLANK}}\n};\n\nint main() {\n    Array2 a(3,4);\n    int i,j;\n    for(  i = 0;i < 3; ++i )\n        for(  j = 0; j < 4; j ++ )\n            a[i][j] = i * 4 + j;\n    for(  i = 0;i < 3; ++i ) {\n        for(  j = 0; j < 4; j ++ ) {\n            cout << a(i,j) << \",\";\n        }\n        cout << endl;\n    }\n    cout << \"next\" << endl;\n    Array2 b;     b = a;\n    for(  i = 0;i < 3; ++i ) {\n        for(  j = 0; j < 4; j ++ ) {\n            cout << b[i][j] << \",\";\n        }\n        cout << endl;\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "private:\n    int* p;\n    int r, c;\npublic:\n    Array2(int row=0, int col=0): r(row), c(col) {\n        if (row*col > 0) p = new int[row*col];\n        else p = NULL;\n    }\n    ~Array2() { if(p) delete [] p; }\n    Array2(const Array2& a): r(a.r), c(a.c) {\n        if (r*c > 0) {\n            p = new int[r*c];\n            memcpy(p, a.p, sizeof(int)*r*c);\n        } else p = NULL;\n    }\n    Array2& operator=(const Array2& a) {\n        if (this == &a) return *this;\n        if (p) delete [] p;\n        r = a.r; c = a.c;\n        if (r*c > 0) {\n            p = new int[r*c];\n            memcpy(p, a.p, sizeof(int)*r*c);\n        } else p = NULL;\n        return *this;\n    }\n    int* operator[](int i) { return p + i*c; }\n    int operator()(int i, int j) { return p[i*c + j]; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "0,1,2,3,\n4,5,6,7,\n8,9,10,11,\nnext\n0,1,2,3,\n4,5,6,7,\n8,9,10,11,"
+        }
+      ],
+      "requiredKeywords": [
+        "operator[]",
+        "operator()"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "用一维数组模拟二维数组，实现构造、析构、深拷贝赋值、operator[]返回行首指针、operator()按行列取值。"
+    },
+    {
+      "id": 105,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "别叫，这个大整数已经很简化了!",
+      "description": "程序填空，输出指定结果。\n输入：多组数据，每组数据是两个非负整数s和n。s最多可能200位，n用int能表示。\n输出：对每组数据，输出6行，内容对应程序中6个输出语句。",
+      "codeTemplate": "#include <iostream> \n#include <cstring> \n#include <cstdlib> \n#include <cstdio>\n#include <vector>\n#include <algorithm> \nusing namespace std;\nconst int MAX = 110; \nclass CHugeInt {\n{{BLANK}}\n};\nint  main() \n{ \n\tchar s[210];\n\tint n;\n\n\twhile (cin >> s >> n) {\n\t\tCHugeInt a(s);\n\t\tCHugeInt b(n);\n\n\t\tcout << a + b << endl;\n\t\tcout << n + a << endl;\n\t\tcout << a + n << endl;\n\t\tb += n;\n\t\tcout  << ++ b << endl;\n\t\tcout << b++ << endl;\n\t\tcout << b << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "private:\n    vector<int> d;\npublic:\n    CHugeInt() {}\n    CHugeInt(const char* s) {\n        int n = strlen(s);\n        d.resize(n);\n        for (int i = 0; i < n; i++) d[i] = s[n-1-i] - '0';\n    }\n    CHugeInt(int n) { *this = n; }\n    CHugeInt& operator=(int n) {\n        d.clear();\n        if (n == 0) { d.push_back(0); return *this; }\n        while (n) { d.push_back(n%10); n/=10; }\n        return *this;\n    }\n    CHugeInt operator+(const CHugeInt& b) const {\n        CHugeInt r;\n        int c = 0;\n        int n = max(d.size(), b.d.size());\n        for (int i = 0; i < n || c; i++) {\n            int x = c;\n            if (i < d.size()) x += d[i];\n            if (i < b.d.size()) x += b.d[i];\n            r.d.push_back(x%10);\n            c = x/10;\n        }\n        return r;\n    }\n    friend CHugeInt operator+(int n, const CHugeInt& a) {\n        CHugeInt t(n);\n        return t + a;\n    }\n    CHugeInt operator+(int n) const {\n        CHugeInt t(n);\n        return *this + t;\n    }\n    CHugeInt& operator+=(int n) {\n        *this = *this + n;\n        return *this;\n    }\n    CHugeInt& operator++() {\n        *this = *this + 1;\n        return *this;\n    }\n    CHugeInt operator++(int) {\n        CHugeInt tmp = *this;\n        *this = *this + 1;\n        return tmp;\n    }\n    friend ostream& operator<<(ostream& os, const CHugeInt& a) {\n        for (int i = a.d.size()-1; i >= 0; i--) os << a.d[i];\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "99999999999999999999999999888888888888888812345678901234567789 12\n6 6",
+          "output": "99999999999999999999999999888888888888888812345678901234567801\n99999999999999999999999999888888888888888812345678901234567801\n99999999999999999999999999888888888888888812345678901234567801\n25\n25\n26\n12\n12\n12\n13\n13\n14"
+        },
+        {
+          "input": "99999999999999999999999999999999999999 1",
+          "output": "100000000000000000000000000000000000000\n100000000000000000000000000000000000000\n100000000000000000000000000000000000000\n3\n3\n4"
+        }
+      ],
+      "requiredKeywords": [
+        "operator+",
+        "operator++"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "实现大整数类，支持从字符串/整数构造、加减进位、友元+、前置/后置++、+=和输出运算符。"
+    }
+  ]
+}

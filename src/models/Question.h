@@ -9,9 +9,9 @@
 
 enum class Difficulty { Easy = 0, Medium = 1, Hard = 2 };
 
- // 0=选择题, 1=普通填空题（原有）, 2=编程题（原有）, 3=代码补全题
+ // 0=选择题, 1=编程题, 2=代码补全题
 
-enum class QuestionType { Choice = 0, FillBlank = 1, Coding = 2, CodeCompletion = 3 };
+enum class QuestionType { Choice = 0, Coding = 1, CodeCompletion = 2 };
 
 /**
  * @brief 代码补全题的测试用例
@@ -29,7 +29,7 @@ struct QuestionTestCase {
 /**
  * @brief 题目数据结构
  *
- * 支持选择题、普通填空题、编程题和代码补全题。
+ * 支持选择题、编程题和代码补全题。
  * 代码补全题使用 codeTemplate + referenceSolution + testCases 描述。
  */
 struct Question {
