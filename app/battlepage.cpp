@@ -46,6 +46,7 @@ BattlePage::BattlePage(QWidget *parent)
     m_playerStats.totalDamage = 0;
     m_playerStats.round = m_currentRound;
     m_playerStats.buffs = QStringList();
+    m_correctCount = 0;
 
     m_enemyStats.hp = 150;
     m_enemyStats.maxHp = 150;
@@ -336,19 +337,8 @@ void BattlePage::onAnswerSubmitted()
         bool correct = false;
         if (q.type == QuestionType::Choice && q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
-        } else if (q.type == QuestionType::FillBlank) {
-            // 填空题：多空答案用 | 分隔，逐空比对，忽略大小写和前后空格
-            QStringList userAnswers = answer.split("|", Qt::SkipEmptyParts);
-            correct = true;
-            for (int i = 0; i < q.blankAnswers.size(); ++i) {
-                QString correctAns = q.blankAnswers[i].trimmed().toLower();
-                QString userAns = (i < userAnswers.size()) ? userAnswers[i].trimmed().toLower() : QString();
-                if (userAns != correctAns) {
-                    correct = false;
-                    break;
-                }
-            }
         } else {
+            // 填空题、编程题、代码补全题暂由后续判题模块处理，此处随机判定占位
             correct = (QRandomGenerator::global()->bounded(2) == 1);
         }
 
@@ -398,20 +388,8 @@ void BattlePage::onAnswerSubmitted()
         if (q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         }
-    } else if (q.type == QuestionType::FillBlank) {
-        // 填空题：多空答案用 | 分隔，逐空比对，忽略大小写和前后空格
-        QStringList userAnswers = answer.split("|", Qt::SkipEmptyParts);
-        correct = true;
-        for (int i = 0; i < q.blankAnswers.size(); ++i) {
-            QString correctAns = q.blankAnswers[i].trimmed().toLower();
-            QString userAns = (i < userAnswers.size()) ? userAnswers[i].trimmed().toLower() : QString();
-            if (userAns != correctAns) {
-                correct = false;
-                break;
-            }
-        }
     } else {
-        // 编程题随机判定（模拟，待后续接入真实判题）
+        // 填空题、编程题、代码补全题暂由后续判题模块处理，此处随机判定占位
         correct = (QRandomGenerator::global()->bounded(2) == 1);
     }
 
@@ -923,7 +901,6 @@ QuestionData BattlePage::questionToQuestionData(const Question& q)
     d.correctOptionIndex = q.correctOptionIndex;
     d.id = q.id;
     d.explanation = q.explanation;
-    d.blankAnswers = q.blankAnswers.toList();
     d.codeTemplate = q.codeTemplate;
 
     // 转换选项
