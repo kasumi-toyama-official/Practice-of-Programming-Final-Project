@@ -34,10 +34,11 @@ void UIManager::setContainer(QWidget *container)
     registerPage(ChapterSelect, new ChapterSelectPage());
     registerPage(Battle, new BattlePage());
     BattlePage *battle = qobject_cast<BattlePage*>(m_pages[Battle]);
-    connect(battle, &BattlePage::gameOver, this, [this](bool victory, int chapter, int damage) {
-        Q_UNUSED(victory);
-        Q_UNUSED(chapter);
-        Q_UNUSED(damage);
+    connect(battle, &BattlePage::gameOver, this, [this](bool victory, int chapter, int damage, int rounds, int correctCount, bool trophyEarned) {
+        ResultPage* result = qobject_cast<ResultPage*>(m_pages.value(Result));
+        if (result) {
+            result->setResult(victory, chapter, damage, rounds, correctCount, trophyEarned);
+        }
         goTo(Result);
     });
     connect(battle, &BattlePage::quitBattle, this, [this]() {

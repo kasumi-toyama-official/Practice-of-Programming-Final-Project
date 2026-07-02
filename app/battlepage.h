@@ -20,6 +20,9 @@
 #include "statusbar.h"
 #include "managers/QuestionBank.h"
 #include "managers/SaveManager.h"
+#include "managers/WrongBookManager.h"
+#include "managers/AchievementManager.h"
+#include "managers/RankingManager.h"
 
 class BattlePage : public QWidget
 {
@@ -37,7 +40,7 @@ public:
     void saveToArchive();
 
 signals:
-    void gameOver(bool victory, int chapterId, int totalDamage);
+    void gameOver(bool victory, int chapterId, int totalDamage, int rounds, int correctCount, bool trophyEarned);
     void quitBattle();
     void arenaQuit();
     void arenaGameFinished(int totalDamage);
@@ -75,11 +78,15 @@ private:
     int m_currentRound;
     int m_roundsPerExtra;
     int m_roundsSinceExtra;
+    int m_correctCount;
 
     int m_chapterId;
     bool m_loadExisting;
     QuestionBank m_questionBank;
     SaveManager m_saveManager;
+    WrongBookManager m_wrongBookManager;
+    AchievementManager m_achievementManager;
+    RankingManager m_rankingManager;
     GameConfig m_gameConfig;
     QSet<int> m_usedQuestionIds;
     QuestionData m_currentQuestionData;   // 当前正在显示的题目，用于判题

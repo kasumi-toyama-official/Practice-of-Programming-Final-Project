@@ -25,6 +25,8 @@ struct Question {
     QuestionType type = QuestionType::Choice;   // 题型（目前固定选择题）
     QString questionText;                // 题干
     QVector<QString> options;            // 选项（A/B/C/D）
+    QVector<QString> blankAnswers;       // 填空题答案列表
+    QString codeTemplate;                // 编程题代码模板
     int correctOptionIndex = 0;          // 正确答案索引（0-based）
     QString explanation;                 // 答案解析（用于错题本复习）
 

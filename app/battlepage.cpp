@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QPixmap>
+#include <QDateTime>
 #include <algorithm>
 
 static QString findDataFile(const QString& relativePath)
@@ -25,11 +26,16 @@ static QString findDataFile(const QString& relativePath)
 }
 
 BattlePage::BattlePage(QWidget *parent)
-    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false)
+    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_correctCount(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false)
 {
     setupUI();
 
     m_gameConfig = GameConfig::getDefault();
+    m_wrongBookManager.setFilePath(QCoreApplication::applicationDirPath() + "/data/progress/wrongbook.json");
+    m_achievementManager.loadDefinitions(QCoreApplication::applicationDirPath() + "/data/achievements.json");
+    m_achievementManager.loadProgress(QCoreApplication::applicationDirPath() + "/data/progress/achievements.json");
+    m_rankingManager.setFilePath(QCoreApplication::applicationDirPath() + "/data/progress/ranking.json");
+    m_rankingManager.load();
 
     m_playerStats.hp = 100;
     m_playerStats.maxHp = 100;
@@ -331,12 +337,28 @@ void BattlePage::onAnswerSubmitted()
         if (q.type == QuestionType::Choice && q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         } else if (q.type == QuestionType::FillBlank) {
-            correct = (answer.trimmed().toLower() == q.blankAnswers.first().toLower());
+            // 填空题：多空答案用 | 分隔，逐空比对，忽略大小写和前后空格
+            QStringList userAnswers = answer.split("|", Qt::SkipEmptyParts);
+            correct = true;
+            for (int i = 0; i < q.blankAnswers.size(); ++i) {
+                QString correctAns = q.blankAnswers[i].trimmed().toLower();
+                QString userAns = (i < userAnswers.size()) ? userAnswers[i].trimmed().toLower() : QString();
+                if (userAns != correctAns) {
+                    correct = false;
+                    break;
+                }
+            }
         } else {
             correct = (QRandomGenerator::global()->bounded(2) == 1);
         }
 
         m_questionWidget->showFeedback(correct);
+
+        // 额外回合答错也记录错题本
+        if (!correct) {
+            m_wrongBookManager.addWrongQuestion(m_chapterId, q.id);
+            m_wrongBookManager.save();
+        }
 
         if (correct && m_pendingBuffId > 0) {
             if (m_pendingBuffId == 101) {
@@ -377,8 +399,17 @@ void BattlePage::onAnswerSubmitted()
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         }
     } else if (q.type == QuestionType::FillBlank) {
-        // 填空题答案比较（忽略大小写）
-        correct = (answer.trimmed().toLower() == q.blankAnswers.first().toLower());
+        // 填空题：多空答案用 | 分隔，逐空比对，忽略大小写和前后空格
+        QStringList userAnswers = answer.split("|", Qt::SkipEmptyParts);
+        correct = true;
+        for (int i = 0; i < q.blankAnswers.size(); ++i) {
+            QString correctAns = q.blankAnswers[i].trimmed().toLower();
+            QString userAns = (i < userAnswers.size()) ? userAnswers[i].trimmed().toLower() : QString();
+            if (userAns != correctAns) {
+                correct = false;
+                break;
+            }
+        }
     } else {
         // 编程题随机判定（模拟，待后续接入真实判题）
         correct = (QRandomGenerator::global()->bounded(2) == 1);
@@ -386,6 +417,17 @@ void BattlePage::onAnswerSubmitted()
 
     // 反馈动画
     m_questionWidget->showFeedback(correct);
+
+    // 答错时记录错题本
+    if (!correct) {
+        m_wrongBookManager.addWrongQuestion(m_chapterId, q.id);
+        m_wrongBookManager.save();
+    }
+
+    // 答对时记录
+    if (correct) {
+        m_correctCount++;
+    }
 
     int playerDmg = 0, enemyDmg = 0;
 
@@ -731,6 +773,7 @@ void BattlePage::onRestart()
     m_usedQuestionIds.clear();
     m_playerStats.totalDamage = 0;
     m_playerStats.buffs.clear();
+    m_correctCount = 0;
 
     m_statusBar->updatePlayer(m_playerStats);
     m_statusBar->updateEnemy(m_enemyStats);
@@ -746,12 +789,30 @@ void BattlePage::onBattleFinished(bool victory)
     m_saveManager.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
     m_saveManager.deleteChapterArchive(m_chapterId);
 
+    // 战斗胜利时触发成就判定和排行榜记录
+    if (victory) {
+        bool trophyEarned = m_gameConfig.meetsThreshold();
+        m_achievementManager.checkChapterClear(m_chapterId, trophyEarned);
+    }
+
+    // 无论胜负都记录排行榜
+    RankingEntry entry;
+    entry.chapterId = m_chapterId;
+    entry.totalDamage = m_playerStats.totalDamage;
+    entry.rounds = m_currentRound;
+    entry.correctCount = m_correctCount;
+    entry.timestamp = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+    entry.trophyEarned = victory && m_gameConfig.meetsThreshold();
+    entry.victory = victory;
+    m_rankingManager.addRecord(entry);
+    m_rankingManager.save();
+
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("战斗结束");
     msgBox.setText(victory ? "你胜利了！" : "你失败了...");
     msgBox.setStyleSheet("color: black; background-color: #f0f0f0;");
     msgBox.exec();
-    emit gameOver(victory, 1, m_playerStats.totalDamage);
+    emit gameOver(victory, m_chapterId, m_playerStats.totalDamage, m_currentRound, m_correctCount, victory && m_gameConfig.meetsThreshold());
 }
 
 void BattlePage::onArenaBattleFinished()
@@ -801,6 +862,7 @@ void BattlePage::loadFromArchive()
 
     m_playerStats.totalDamage = 0;
     m_playerStats.round = m_currentRound;
+    m_correctCount = 0;
     m_statusBar->updatePlayer(m_playerStats);
     m_statusBar->updateEnemy(m_enemyStats);
     showNextQuestion();
@@ -819,6 +881,7 @@ void BattlePage::resetBattle()
     m_isExtraRound = false;
     m_playerStats.totalDamage = 0;
     m_playerStats.buffs.clear();
+    m_correctCount = 0;
 
     QString questionPath = findDataFile(QString("data/questions/chapter%1.json").arg(m_chapterId));
     if (!questionPath.isEmpty()) {
@@ -843,6 +906,10 @@ void BattlePage::resetBattle()
     m_dimOverlay->hide();
     m_extraRoundTitle->hide();
 
+    // 每次进入战斗时确保错题本管理器路径和最新数据
+    m_wrongBookManager.setFilePath(QCoreApplication::applicationDirPath() + "/data/progress/wrongbook.json");
+    m_wrongBookManager.load();
+
     // 显示第一道题
     showNextQuestion();
     setArenaMode(m_isArenaMode);
@@ -856,7 +923,8 @@ QuestionData BattlePage::questionToQuestionData(const Question& q)
     d.correctOptionIndex = q.correctOptionIndex;
     d.id = q.id;
     d.explanation = q.explanation;
-    d.tolerance = 0;
+    d.blankAnswers = q.blankAnswers.toList();
+    d.codeTemplate = q.codeTemplate;
 
     // 转换选项
     for (const QString& opt : q.options) {

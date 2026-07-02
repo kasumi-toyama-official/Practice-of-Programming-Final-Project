@@ -19,6 +19,13 @@ QJsonObject Question::toJson() const
     }
     obj["options"] = optionsArr;
 
+    QJsonArray blankArr;
+    for (const QString& ans : blankAnswers) {
+        blankArr.append(ans);
+    }
+    obj["blankAnswers"] = blankArr;
+    obj["codeTemplate"] = codeTemplate;
+
     return obj;
 }
 
@@ -38,6 +45,12 @@ Question Question::fromJson(const QJsonObject& obj)
     for (const auto& val : optionsArr) {
         q.options.append(val.toString());
     }
+
+    QJsonArray blankArr = obj["blankAnswers"].toArray();
+    for (const auto& val : blankArr) {
+        q.blankAnswers.append(val.toString());
+    }
+    q.codeTemplate = obj["codeTemplate"].toString();
 
     return q;
 }

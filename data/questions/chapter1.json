@@ -136,6 +136,30 @@
       ],
       "correctOptionIndex": 1,
       "explanation": "C++11支持int arr[]{1,2,3}。A默认参数必须从右向左；C不能将右值绑定到非const引用；D中T2前缺少class/typename。"
+    },
+    {
+      "id": 1001,
+      "chapterId": 1,
+      "difficulty": 0,
+      "type": 1,
+      "questionText": "C++ 中用于标准输入的对象是 ____ 。",
+      "options": [],
+      "blankAnswers": ["cin"],
+      "codeTemplate": "",
+      "correctOptionIndex": -1,
+      "explanation": "标准输入流对象为 cin，与之对应的标准输出流对象是 cout。"
+    },
+    {
+      "id": 1002,
+      "chapterId": 1,
+      "difficulty": 1,
+      "type": 1,
+      "questionText": "使用 new 动态分配一个 int 数组的语句是：int *p = ____ int[10];",
+      "options": [],
+      "blankAnswers": ["new"],
+      "codeTemplate": "",
+      "correctOptionIndex": -1,
+      "explanation": "new 运算符用于动态分配内存，例如 int *p = new int[10]; 分配包含10个int的数组。"
     }
   ]
 }
