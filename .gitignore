@@ -20,3 +20,5 @@ __MACOSX/
 # 原始代码包备份
 big_project.zip
 .kimi/
+app/build_test/
+功能文档和进度建议.txt
