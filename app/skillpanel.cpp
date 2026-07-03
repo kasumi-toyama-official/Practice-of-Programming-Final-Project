@@ -26,6 +26,8 @@ void SkillPanel::setSkills(const QList<SkillData>& skills, bool isArenaMode)
         delete item;
     }
     m_skillButtons.clear();
+    for (int c = 0; c < 3; ++c)
+        m_layout->setColumnStretch(c, 0);
 
     int row = 0, col = 0;
     const int maxCols = 3;
@@ -33,20 +35,14 @@ void SkillPanel::setSkills(const QList<SkillData>& skills, bool isArenaMode)
         QPushButton* btn = new QPushButton;
         btn->setIcon(QIcon(skill.iconPath));
         btn->setIconSize(QSize(32, 32));
-        if (isArenaMode) {
-            btn->setText(skill.name);
-            btn->setProperty("skillId", skill.id);
-            btn->setProperty("difficulty", static_cast<int>(skill.difficulty));
-        } else {
-            // 学习模式：显示属性名和可选的难度范围
-            btn->setText(QString("%1\n(简单/中等/困难)").arg(skill.name));
-            btn->setProperty("skillId", skill.id);
-            // 存储各难度加成数值，用于弹出菜单后发送
-            btn->setProperty("easyBonus", skill.easyBonus);
-            btn->setProperty("mediumBonus", skill.mediumBonus);
-            btn->setProperty("hardBonus", skill.hardBonus);
-        }
-        btn->setMinimumSize(100, 80);
+        btn->setText(skill.name);
+        btn->setProperty("skillId", skill.id);
+        btn->setProperty("easyBonus", skill.easyBonus);
+        btn->setProperty("mediumBonus", skill.mediumBonus);
+        btn->setProperty("hardBonus", skill.hardBonus);
+        btn->setProperty("attribute", skill.attribute);
+        btn->setFixedSize(150, 70);
+        btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         connect(btn, &QPushButton::clicked, this, &SkillPanel::onSkillButtonClicked);
         m_layout->addWidget(btn, row, col);
         m_skillButtons.append(btn);
@@ -56,6 +52,7 @@ void SkillPanel::setSkills(const QList<SkillData>& skills, bool isArenaMode)
             row++;
         }
     }
+    m_layout->activate();
 }
 
 void SkillPanel::onSkillButtonClicked()
@@ -64,38 +61,39 @@ void SkillPanel::onSkillButtonClicked()
     if (!btn) return;
 
     int skillId = btn->property("skillId").toInt();
-    if (m_isArenaMode) {
-        // 竞技模式：直接取出难度，发送信号
-        Difficulty diff = static_cast<Difficulty>(btn->property("difficulty").toInt());
-        emit skillSelected(skillId, diff);
-        hideWithAnimation();
-    } else {
-        // 学习模式：弹出难度菜单
-        QMenu menu;
-        QAction* easyAct = menu.addAction("简单");
-        QAction* mediumAct = menu.addAction("中等");
-        QAction* hardAct = menu.addAction("困难");
-        // 菜单弹出位置在按钮下方
-        QAction* chosen = menu.exec(btn->mapToGlobal(QPoint(0, btn->height())));
-        if (chosen == easyAct)
-            emit skillSelected(skillId, Difficulty::Easy);
-        else if (chosen == mediumAct)
-            emit skillSelected(skillId, Difficulty::Medium);
-        else if (chosen == hardAct)
-            emit skillSelected(skillId, Difficulty::Hard);
-        else
-            return; // 取消
-        hideWithAnimation();
-    }
+    int easyBonus = btn->property("easyBonus").toInt();
+    int medBonus = btn->property("mediumBonus").toInt();
+    int hardBonus = btn->property("hardBonus").toInt();
+    QString attr = btn->property("attribute").toString();
+    QString unit = (attr == "吸血比例") ? "%" : (attr == "Pass卡") ? "张" : "";
+
+    QMenu menu;
+    QAction* easyAct = menu.addAction(QString("简单 (+%1%2)").arg(easyBonus).arg(unit));
+    QAction* mediumAct = menu.addAction(QString("中等 (+%1%2)").arg(medBonus).arg(unit));
+    QAction* hardAct = menu.addAction(QString("困难 (+%1%2)").arg(hardBonus).arg(unit));
+    QAction* chosen = menu.exec(btn->mapToGlobal(QPoint(0, btn->height())));
+    if (chosen == easyAct)
+        emit skillSelected(skillId, Difficulty::Easy);
+    else if (chosen == mediumAct)
+        emit skillSelected(skillId, Difficulty::Medium);
+    else if (chosen == hardAct)
+        emit skillSelected(skillId, Difficulty::Hard);
+    else
+        return;
+    hideWithAnimation();
 }
 
-// 动画部分保持不变
 void SkillPanel::showWithAnimation()
 {
-    setWindowOpacity(0.0);
-    show();
+    if (graphicsEffect()) {
+        graphicsEffect()->setEnabled(false);
+        delete graphicsEffect();
+    }
+    hide();
     QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(0.0);
     setGraphicsEffect(effect);
+    show();
     QPropertyAnimation* anim = new QPropertyAnimation(effect, "opacity");
     anim->setDuration(250);
     anim->setStartValue(0.0);
@@ -105,6 +103,7 @@ void SkillPanel::showWithAnimation()
 
 void SkillPanel::hideWithAnimation()
 {
+    delete graphicsEffect();
     QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(effect);
     QPropertyAnimation* anim = new QPropertyAnimation(effect, "opacity");

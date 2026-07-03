@@ -7,6 +7,7 @@
 #include <QList>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include "models/GameConfig.h"
 
 class UIManager : public QObject
 {
@@ -31,6 +32,7 @@ public:
     void goBack();                         // 返回上一页
     void clearHistory() { m_history.clear(); }  // 清空历史
     void setPendingChapterId(int id) { m_pendingChapterId = id; }
+    void setPendingConfig(const GameConfig& config) { m_pendingConfig = config; }
     void setLoadExisting(bool load) { m_loadExisting = load; }
     QWidget* getPage(Page page) { return m_pages.value(page, nullptr); }
 
@@ -43,7 +45,8 @@ private:
     Page m_currentPage = MainMenu;         // 当前显示的页
     QList<Page> m_history;                 // 页面历史，用于返回
     int m_pendingChapterId = 1;
-    bool m_loadExisting = false;            // 选中的章节ID
+    bool m_loadExisting = false;
+    GameConfig m_pendingConfig;             // 新游戏时使用的配置
     static const int PAGE_WIDTH = 960;
     static const int PAGE_HEIGHT = 640;
 

@@ -10,6 +10,7 @@
 struct QuestionData
 {
     QuestionType type;
+    Difficulty difficulty;             // 题目难度
     QString description;
     QStringList options;
     QStringList blankAnswers;

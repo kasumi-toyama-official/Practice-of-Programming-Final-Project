@@ -12,7 +12,13 @@
 #include <QJsonObject>
 #include <QDir>
 #include <QFileInfo>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QIntValidator>
 #include "managers/SaveManager.h"
+#include "models/GameConfig.h"
 
 static QString chapterNameRead(int id)
 {
@@ -29,6 +35,77 @@ static QString chapterNameRead(int id)
         if (!dir.cdUp()) break;
     }
     return QString("第%1章").arg(id);
+}
+
+// 难度权重配置对话框，用户确认后 outConfig 被填充，返回 true
+static bool showConfigDialog(GameConfig& outConfig, QWidget* parent)
+{
+    QDialog dlg(parent);
+    dlg.setWindowTitle("难度权重配置");
+    dlg.setFixedSize(350, 250);
+    dlg.setStyleSheet(
+        "QDialog { background-color: #1e1e3a; color: white; }"
+        "QLabel { color: white; background: transparent; }"
+        "QLineEdit { color: white; background-color: #2a2a5a; border: 1px solid #555; padding: 4px; }");
+
+    QFormLayout* form = new QFormLayout(&dlg);
+
+    QLineEdit* easyEdit = new QLineEdit(QString::number(outConfig.easyWeight));
+    QLineEdit* mediumEdit = new QLineEdit(QString::number(outConfig.mediumWeight));
+    QLineEdit* hardEdit = new QLineEdit(QString::number(outConfig.hardWeight));
+
+    easyEdit->setValidator(new QIntValidator(0, 100, &dlg));
+    mediumEdit->setValidator(new QIntValidator(0, 100, &dlg));
+    hardEdit->setValidator(new QIntValidator(0, 100, &dlg));
+
+    form->addRow("简单题权重 (0-100):", easyEdit);
+    form->addRow("中等题权重 (0-100):", mediumEdit);
+    form->addRow("困难题权重 (0-100):", hardEdit);
+
+    QLabel* hint = new QLabel("三个权重不能全为 0");
+    hint->setStyleSheet("color: #aaa; font-size: 11px;");
+    form->addRow(hint);
+
+    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    buttons->button(QDialogButtonBox::Ok)->setText("确定");
+    buttons->button(QDialogButtonBox::Cancel)->setText("取消");
+    buttons->setStyleSheet(
+        "QPushButton { color: white; background-color: #3a3a6a; border: 1px solid #777;"
+        " border-radius: 4px; padding: 6px 16px; }"
+        "QPushButton:hover { background-color: #5a5a8a; }");
+
+    QObject::connect(buttons, &QDialogButtonBox::accepted, [&]() {
+        // 检查每个输入框是否合法
+        if (!easyEdit->hasAcceptableInput() || !mediumEdit->hasAcceptableInput() || !hardEdit->hasAcceptableInput()) {
+            QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！");
+            return;
+        }
+
+        int easy = easyEdit->text().toInt();
+        int medium = mediumEdit->text().toInt();
+        int hard = hardEdit->text().toInt();
+
+        // 二次校验范围（QIntValidator 的 Intermediate 状态可能放过超限值）
+        if (easy < 0 || easy > 100 || medium < 0 || medium > 100 || hard < 0 || hard > 100) {
+            QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！");
+            return;
+        }
+
+        if (easy + medium + hard == 0) {
+            QMessageBox::warning(&dlg, "输入错误", "三个权重不能全为 0！");
+            return;
+        }
+
+        outConfig.easyWeight = easy;
+        outConfig.mediumWeight = medium;
+        outConfig.hardWeight = hard;
+        dlg.accept();
+    });
+
+    QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+
+    form->addRow(buttons);
+    return dlg.exec() == QDialog::Accepted;
 }
 
 ChapterSelectPage::ChapterSelectPage(QWidget *parent)
@@ -65,7 +142,7 @@ ChapterSelectPage::ChapterSelectPage(QWidget *parent)
             "QPushButton:hover { background-color: #3a3a7a; border-color: #888; }");
         cellLayout->addWidget(btn);
 
-        connect(btn, &QPushButton::clicked, this, [chapterId]() {
+        connect(btn, &QPushButton::clicked, this, [this, chapterId]() {
             UIManager* mgr = UIManager::instance();
             mgr->setPendingChapterId(chapterId);
 
@@ -87,18 +164,29 @@ ChapterSelectPage::ChapterSelectPage(QWidget *parent)
                 msgBox.exec();
 
                 if (msgBox.clickedButton() == btnLoad) {
+                    // 读档：不弹配置，直接用存档里的配置
                     mgr->setLoadExisting(true);
                     mgr->goTo(UIManager::Battle);
                 } else if (msgBox.clickedButton() == btnNew) {
-                    mgr->setLoadExisting(false);
-                    SaveManager sm;
-                    sm.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
-                    sm.deleteChapterArchive(chapterId);
-                    mgr->goTo(UIManager::Battle);
+                    // 新游戏：弹配置对话框
+                    GameConfig config = GameConfig::getDefault();
+                    if (showConfigDialog(config, this)) {
+                        mgr->setPendingConfig(config);
+                        mgr->setLoadExisting(false);
+                        SaveManager sm2;
+                        sm2.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
+                        sm2.deleteChapterArchive(chapterId);
+                        mgr->goTo(UIManager::Battle);
+                    }
                 }
             } else {
-                mgr->setLoadExisting(false);
-                mgr->goTo(UIManager::Battle);
+                // 无存档：弹配置对话框
+                GameConfig config = GameConfig::getDefault();
+                if (showConfigDialog(config, this)) {
+                    mgr->setPendingConfig(config);
+                    mgr->setLoadExisting(false);
+                    mgr->goTo(UIManager::Battle);
+                }
             }
         });
 

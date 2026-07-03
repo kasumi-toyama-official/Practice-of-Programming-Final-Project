@@ -1,5 +1,6 @@
 {
   "chapterId": 2,
+  "_comment": "【出题规范】应均衡覆盖三种难度，每种至少一题。",
   "chapterName": "类与对象深入",
   "questions": [
     {
@@ -230,7 +231,7 @@
     {
       "id": 115,
       "chapterId": 2,
-      "difficulty": 0,
+      "difficulty": 1,
       "type": 0,
       "questionText": "下面关于类和对象的说法错误的是",
       "options": [

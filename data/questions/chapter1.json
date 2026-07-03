@@ -1,5 +1,6 @@
 {
   "chapterId": 1,
+  "_comment": "【出题规范】应均衡覆盖三种难度，每种至少一题。",
   "chapterName": "C++基础与类入门",
   "questions": [
     {

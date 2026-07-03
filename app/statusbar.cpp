@@ -141,7 +141,7 @@ void StatusBar::showRoundLabel(bool show)
 }
 void StatusBar::setArenaMode(bool on)
 {
-    m_passCardLabel->setVisible(on);
+    m_passCardLabel->hide();
     m_totalDamageLabel->setVisible(on);
     m_pauseBtn->setVisible(!on);
     m_roundLabel->setVisible(!on);

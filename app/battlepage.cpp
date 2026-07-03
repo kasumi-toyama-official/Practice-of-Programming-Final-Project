@@ -1,4 +1,5 @@
 #include "battlepage.h"
+#include <climits>
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include <QFileInfo>
@@ -6,6 +7,8 @@
 #include <QCoreApplication>
 #include <QPixmap>
 #include <algorithm>
+
+static const int ARENA_TOLERANCE = 3;
 
 static QString findDataFile(const QString& relativePath)
 {
@@ -25,7 +28,8 @@ static QString findDataFile(const QString& relativePath)
 }
 
 BattlePage::BattlePage(QWidget *parent)
-    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false)
+    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false),
+    m_arenaElapsedMs(0), m_arenaConsecutiveErrors(0), m_arenaLastQuestionId(-1)
 {
     setupUI();
 
@@ -55,7 +59,7 @@ BattlePage::BattlePage(QWidget *parent)
     m_statusBar->updateEnemy(m_enemyStats);
 
     m_isArenaMode = false;
-    m_attackInterval = 5000;
+    m_attackInterval = 60000;
     m_elapsed = 0;
     m_passCardCount = 3;
     m_arenaState = Idle;
@@ -75,7 +79,7 @@ void BattlePage::setArenaMode(bool isArena)
         if (!m_countdownBar)
         {
             m_countdownBar = new QProgressBar(this);
-            m_countdownBar->setGeometry(10, 95, 940, 20);
+            m_countdownBar->setGeometry(10, 143, 940, 12);
             m_countdownBar->setRange(0, m_attackInterval);
             m_countdownBar->setValue(0);
             m_countdownBar->setTextVisible(false);
@@ -85,21 +89,46 @@ void BattlePage::setArenaMode(bool isArena)
         m_countdownBar->show();
         if (!m_passBtn)
         {
-            m_passBtn = new QPushButton("Pass", this);
-            m_passBtn->setGeometry(10, 590, 80, 40);
+            m_passBtn = new QPushButton(this);
+            m_passBtn->setGeometry(415, 97, 130, 28);
+            m_passBtn->setStyleSheet(
+                "QPushButton { color: white; background-color: #d9534f; border: 2px solid #c9302c;"
+                " border-radius: 6px; font-size: 16px; font-weight: bold; }"
+                "QPushButton:hover { background-color: #c9302c; }"
+                "QPushButton:disabled { background-color: #555; border-color: #444; color: #999; }");
             connect(m_passBtn, &QPushButton::clicked, this, &BattlePage::onPassClicked);
         }
+        m_passBtn->raise();
+        m_passBtn->setText(QString("Pass (%1)").arg(m_passCardCount));
         m_passBtn->show();
         m_passBtn->setEnabled(m_passCardCount > 0);
         m_statusBar->setArenaMode(true);
+        m_enemyStats.hp = INT_MAX;
+        m_enemyStats.maxHp = INT_MAX;
+        m_enemyStats.attack = 15;
+        m_enemyStats.defence = 5;
+        // 玩家竞技模式初始属性
+        m_playerStats.hp = 100;
+        m_playerStats.maxHp = 100;
+        m_playerStats.attack = 25;
+        m_playerStats.defence = 8;
+        m_playerStats.lifesteal = 0.0;
         m_playerStats.passCards = m_passCardCount;
         m_playerStats.totalDamage = 0;
         m_statusBar->updatePlayer(m_playerStats);
+        m_statusBar->updateEnemy(m_enemyStats);
         m_arenaTimer->start(50);
         m_elapsed = 0;
+        m_arenaElapsedMs = 0;
+        m_arenaConsecutiveErrors = 0;
+        m_arenaLastQuestionId = -1;
         m_arenaState = Idle;
         m_pauseOverlay->hide();
-        startArenaRound();
+        for (int ch = 1; ch <= 8; ++ch) {
+            QString path = findDataFile(QString("data/questions/chapter%1.json").arg(ch));
+            if (!path.isEmpty())
+                m_questionBank.loadChapter(ch, path);
+        }
     }
     else
     {
@@ -111,39 +140,71 @@ void BattlePage::setArenaMode(bool isArena)
     }
 }
 
+static int getArenaSkillBonus(const QString& attr, Difficulty diff)
+{
+    if (attr == "攻击力") {
+        if (diff == Difficulty::Easy) return 3;
+        if (diff == Difficulty::Medium) return 5;
+        return 8;
+    }
+    if (attr == "防御力") {
+        if (diff == Difficulty::Easy) return 2;
+        if (diff == Difficulty::Medium) return 4;
+        return 6;
+    }
+    if (attr == "生命上限") {
+        if (diff == Difficulty::Easy) return 5;
+        if (diff == Difficulty::Medium) return 10;
+        return 15;
+    }
+    if (attr == "吸血比例") {
+        if (diff == Difficulty::Easy) return 2;
+        if (diff == Difficulty::Medium) return 4;
+        return 6;
+    }
+    if (attr == "Pass卡") {
+        if (diff == Difficulty::Easy) return 1;
+        if (diff == Difficulty::Medium) return 1;
+        return 2;
+    }
+    if (attr == "回复生命") {
+        if (diff == Difficulty::Easy) return 10;
+        if (diff == Difficulty::Medium) return 20;
+        return 30;
+    }
+    return 0;
+}
+
 void BattlePage::startArenaRound()
 {
     m_arenaState = WaitingSkill;
+    m_arenaConsecutiveErrors = 0;
     m_passBtn->setEnabled(false);
     QList<SkillData> skills;
 
-    // 随机生成三个技能，每个绑定额定属性和随机难度
-    QStringList attrs = {"攻击力", "防御力", "生命上限", "吸血比例"};
-    for (int i = 0; i < 3; ++i) {
+    QStringList attrs = {"攻击力", "防御力", "生命上限", "吸血比例", "Pass卡", "回复生命"};
+    QSet<int> picked;
+    while (picked.size() < 3) {
+        int idx = QRandomGenerator::global()->bounded(attrs.size());
+        if (picked.contains(idx)) continue;
+        picked.insert(idx);
+
         SkillData s;
-        s.id = 200 + i;
-        s.attribute = attrs[i % attrs.size()];
-        s.name = s.attribute;   // 名称就用属性名
+        s.id = 200 + idx;
+        s.attribute = attrs[idx];
+        s.name = s.attribute;
         s.iconPath = "";
         s.difficulty = static_cast<Difficulty>(QRandomGenerator::global()->bounded(3));
 
-        // 根据难度设定加成数值（按属性区分，这里简单给统一值，你可以细调）
-        if (s.attribute == "吸血比例") {
-            s.easyBonus = 0; s.mediumBonus = 0; s.hardBonus = 0; // 吸血固定加5%
-        } else {
-            if (s.difficulty == Difficulty::Easy) {
-                s.easyBonus = 3; s.mediumBonus = 3; s.hardBonus = 3;
-            } else if (s.difficulty == Difficulty::Medium) {
-                s.easyBonus = 5; s.mediumBonus = 5; s.hardBonus = 5;
-            } else {
-                s.easyBonus = 8; s.mediumBonus = 8; s.hardBonus = 8;
-            }
-        }
+        s.easyBonus = getArenaSkillBonus(s.attribute, Difficulty::Easy);
+        s.mediumBonus = getArenaSkillBonus(s.attribute, Difficulty::Medium);
+        s.hardBonus = getArenaSkillBonus(s.attribute, Difficulty::Hard);
+
         skills.append(s);
     }
 
     m_currentRoundSkills = skills;
-    m_skillPanel->setSkills(skills, true);  // true = 竞技模式
+    m_skillPanel->setSkills(skills, true);
     m_skillPanel->showWithAnimation();
     m_questionWidget->hide();
 }
@@ -258,29 +319,17 @@ void BattlePage::setupUI()
 
 void BattlePage::showNextQuestion()
 {
-    std::optional<Question> result = std::nullopt;
+    // 按权重决定本次抽题难度
+    int targetDifficulty = m_gameConfig.rollDifficulty();
+    auto result = m_questionBank.drawQuestion(m_chapterId, targetDifficulty, m_usedQuestionIds[targetDifficulty]);
 
-    // 从所有难度中收集剩余候选题目，再随机抽一道（实现全排列遍历）
-    QVector<Question> candidates;
-    for (int d = 0; d <= 2; ++d) {
-        auto r = m_questionBank.drawQuestion(m_chapterId, d, m_usedQuestionIds);
-        if (r.has_value()) {
-            candidates.append(r.value());
-        }
+    // 该难度题库用完 → 只重置该难度
+    if (!result.has_value()) {
+        m_usedQuestionIds[targetDifficulty].clear();
+        result = m_questionBank.drawQuestion(m_chapterId, targetDifficulty, m_usedQuestionIds[targetDifficulty]);
     }
 
-    if (candidates.isEmpty()) {
-        // 所有难度的题都用完了 → 重置，重新遍历
-        m_usedQuestionIds.clear();
-        for (int d = 0; d <= 2; ++d) {
-            auto r = m_questionBank.drawQuestion(m_chapterId, d, m_usedQuestionIds);
-            if (r.has_value()) {
-                candidates.append(r.value());
-            }
-        }
-    }
-
-    if (candidates.isEmpty()) {
+    if (!result.has_value()) {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("提示");
         msgBox.setText("当前章节没有可用题目！");
@@ -289,8 +338,8 @@ void BattlePage::showNextQuestion()
         return;
     }
 
-    Question backendQ = candidates[QRandomGenerator::global()->bounded(candidates.size())];
-    m_usedQuestionIds.insert(backendQ.id);
+    Question backendQ = result.value();
+    m_usedQuestionIds[static_cast<int>(backendQ.difficulty)].insert(backendQ.id);
     m_currentQuestionData = questionToQuestionData(backendQ);
 
     // 随机打乱选择题选项顺序
@@ -398,11 +447,9 @@ void BattlePage::onAnswerSubmitted()
         m_playerStats.totalDamage += playerDmg;
         m_enemyStats.hp = qMax(0, m_enemyStats.hp - playerDmg);
 
-        // 飘字：对敌人伤害
         showFloatingText(QString("-%1").arg(playerDmg), QPoint(860, 200), Qt::red);
-        // 吸血回复飘字
         if (heal > 0)
-            showFloatingText(QString("+%1 HP").arg(heal), QPoint(80, 160), Qt::green);
+            showFloatingText(QString("+%1").arg(heal), QPoint(80, 160), Qt::green);
     }
 
     // 敌人固定反击（普通回合结束时）
@@ -441,12 +488,18 @@ void BattlePage::onAnswerSubmitted()
 void BattlePage::onArenaAnswerSubmitted()
 {
     QString answer = m_questionWidget->getAnswer();
-    // 临时判题：答案非空就算对（以后替换为真实判断）
-    bool correct = !answer.trimmed().isEmpty();
+    bool correct = false;
+    if (m_currentQuestionData.type == QuestionType::Choice && m_currentQuestionData.correctOptionIndex >= 0
+        && m_currentQuestionData.correctOptionIndex < m_currentQuestionData.options.size()) {
+        correct = (answer.trimmed() == m_currentQuestionData.options[m_currentQuestionData.correctOptionIndex].trimmed());
+    } else {
+        correct = !answer.trimmed().isEmpty();
+    }
     m_questionWidget->showFeedback(correct);
 
     if (correct) {
-        // ===== 根据技能属性应用加成 =====
+        m_arenaConsecutiveErrors = 0;
+
         if (m_currentSkillAttr == "攻击力") {
             m_playerStats.attack += m_currentSkillBonus;
         } else if (m_currentSkillAttr == "防御力") {
@@ -455,44 +508,59 @@ void BattlePage::onArenaAnswerSubmitted()
             m_playerStats.maxHp += m_currentSkillBonus;
             m_playerStats.hp = qMin(m_playerStats.hp + m_currentSkillBonus, m_playerStats.maxHp);
         } else if (m_currentSkillAttr == "吸血比例") {
-            // 假设每级增加 5% 吸血（可根据需要调整）
-            m_playerStats.lifesteal += 0.05;
+            m_playerStats.lifesteal += m_currentSkillBonus * 0.01;
+        } else if (m_currentSkillAttr == "Pass卡") {
+            m_passCardCount += m_currentSkillBonus;
+            m_playerStats.passCards = m_passCardCount;
+            m_passBtn->setText(QString("Pass (%1)").arg(m_passCardCount));
+        } else if (m_currentSkillAttr == "回复生命") {
+            m_playerStats.hp = qMin(m_playerStats.maxHp, m_playerStats.hp + m_currentSkillBonus);
+            showFloatingText(QString("+%1").arg(m_currentSkillBonus), QPoint(80, 160), Qt::green);
         }
 
-        // 玩家攻击敌人
         int playerDmg = qMax(1, m_playerStats.attack - m_enemyStats.defence);
-        m_enemyStats.hp -= playerDmg;    // 敌人血量虽无限，但累积伤害
+        m_enemyStats.hp -= playerDmg;
         m_playerStats.totalDamage += playerDmg;
 
-        // 吸血回复
         int heal = static_cast<int>(playerDmg * m_playerStats.lifesteal);
         m_playerStats.hp = qMin(m_playerStats.maxHp, m_playerStats.hp + heal);
 
-        // 飘字
         showFloatingText(QString("-%1").arg(playerDmg), QPoint(860, 200), Qt::red);
         if (heal > 0)
-            showFloatingText(QString("+%1HP").arg(heal), QPoint(80, 160), Qt::green);
+            showFloatingText(QString("+%1").arg(heal), QPoint(80, 160), Qt::green);
+
+        m_statusBar->updatePlayer(m_playerStats);
+        m_statusBar->updateEnemy(m_enemyStats);
+
+        if (m_playerStats.hp <= 0) {
+            onArenaBattleFinished();
+            return;
+        }
+
+        m_passBtn->setEnabled(false);
+        startArenaRound();
     } else {
-        // 错误：立即承受一次敌人攻击
+        m_arenaConsecutiveErrors++;
+        m_questionWidget->setRemainingTolerance(ARENA_TOLERANCE - m_arenaConsecutiveErrors);
+
         int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
         m_playerStats.hp -= enemyDmg;
         showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
+
+        m_statusBar->updatePlayer(m_playerStats);
+
+        if (m_playerStats.hp <= 0) {
+            onArenaBattleFinished();
+            return;
+        }
+
+        if (m_arenaConsecutiveErrors >= ARENA_TOLERANCE) {
+            m_arenaConsecutiveErrors = 0;
+            m_questionWidget->reset();
+            m_passBtn->setEnabled(false);
+            startArenaRound();
+        }
     }
-
-    // 刷新状态栏
-    m_statusBar->updatePlayer(m_playerStats);
-    m_statusBar->updateEnemy(m_enemyStats);
-
-    // 检查玩家是否死亡
-    if (m_playerStats.hp <= 0) {
-        onArenaBattleFinished();
-        return;
-    }
-
-    // 进入下一轮
-    m_passBtn->setEnabled(false);
-    m_elapsed = 0;
-    startArenaRound();
 }
 
 void BattlePage::onExtraRoundTrigger()
@@ -543,8 +611,8 @@ void BattlePage::onPassClicked()
     m_passCardCount--;
     m_passBtn->setEnabled(m_passCardCount > 0);
     m_playerStats.passCards = m_passCardCount;
+    m_passBtn->setText(QString("Pass (%1)").arg(m_passCardCount));
     m_statusBar->updatePlayer(m_playerStats);
-    // 跳过当前题目，进入下一轮
     m_questionWidget->reset();
     m_questionWidget->hide();
     startArenaRound();
@@ -553,23 +621,24 @@ void BattlePage::onPassClicked()
 void BattlePage::onArenaTimerTick()
 {
     if (!m_isArenaMode) return;
-    // 更新倒计时进度条
     m_elapsed += 50;
+    m_arenaElapsedMs += 50;
+    double seconds = m_arenaElapsedMs / 1000.0;
+    m_enemyStats.attack = 15 + static_cast<int>(0.05 * seconds + 0.0001 * seconds * seconds);
+    m_enemyStats.defence = 5 + static_cast<int>(0.025 * seconds + 0.00005 * seconds * seconds);
     m_countdownBar->setValue(m_elapsed);
     if (m_elapsed >= m_attackInterval) {
         m_elapsed = 0;
-        // 敌人自动攻击
         int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
         m_playerStats.hp -= enemyDmg;
         showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
         m_statusBar->updatePlayer(m_playerStats);
         if (m_playerStats.hp <= 0) {
             onArenaBattleFinished();
+            return;
         }
-        m_enemyStats.attack += 1;
-        m_enemyStats.defence += 1;
-        m_statusBar->updateEnemy(m_enemyStats);
     }
+    m_statusBar->updateEnemy(m_enemyStats);
 }
 
 void BattlePage::onSkillSelected(int skillId, Difficulty diff)
@@ -596,18 +665,34 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
         else                    bonus = chosenSkill.hardBonus;
         m_currentSkillBonus = bonus;
 
-        // 出一道填空题
-        QuestionData q;
-        q.type = QuestionType::FillBlank;
-        q.description = QString("竞技：%1 (难度：%2)").arg(chosenSkill.name)
-                            .arg(diff == Difficulty::Easy ? "简单" : (diff == Difficulty::Medium ? "中等" : "困难"));
-        q.blankAnswers = QStringList() << "test";  // 临时答案，以后接真实题库
-        q.tolerance = 1;  // 填空题无容忍
-        m_questionWidget->setQuestion(q);
+        // 按选定难度从全部章节题库中抽选择题
+        int diffInt = static_cast<int>(diff);
+        std::optional<Question> drawn;
+        for (int ch = 1; ch <= 8 && !drawn.has_value(); ++ch)
+            drawn = m_questionBank.drawQuestion(ch, diffInt, m_usedQuestionIds[diffInt]);
+
+        // 该难度用完 → 只重置该难度
+        if (!drawn.has_value()) {
+            m_usedQuestionIds[diffInt].clear();
+            for (int ch = 1; ch <= 8 && !drawn.has_value(); ++ch)
+                drawn = m_questionBank.drawQuestion(ch, diffInt, m_usedQuestionIds[diffInt]);
+        }
+
+        if (drawn.has_value()) {
+            Question backendQ = drawn.value();
+            m_usedQuestionIds[static_cast<int>(backendQ.difficulty)].insert(backendQ.id);
+            m_currentQuestionData = questionToQuestionData(backendQ);
+        } else {
+            QMessageBox::warning(this, "错误", "所有章节均无该难度题目，请联系出题人补充！");
+            return;
+        }
+        m_questionWidget->setQuestion(m_currentQuestionData);
+        m_questionWidget->setRemainingTolerance(ARENA_TOLERANCE);
         m_questionWidget->show();
 
         m_arenaState = WaitingAnswer;
         m_passBtn->setEnabled(m_passCardCount > 0);
+        m_skillPanel->hide();
     }
     else
     {
@@ -625,14 +710,15 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
         m_pendingBuffId = skillId;
         m_dimOverlay->hide();
         m_extraRoundTitle->hide();
-        auto result = m_questionBank.drawQuestion(m_chapterId, m_gameConfig, m_usedQuestionIds);
+        int diff = m_gameConfig.rollDifficulty();
+        auto result = m_questionBank.drawQuestion(m_chapterId, diff, m_usedQuestionIds[diff]);
         if (!result.has_value()) {
-            m_usedQuestionIds.clear();
-            result = m_questionBank.drawQuestion(m_chapterId, m_gameConfig, m_usedQuestionIds);
+            m_usedQuestionIds[diff].clear();
+            result = m_questionBank.drawQuestion(m_chapterId, diff, m_usedQuestionIds[diff]);
         }
         if (result.has_value()) {
             Question q = result.value();
-            m_usedQuestionIds.insert(q.id);
+            m_usedQuestionIds[static_cast<int>(q.difficulty)].insert(q.id);
             m_currentQuestionData = questionToQuestionData(q);
             m_questionWidget->reset();
             m_questionWidget->setQuestion(m_currentQuestionData);
@@ -780,6 +866,7 @@ void BattlePage::saveToArchive()
     archive.enemyData = m_enemyStats.toJson();
     archive.usedQuestionIds = m_usedQuestionIds;
     archive.normalRoundCount = m_currentRound;
+    archive.configData = m_gameConfig;
     archive.hasActiveArchive = true;
 
     m_saveManager.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
@@ -792,6 +879,10 @@ void BattlePage::loadFromArchive()
     ChapterArchive archive = m_saveManager.loadChapterArchive(m_chapterId);
 
     if (!archive.hasActiveArchive) return;
+
+    // 恢复存档中的难度配置
+    if (archive.configData.easyWeight + archive.configData.mediumWeight + archive.configData.hardWeight > 0)
+        m_gameConfig = archive.configData;
 
     m_playerStats = Stats::fromJson(archive.playerData);
     m_enemyStats = Stats::fromJson(archive.enemyData);
@@ -846,12 +937,15 @@ void BattlePage::resetBattle()
     // 显示第一道题
     showNextQuestion();
     setArenaMode(m_isArenaMode);
+    if (m_isArenaMode)
+        QTimer::singleShot(50, this, [this](){ startArenaRound(); });
 }
 
 QuestionData BattlePage::questionToQuestionData(const Question& q)
 {
     QuestionData d;
     d.type = static_cast<QuestionType>(static_cast<int>(q.type));
+    d.difficulty = q.difficulty;
     d.description = q.questionText;
     d.correctOptionIndex = q.correctOptionIndex;
     d.id = q.id;

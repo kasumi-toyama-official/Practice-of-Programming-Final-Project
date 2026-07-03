@@ -13,6 +13,7 @@
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
 #include <QSet>
+#include <QMap>
 
 #include "GameData.h"
 #include "questionwidget.h"
@@ -32,6 +33,7 @@ public:
     void setArenaMode(bool isArena);
     void resetBattle();
     void setChapterId(int chapterId) { m_chapterId = chapterId; }
+    void setGameConfig(const GameConfig& config) { m_gameConfig = config; }
     void setLoadExisting(bool load) { m_loadExisting = load; }
     void loadFromArchive();
     void saveToArchive();
@@ -81,7 +83,7 @@ private:
     QuestionBank m_questionBank;
     SaveManager m_saveManager;
     GameConfig m_gameConfig;
-    QSet<int> m_usedQuestionIds;
+    QMap<int, QSet<int>> m_usedQuestionIds;  // difficulty(0/1/2) → 已用题目ID
     QuestionData m_currentQuestionData;   // 当前正在显示的题目，用于判题
 
     bool m_isExtraRound;
@@ -116,6 +118,10 @@ private:
     enum ArenaState{Idle, WaitingSkill, WaitingAnswer};
     ArenaState m_arenaState;
     QList<SkillData> m_currentRoundSkills;
+
+    qint64 m_arenaElapsedMs;
+    int m_arenaConsecutiveErrors;
+    int m_arenaLastQuestionId;
 
     QPushButton *m_leaderboardBtn;
 };

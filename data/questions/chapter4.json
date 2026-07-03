@@ -1,5 +1,6 @@
 {
   "chapterId": 4,
+  "_comment": "【出题规范】应均衡覆盖三种难度，每种至少一题。",
   "chapterName": "继承和派生",
   "questions": [
     {
@@ -125,7 +126,7 @@
     {
       "id": 308,
       "chapterId": 4,
-      "difficulty": 1,
+      "difficulty": 2,
       "type": 0,
       "questionText": "派生类的成员函数，可以访问以下哪几种成员变量？\n(1) 当前基类对象的private成员变量\n(2) 当前基类对象的protected成员变量\n(3) 其他基类对象的protected成员变量\n(4) 其他同类对象的protected成员变量",
       "options": [

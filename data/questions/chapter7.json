@@ -1,5 +1,6 @@
 {
   "chapterId": 7,
+  "_comment": "【出题规范】应均衡覆盖三种难度，每种至少一题。",
   "chapterName": "STL",
   "questions": [
     {

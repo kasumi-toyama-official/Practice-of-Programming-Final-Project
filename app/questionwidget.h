@@ -50,6 +50,12 @@ private:
     QStackedWidget* m_stackedWidget;
     QList<QLabel*> m_choiceLabels;
 
+    // 难度标签（三个面板各一个）
+    QLabel* m_choiceDiffLabel;
+    QLabel* m_choiceToleranceLabel;
+    QLabel* m_fillDiffLabel;
+    QLabel* m_codingDiffLabel;
+
     QList<QLineEdit*> m_fillInputs;
     QLabel* m_fillToleranceLabel;
 

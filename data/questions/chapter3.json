@@ -1,5 +1,6 @@
 {
   "chapterId": 3,
+  "_comment": "【出题规范】应均衡覆盖三种难度，每种至少一题。",
   "chapterName": "运算符重载",
   "questions": [
     {
@@ -80,7 +81,7 @@
     {
       "id": 205,
       "chapterId": 3,
-      "difficulty": 1,
+      "difficulty": 2,
       "type": 0,
       "questionText": "关于 C++ 中运算符重载的说法，下列正确的是：",
       "options": [
@@ -290,7 +291,7 @@
     {
       "id": 219,
       "chapterId": 3,
-      "difficulty": 1,
+      "difficulty": 2,
       "type": 0,
       "questionText": "以下正确的是：",
       "options": [

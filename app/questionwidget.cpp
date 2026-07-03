@@ -32,6 +32,18 @@ void QuestionWidget::setupChoicePanel()
     m_choicePanel = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout(m_choicePanel);
 
+    // 难度标签（左上角）
+    m_choiceDiffLabel = new QLabel("中等");
+    m_choiceDiffLabel->setStyleSheet(
+        "QLabel { color: #ffcc00; font-size: 12px; font-weight: bold;"
+        " background: transparent; padding: 0; }");
+    layout->addWidget(m_choiceDiffLabel);
+
+    m_choiceToleranceLabel = new QLabel;
+    m_choiceToleranceLabel->hide();
+    m_choiceToleranceLabel->setStyleSheet("color: #ff9800; font-size: 12px; background: transparent;");
+    layout->addWidget(m_choiceToleranceLabel);
+
     QTextEdit* descArea = new QTextEdit;
     descArea->setObjectName("choiceDescLabel");
     descArea->setReadOnly(true);
@@ -65,6 +77,13 @@ void QuestionWidget::setupFillBlankPanel()
     m_fillBlankPanel = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout(m_fillBlankPanel);
 
+    // 难度标签（左上角）
+    m_fillDiffLabel = new QLabel("中等");
+    m_fillDiffLabel->setStyleSheet(
+        "QLabel { color: #ffcc00; font-size: 12px; font-weight: bold;"
+        " background: transparent; padding: 0; }");
+    layout->addWidget(m_fillDiffLabel);
+
     QLabel* descLabel = new QLabel("填空题描述");
     descLabel->setObjectName("fillDescLabel");
     descLabel->setWordWrap(true);
@@ -97,6 +116,13 @@ void QuestionWidget::setupCodingPanel()
 {
     m_codingPanel = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout(m_codingPanel);
+
+    // 难度标签（左上角）
+    m_codingDiffLabel = new QLabel("中等");
+    m_codingDiffLabel->setStyleSheet(
+        "QLabel { color: #ffcc00; font-size: 12px; font-weight: bold;"
+        " background: transparent; padding: 0; }");
+    layout->addWidget(m_codingDiffLabel);
 
     QLabel* descLabel = new QLabel("编程题描述");
     descLabel->setObjectName("codingDescLabel");
@@ -144,6 +170,27 @@ void QuestionWidget::setQuestion(const QuestionData &data)
 {
     m_currentType = data.type;
     m_codeTemplate = data.codeTemplate;
+
+    // 设置难度标签（三个面板都设，切到哪个都能看到）
+    QString diffText;
+    QString diffColor;
+    switch (data.difficulty) {
+    case Difficulty::Easy:
+        diffText = "简单"; diffColor = "#4caf50"; break;   // 绿色
+    case Difficulty::Medium:
+        diffText = "中等"; diffColor = "#ffcc00"; break;   // 黄色
+    case Difficulty::Hard:
+        diffText = "困难"; diffColor = "#f44336"; break;   // 红色
+    }
+    QString diffStyle = QString(
+        "QLabel { color: %1; font-size: 12px; font-weight: bold;"
+        " background: transparent; padding: 0; }").arg(diffColor);
+    m_choiceDiffLabel->setStyleSheet(diffStyle);
+    m_choiceDiffLabel->setText(diffText);
+    m_fillDiffLabel->setStyleSheet(diffStyle);
+    m_fillDiffLabel->setText(diffText);
+    m_codingDiffLabel->setStyleSheet(diffStyle);
+    m_codingDiffLabel->setText(diffText);
 
     switch (data.type)
     {
@@ -230,16 +277,49 @@ QString QuestionWidget::getAnswer() const
 
 void QuestionWidget::showFeedback(bool correct)
 {
-    QWidget* current = m_stackedWidget->currentWidget();
-    if (!current) return;
-    QString originalStyle = current->styleSheet();
-    if (correct)
-        current->setStyleSheet("background-color: rgba(0, 200, 0, 80);");
-    else
-        current->setStyleSheet("background-color: rgba(200, 0, 0, 80);");
-    QTimer::singleShot(400, this, [current, originalStyle](){
-        if (current) current->setStyleSheet(originalStyle);
-    });
+    QString color = correct ? "#4caf50" : "#f44336";
+
+    if (m_currentType == QuestionType::Choice) {
+        if (m_selectedChoice >= 0 && m_selectedChoice < m_choiceLabels.size()) {
+            for (int i = 0; i < m_choiceLabels.size(); ++i) {
+                QLabel* label = m_choiceLabels[i];
+                if (i == m_selectedChoice) {
+                    label->setStyleSheet(
+                        QString("QLabel { color: white; background-color: %1; border: 2px solid %1;"
+                                " border-radius: 4px; padding: 6px; font-size: 15px; }").arg(color));
+                } else {
+                    label->setStyleSheet(
+                        "QLabel { color: white; background-color: #3a3a6a; border: 1px solid #777;"
+                        " border-radius: 4px; padding: 6px; font-size: 15px; }");
+                }
+            }
+            QTimer::singleShot(400, this, [this](){
+                m_selectedChoice = -1;
+                for (QLabel* l : m_choiceLabels)
+                    l->setStyleSheet(
+                        "QLabel { color: white; background-color: #3a3a6a; border: 1px solid #777;"
+                        " border-radius: 4px; padding: 6px; font-size: 15px; }");
+            });
+        }
+    } else if (m_currentType == QuestionType::FillBlank) {
+        for (QLineEdit* edit : m_fillInputs) {
+            if (edit->isVisible()) {
+                QString orig = edit->styleSheet();
+                edit->setStyleSheet(QString("QLineEdit { color: white; background-color: %1;"
+                    " border: 2px solid %1; border-radius: 3px; padding: 4px; }").arg(color));
+                QTimer::singleShot(400, this, [edit, orig](){
+                    if (edit) edit->setStyleSheet(orig);
+                });
+            }
+        }
+    } else if (m_currentType == QuestionType::Coding) {
+        QString orig = m_codeEditor->styleSheet();
+        m_codeEditor->setStyleSheet(QString("QPlainTextEdit { color: white; background-color: %1;"
+            " border: 2px solid %1; }").arg(color));
+        QTimer::singleShot(400, this, [this, orig](){
+            if (m_codeEditor) m_codeEditor->setStyleSheet(orig);
+        });
+    }
 }
 
 void QuestionWidget::reset()
@@ -263,10 +343,14 @@ void QuestionWidget::reset()
 
 void QuestionWidget::setRemainingTolerance(int remain)
 {
-    if (m_currentType == QuestionType::FillBlank && m_fillToleranceLabel)
+    if (m_currentType == QuestionType::Choice && m_choiceToleranceLabel) {
+        m_choiceToleranceLabel->setText(QString("剩余机会: %1/%2").arg(remain).arg(3));
+        m_choiceToleranceLabel->setVisible(remain < 3);
+    } else if (m_currentType == QuestionType::FillBlank && m_fillToleranceLabel) {
         m_fillToleranceLabel->setText(QString("剩余容错次数：%1").arg(remain));
-    else if (m_currentType == QuestionType::Coding && m_codingToleranceLabel)
+    } else if (m_currentType == QuestionType::Coding && m_codingToleranceLabel) {
         m_codingToleranceLabel->setText(QString("剩余容错次数：%1").arg(remain));
+    }
 }
 
 bool QuestionWidget::eventFilter(QObject *obj, QEvent *event)

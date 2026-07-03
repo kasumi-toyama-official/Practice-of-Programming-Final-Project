@@ -1,13 +1,13 @@
 #include "uimanager.h"
 #include <QSize>
-#include <mainmenupage.h>
-#include <chapterselectpage.h>
-#include <battlepage.h>
-#include <resultpage.h>
-#include <errorbookpage.h>
-#include <collectionpage.h>
-#include <achievementpage.h>
-#include <settingspage.h>
+#include "mainmenupage.h"
+#include "chapterselectpage.h"
+#include "battlepage.h"
+#include "resultpage.h"
+#include "errorbookpage.h"
+#include "collectionpage.h"
+#include "achievementpage.h"
+#include "settingspage.h"
 
 UIManager* UIManager::m_instance = nullptr;
 
@@ -87,9 +87,10 @@ void UIManager::goTo(Page page)
             if (m_loadExisting) {
                 bp->setLoadExisting(true);
                 bp->resetBattle();
-                bp->loadFromArchive();
+                bp->loadFromArchive();  // 读档：配置从存档中恢复
             } else {
                 bp->setLoadExisting(false);
+                bp->setGameConfig(m_pendingConfig);  // 新游戏：先设配置再重置
                 bp->resetBattle();
             }
             m_loadExisting = false;
