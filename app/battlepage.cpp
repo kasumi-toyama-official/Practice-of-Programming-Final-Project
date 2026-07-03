@@ -171,30 +171,33 @@ void BattlePage::setupUI()
 
     // 敌人立绘 — 像素化处理
     m_enemySprite = new QLabel(this);
-    m_enemySprite->setGeometry(730, 150, 160, 160);
+    m_enemySprite->setGeometry(700, 120, 240, 240);
     m_enemySprite->setAlignment(Qt::AlignCenter);
-    {
-        QPixmap full(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Attacking/Golem_03_Attacking_000.png");
-        if (!full.isNull()) {
-            QPixmap crop = full.copy(QRect(218, 103, 425, 347));
-            // 先缩到像素级小尺寸（约 5×4 像素格），再用临近插值放大回 160px
-            QPixmap small = crop.scaled(32, 26, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            QPixmap pixelated = small.scaled(160, 160, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-            m_enemySprite->setPixmap(pixelated);
-        }
-    }
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Attacking/Golem_03_Attacking_", 12, m_enemyAttackFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Hurt/Golem_03_Hurt_", 12, m_enemyHurtFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Dying/Golem_03_Dying_", 15, m_enemyDeathFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Idle/Golem_03_Idle_", 12, m_enemyIdleFrames, true);
+    if (!m_enemyIdleFrames.isEmpty())
+        m_enemySprite->setPixmap(m_enemyIdleFrames.first());
 
     // 玩家立绘
     m_playerSprite = new QLabel(this);
-    m_playerSprite->setGeometry(70, 150, 160, 160);
+    m_playerSprite->setGeometry(30, 80, 320, 320);
     m_playerSprite->setAlignment(Qt::AlignCenter);
-    m_playerSprite->setScaledContents(true);
-    {
-        QPixmap sheet(":/charactors/players/PNG/Swordsman_lvl3/With_shadow/Swordsman_lvl3_Idle_with_shadow.png");
-        if (!sheet.isNull()) {
-            m_playerSprite->setPixmap(sheet.copy(QRect(19, 20, 20, 27)));
-        }
-    }
+    loadFrames(":/charactors/players2/Fairy_02/ATTACK_", 10, m_playerAttackFrames);
+    loadFrames(":/charactors/players2/Fairy_02/HURT_", 10, m_playerHurtFrames);
+    loadFrames(":/charactors/players2/Fairy_02/DIE_", 10, m_playerDeathFrames);
+    loadFrames(":/charactors/players2/Fairy_02/IDLE_", 10, m_playerIdleFrames);
+    if (!m_playerIdleFrames.isEmpty())
+        m_playerSprite->setPixmap(m_playerIdleFrames.first());
+
+    m_animTimer = new QTimer(this);
+    connect(m_animTimer, &QTimer::timeout, this, &BattlePage::onAnimTimerTick);
+    m_animTimer->start(80);
+    m_playerState = Anim_Idle;
+    m_enemyState = Anim_Idle;
+    m_playerFrameIndex = 0;
+    m_enemyFrameIndex = 0;
 
     m_statusBar = new StatusBar(this);
     m_statusBar->setGeometry(10, 5, 940, 135);
@@ -410,6 +413,10 @@ void BattlePage::onAnswerSubmitted()
     int playerDmg = 0, enemyDmg = 0;
 
     if (correct) {
+        QTimer::singleShot(400, this, [this](){
+            playPlayerAnim(Anim_Attack);
+            playEnemyAnim(Anim_Hurt);
+        });
         // 玩家攻击伤害 = 攻击力 - 敌人防御，最少为1
         playerDmg = qMax(1, m_playerStats.attack - m_enemyStats.defence);
         // 吸血回复
@@ -426,6 +433,10 @@ void BattlePage::onAnswerSubmitted()
     }
 
     // 敌人固定反击（普通回合结束时）
+    QTimer::singleShot(400, this, [this](){
+        playEnemyAnim(Anim_Attack);
+        playPlayerAnim(Anim_Hurt);
+    });
     enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
     m_playerStats.hp = qMax(0, m_playerStats.hp - enemyDmg);
     showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
@@ -437,11 +448,17 @@ void BattlePage::onAnswerSubmitted()
 
     // 检查战斗结束
     if (m_playerStats.hp <= 0) {
-        onBattleFinished(false);
+        playPlayerAnim(Anim_Death);
+        QTimer::singleShot(900, this, [this](){
+            onBattleFinished(false);
+        });
         return;
     }
     if (m_enemyStats.hp <= 0) {
-        onBattleFinished(true);
+        playEnemyAnim(Anim_Death);
+        QTimer::singleShot(1200, this, [this](){
+            onBattleFinished(true);
+        });
         return;
     }
 
@@ -480,6 +497,10 @@ void BattlePage::onArenaAnswerSubmitted()
         }
 
         // 玩家攻击敌人
+        QTimer::singleShot(400, this, [this](){
+            playPlayerAnim(Anim_Attack);
+            playEnemyAnim(Anim_Hurt);
+        });
         int playerDmg = qMax(1, m_playerStats.attack - m_enemyStats.defence);
         m_enemyStats.hp -= playerDmg;    // 敌人血量虽无限，但累积伤害
         m_playerStats.totalDamage += playerDmg;
@@ -494,6 +515,10 @@ void BattlePage::onArenaAnswerSubmitted()
             showFloatingText(QString("+%1HP").arg(heal), QPoint(80, 160), Qt::green);
     } else {
         // 错误：立即承受一次敌人攻击
+        QTimer::singleShot(400, this, [this](){
+            playEnemyAnim(Anim_Attack);
+            playPlayerAnim(Anim_Hurt);
+        });
         int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
         m_playerStats.hp -= enemyDmg;
         showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
@@ -505,7 +530,10 @@ void BattlePage::onArenaAnswerSubmitted()
 
     // 检查玩家是否死亡
     if (m_playerStats.hp <= 0) {
-        onArenaBattleFinished();
+        playPlayerAnim(Anim_Death);
+        QTimer::singleShot(900, this, [this](){
+            onArenaBattleFinished();
+        });
         return;
     }
 
@@ -891,6 +919,15 @@ void BattlePage::resetBattle()
     // 显示第一道题
     showNextQuestion();
     setArenaMode(m_isArenaMode);
+
+    m_playerState = Anim_Idle;      // 玩家状态改回待机
+    m_playerFrameIndex = 0;         // 从待机动画第一帧开始
+    m_enemyState = Anim_Idle;       // 敌人状态改回待机
+    m_enemyFrameIndex = 0;
+    if (!m_playerIdleFrames.isEmpty())
+        m_playerSprite->setPixmap(m_playerIdleFrames.first());
+    if (!m_enemyIdleFrames.isEmpty())
+        m_enemySprite->setPixmap(m_enemyIdleFrames.first());
 }
 
 QuestionData BattlePage::questionToQuestionData(const Question& q)
@@ -909,4 +946,97 @@ QuestionData BattlePage::questionToQuestionData(const Question& q)
     }
 
     return d;
+}
+
+void BattlePage::loadFrames(const QString &prefix, int count, QList<QPixmap> &outFrames, bool flipHorizontal)
+{
+    outFrames.clear();
+    for (int i = 0; i < count; ++i)
+    {
+        QString path = QString("%1%2.png").arg(prefix).arg(i, 3, 10, QLatin1Char('0'));
+        QPixmap pix(path);
+        if (!pix.isNull())
+        {
+            QPixmap scaled = pix.scaled(240, 240, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            if (flipHorizontal)
+            {
+                scaled = QPixmap::fromImage(scaled.toImage().mirrored(true, false));
+            }
+            outFrames.append(scaled);
+        }
+        else
+        {
+            qDebug() << "Failed to load frame:" << path;
+        }
+    }
+}
+
+void BattlePage::playPlayerAnim(AnimState state)
+{
+    if (m_playerState == Anim_Death && state != Anim_Death) return;
+    if (m_playerState == state) return;
+    m_playerState = state;
+    m_playerFrameIndex = 0;
+}
+
+void BattlePage::playEnemyAnim(AnimState state)
+{
+    if (m_enemyState == Anim_Death && state != Anim_Death) return;
+    if (m_enemyState == state) return;
+    m_enemyState = state;
+    m_enemyFrameIndex = 0;
+}
+
+void BattlePage::onAnimTimerTick()
+{
+    QList<QPixmap>* playerFrames = nullptr;
+    switch (m_playerState)
+    {
+    case Anim_Idle: playerFrames = &m_playerIdleFrames; break;
+    case Anim_Attack: playerFrames = &m_playerAttackFrames; break;
+    case Anim_Hurt: playerFrames = &m_playerHurtFrames; break;
+    case Anim_Death: playerFrames = &m_playerDeathFrames; break;
+    }
+    if (playerFrames && !playerFrames->isEmpty())
+    {
+        int idx = m_playerFrameIndex % playerFrames->size();
+        m_playerSprite->setPixmap((*playerFrames)[idx]);
+        m_playerFrameIndex++;
+        if (m_playerState == Anim_Attack || m_playerState == Anim_Hurt)
+        {
+            if (m_playerFrameIndex >= playerFrames->size())
+            {
+                playPlayerAnim(Anim_Idle);
+            }
+        }
+        if (m_playerState == Anim_Death && m_playerFrameIndex >= playerFrames->size())
+        {
+            m_playerFrameIndex = playerFrames->size() - 1;
+        }
+    }
+    QList<QPixmap>* enemyFrames = nullptr;
+    switch (m_enemyState)
+    {
+    case Anim_Idle: enemyFrames = &m_enemyIdleFrames; break;
+    case Anim_Attack: enemyFrames = &m_enemyAttackFrames; break;
+    case Anim_Hurt: enemyFrames = &m_enemyHurtFrames; break;
+    case Anim_Death: enemyFrames = &m_enemyDeathFrames; break;
+    }
+    if (enemyFrames && !enemyFrames->isEmpty())
+    {
+        int idx = m_enemyFrameIndex % enemyFrames->size();
+        m_enemySprite->setPixmap((*enemyFrames)[idx]);
+        m_enemyFrameIndex++;
+        if (m_enemyState == Anim_Attack || m_enemyState == Anim_Hurt)
+        {
+            if (m_enemyFrameIndex >= enemyFrames->size())
+            {
+                playEnemyAnim(Anim_Idle);
+            }
+        }
+        if (m_enemyState == Anim_Death && m_enemyFrameIndex >= enemyFrames->size())
+        {
+            m_enemyFrameIndex = enemyFrames->size() - 1;
+        }
+    }
 }

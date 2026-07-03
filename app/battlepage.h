@@ -13,6 +13,8 @@
 #include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
 #include <QSet>
+#include <QList>
+#include <QPixmap>
 
 #include "GameData.h"
 #include "questionwidget.h"
@@ -125,6 +127,34 @@ private:
     QList<SkillData> m_currentRoundSkills;
 
     QPushButton *m_leaderboardBtn;
+
+    QList<QPixmap> m_playerIdleFrames;
+    QList<QPixmap> m_playerAttackFrames;
+    QList<QPixmap> m_playerHurtFrames;
+    QList<QPixmap> m_playerDeathFrames;
+    QList<QPixmap> m_enemyIdleFrames;
+    QList<QPixmap> m_enemyAttackFrames;
+    QList<QPixmap> m_enemyHurtFrames;
+    QList<QPixmap> m_enemyDeathFrames;
+
+    QTimer* m_animTimer;
+
+    enum AnimState
+    {
+        Anim_Idle = 0,
+        Anim_Attack,
+        Anim_Hurt,
+        Anim_Death
+    };
+    AnimState m_playerState;
+    AnimState m_enemyState;
+    int m_playerFrameIndex;
+    int m_enemyFrameIndex;
+
+    void loadFrames(const QString& prefix, int count, QList<QPixmap>& outFrames, bool flipHorizontal = false);
+    void playPlayerAnim(AnimState state);
+    void playEnemyAnim(AnimState state);
+    void onAnimTimerTick();
 };
 
 #endif // BATTLEPAGE_H
