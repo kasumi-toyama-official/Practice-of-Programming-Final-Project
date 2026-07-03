@@ -2,6 +2,22 @@
 
 #include <QJsonArray>
 
+QJsonObject QuestionTestCase::toJson() const
+{
+    QJsonObject obj;
+    obj["input"] = input;
+    obj["output"] = output;
+    return obj;
+}
+
+QuestionTestCase QuestionTestCase::fromJson(const QJsonObject& obj)
+{
+    QuestionTestCase tc;
+    tc.input = obj["input"].toString();
+    tc.output = obj["output"].toString();
+    return tc;
+}
+
 QJsonObject Question::toJson() const
 {
     QJsonObject obj;
@@ -18,6 +34,16 @@ QJsonObject Question::toJson() const
         optionsArr.append(opt);
     }
     obj["options"] = optionsArr;
+
+    obj["codeTemplate"] = codeTemplate;
+    obj["referenceSolution"] = referenceSolution;
+    obj["blankCount"] = blankCount;
+
+    QJsonArray testCasesArr;
+    for (const QuestionTestCase& tc : testCases) {
+        testCasesArr.append(tc.toJson());
+    }
+    obj["testCases"] = testCasesArr;
 
     return obj;
 }
@@ -37,6 +63,17 @@ Question Question::fromJson(const QJsonObject& obj)
     QJsonArray optionsArr = obj["options"].toArray();
     for (const auto& val : optionsArr) {
         q.options.append(val.toString());
+    }
+
+    q.codeTemplate = obj["codeTemplate"].toString();
+    q.referenceSolution = obj["referenceSolution"].toString();
+    q.blankCount = obj["blankCount"].toInt(1);
+
+    QJsonArray testCasesArr = obj["testCases"].toArray();
+    for (const auto& val : testCasesArr) {
+        if (val.isObject()) {
+            q.testCases.append(QuestionTestCase::fromJson(val.toObject()));
+        }
     }
 
     return q;

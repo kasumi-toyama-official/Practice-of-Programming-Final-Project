@@ -15,7 +15,7 @@ struct GameConfig {
     int hardWeight = 1;      // 困难题权重
 
     int choiceWeight = 1;    // 选择题权重（当前唯一题型）
-    int blankWeight = 0;     // 填空题权重（本次不使用）
+    int codeCompletionWeight = 0;     // 代码补全题权重（本次不使用）
     int codeWeight = 0;      // 编程题权重（本次不使用）
 
     QString presetName;      // 配置名称（如"均衡配置"）

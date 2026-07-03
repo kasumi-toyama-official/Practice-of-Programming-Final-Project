@@ -13,7 +13,6 @@ struct QuestionData
     Difficulty difficulty;             // 题目难度
     QString description;
     QStringList options;
-    QStringList blankAnswers;
     QString codeTemplate;
     int tolerance;
     int correctOptionIndex;   // 选择题正确答案索引（0-based），非选择题填 -1

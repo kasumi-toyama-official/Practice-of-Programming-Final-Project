@@ -25,8 +25,15 @@ SOURCES += \
     uimanager.cpp \
     ../src/managers/QuestionBank.cpp \
     ../src/managers/SaveManager.cpp \
+    ../src/managers/WrongBookManager.cpp \
+    ../src/managers/AchievementManager.cpp \
+    ../src/managers/RankingManager.cpp \
     ../src/models/ChapterArchive.cpp \
     ../src/models/Question.cpp \
+    ../src/models/CodeCompletionQuestion.cpp \
+    ../src/models/WrongBookEntry.cpp \
+    ../src/models/Achievement.cpp \
+    ../src/models/RankingEntry.cpp \
     ../src/models/GameConfig.cpp \
     ../src/utils/JsonUtils.cpp \
     ../src/utils/RandomUtils.cpp

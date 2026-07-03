@@ -20,7 +20,7 @@ bool GameConfig::meetsThreshold() const
         return false;
     }
 
-    int totalType = choiceWeight + blankWeight + codeWeight;
+    int totalType = choiceWeight + codeCompletionWeight + codeWeight;
     if (totalType <= 0) {
         return false;
     }
@@ -41,7 +41,7 @@ QJsonObject GameConfig::toJson() const
     obj["mediumWeight"] = mediumWeight;
     obj["hardWeight"] = hardWeight;
     obj["choiceWeight"] = choiceWeight;
-    obj["blankWeight"] = blankWeight;
+    obj["codeCompletionWeight"] = codeCompletionWeight;
     obj["codeWeight"] = codeWeight;
     obj["presetName"] = presetName;
     return obj;
@@ -54,7 +54,7 @@ GameConfig GameConfig::fromJson(const QJsonObject& obj)
     c.mediumWeight = obj["mediumWeight"].toInt(1);
     c.hardWeight = obj["hardWeight"].toInt(1);
     c.choiceWeight = obj["choiceWeight"].toInt(1);
-    c.blankWeight = obj["blankWeight"].toInt(0);
+    c.codeCompletionWeight = obj["codeCompletionWeight"].toInt(obj["blankWeight"].toInt(0));
     c.codeWeight = obj["codeWeight"].toInt(0);
     c.presetName = obj["presetName"].toString();
     return c;
@@ -67,7 +67,7 @@ GameConfig GameConfig::getDefault()
     c.mediumWeight = 1;
     c.hardWeight = 1;
     c.choiceWeight = 1;
-    c.blankWeight = 0;
+    c.codeCompletionWeight = 0;
     c.codeWeight = 0;
     c.presetName = "默认配置";
     return c;
