@@ -61,26 +61,37 @@ void SkillPanel::onSkillButtonClicked()
     if (!btn) return;
 
     int skillId = btn->property("skillId").toInt();
-    int easyBonus = btn->property("easyBonus").toInt();
-    int medBonus = btn->property("mediumBonus").toInt();
-    int hardBonus = btn->property("hardBonus").toInt();
-    QString attr = btn->property("attribute").toString();
-    QString unit = (attr == "吸血比例") ? "%" : (attr == "Pass卡") ? "张" : "";
 
-    QMenu menu;
-    QAction* easyAct = menu.addAction(QString("简单 (+%1%2)").arg(easyBonus).arg(unit));
-    QAction* mediumAct = menu.addAction(QString("中等 (+%1%2)").arg(medBonus).arg(unit));
-    QAction* hardAct = menu.addAction(QString("困难 (+%1%2)").arg(hardBonus).arg(unit));
-    QAction* chosen = menu.exec(btn->mapToGlobal(QPoint(0, btn->height())));
-    if (chosen == easyAct)
+    if (skillId == 105) {
         emit skillSelected(skillId, Difficulty::Easy);
-    else if (chosen == mediumAct)
-        emit skillSelected(skillId, Difficulty::Medium);
-    else if (chosen == hardAct)
-        emit skillSelected(skillId, Difficulty::Hard);
-    else
+        hideWithAnimation();
         return;
-    hideWithAnimation();
+    }
+
+    if (m_isArenaMode) {
+        Difficulty diff = static_cast<Difficulty>(btn->property("difficulty").toInt());
+        emit skillSelected(skillId, diff);
+        hideWithAnimation();
+    } else {
+        int easyBonus = btn->property("easyBonus").toInt();
+        int medBonus = btn->property("mediumBonus").toInt();
+        int hardBonus = btn->property("hardBonus").toInt();
+        QString attr = btn->property("attribute").toString();
+        QString unit = (attr == "吸血比例") ? "%" : (attr == "Pass卡") ? "张" : "";
+
+        QMenu menu;
+        menu.addAction(QString("简单 (+%1%2)").arg(easyBonus).arg(unit));
+        menu.addAction(QString("中等 (+%1%2)").arg(medBonus).arg(unit));
+        menu.addAction(QString("困难 (+%1%2)").arg(hardBonus).arg(unit));
+        QAction* chosen = menu.exec(btn->mapToGlobal(QPoint(0, btn->height())));
+        if (!chosen) return;
+        Difficulty diff;
+        if (chosen->text().startsWith("简单")) diff = Difficulty::Easy;
+        else if (chosen->text().startsWith("中等")) diff = Difficulty::Medium;
+        else diff = Difficulty::Hard;
+        emit skillSelected(skillId, diff);
+        hideWithAnimation();
+    }
 }
 
 void SkillPanel::showWithAnimation()

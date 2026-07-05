@@ -142,6 +142,7 @@ void StatusBar::showRoundLabel(bool show)
 void StatusBar::setArenaMode(bool on)
 {
     m_passCardLabel->hide();
+    m_totalDamageLabel->setText("总伤害: 0");
     m_totalDamageLabel->setVisible(on);
     m_pauseBtn->setVisible(!on);
     m_roundLabel->setVisible(!on);

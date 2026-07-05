@@ -36,7 +36,7 @@ protected:
 
 private:
     void setupChoicePanel();
-    void setupFillBlankPanel();
+    void setupCodeCompletionPanel();
     void setupCodingPanel();
 
     QuestionType m_currentType;
@@ -44,20 +44,20 @@ private:
     int m_selectedChoice;
 
     QWidget* m_choicePanel;
-    QWidget* m_fillBlankPanel;
+    QWidget* m_codeCompletionPanel;
     QWidget* m_codingPanel;
 
     QStackedWidget* m_stackedWidget;
     QList<QLabel*> m_choiceLabels;
 
-    // 难度标签（三个面板各一个）
     QLabel* m_choiceDiffLabel;
     QLabel* m_choiceToleranceLabel;
-    QLabel* m_fillDiffLabel;
+    QLabel* m_codeCompletionDiffLabel;
     QLabel* m_codingDiffLabel;
 
-    QList<QLineEdit*> m_fillInputs;
-    QLabel* m_fillToleranceLabel;
+    QString m_storedCodeTemplate;
+    QPlainTextEdit* m_codeCompletionEditor;
+    QLabel* m_codeCompletionToleranceLabel;
 
     QPlainTextEdit* m_codeEditor;
     QLabel* m_codingToleranceLabel;

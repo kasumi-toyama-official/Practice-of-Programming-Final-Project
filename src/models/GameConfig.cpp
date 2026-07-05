@@ -7,6 +7,12 @@ int GameConfig::rollDifficulty() const
     return RandomUtils::weightedRandom(weights);
 }
 
+int GameConfig::rollQuestionType() const
+{
+    QVector<int> weights = {choiceWeight, codeCompletionWeight, codeWeight};
+    return RandomUtils::weightedRandom(weights);
+}
+
 bool GameConfig::meetsThreshold() const
 {
     int totalDifficulty = easyWeight + mediumWeight + hardWeight;
@@ -25,9 +31,9 @@ bool GameConfig::meetsThreshold() const
         return false;
     }
 
-    // 选择题占比 >= 80%
+    // 选择题占比 <= 80%
     double choiceRatio = static_cast<double>(choiceWeight) / totalType;
-    if (choiceRatio < 0.8) {
+    if (choiceRatio > 0.8) {
         return false;
     }
 

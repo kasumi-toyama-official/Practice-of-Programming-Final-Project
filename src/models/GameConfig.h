@@ -21,6 +21,7 @@ struct GameConfig {
     QString presetName;      // 配置名称（如"均衡配置"）
 
     int rollDifficulty() const;
+    int rollQuestionType() const;
 
     bool meetsThreshold() const;
 

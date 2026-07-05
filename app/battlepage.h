@@ -21,6 +21,10 @@
 #include "statusbar.h"
 #include "managers/QuestionBank.h"
 #include "managers/SaveManager.h"
+#include "managers/WrongBookManager.h"
+#include "managers/AchievementManager.h"
+#include "managers/RankingManager.h"
+#include "models/CodeCompletionQuestion.h"
 
 class BattlePage : public QWidget
 {
@@ -39,7 +43,7 @@ public:
     void saveToArchive();
 
 signals:
-    void gameOver(bool victory, int chapterId, int totalDamage);
+    void gameOver(bool victory, int chapterId, int totalDamage, int rounds, int correctCount, bool trophyEarned);
     void quitBattle();
     void arenaQuit();
     void arenaGameFinished(int totalDamage);
@@ -77,14 +81,20 @@ private:
     int m_currentRound;
     int m_roundsPerExtra;
     int m_roundsSinceExtra;
+    int m_correctCount;
 
     int m_chapterId;
     bool m_loadExisting;
     QuestionBank m_questionBank;
     SaveManager m_saveManager;
+    WrongBookManager m_wrongBookManager;
+    AchievementManager m_achievementManager;
+    RankingManager m_rankingManager;
     GameConfig m_gameConfig;
-    QMap<int, QSet<int>> m_usedQuestionIds;  // difficulty(0/1/2) → 已用题目ID
-    QuestionData m_currentQuestionData;   // 当前正在显示的题目，用于判题
+    QMap<int, QSet<int>> m_usedQuestionIds;
+    QMap<int, CodeCompletionQuestion> m_completionQuestions;
+    QuestionData m_currentQuestionData;
+    CodeCompletionQuestion m_currentCompletionData;
 
     bool m_isExtraRound;
     QString m_currentSkillAttr;
@@ -122,8 +132,23 @@ private:
     qint64 m_arenaElapsedMs;
     int m_arenaConsecutiveErrors;
     int m_arenaLastQuestionId;
+    int m_codeCompletionRetries;
 
     QPushButton *m_leaderboardBtn;
+
+    QList<QPixmap> m_enemyIdleFrames, m_enemyAttackFrames, m_enemyHurtFrames, m_enemyDeathFrames;
+
+    QPixmap m_playerIdlePix, m_playerAttackPix, m_playerHurtPix, m_playerDeathPix;
+
+    QTimer* m_animTimer;
+    enum AnimState { Anim_Idle = 0, Anim_Attack, Anim_Hurt, Anim_Death };
+    AnimState m_playerState, m_enemyState;
+    int m_playerFrameIndex, m_enemyFrameIndex;
+
+    void loadFrames(const QString& prefix, int count, QList<QPixmap>& outFrames, bool flipHorizontal = false);
+    void playPlayerAnim(AnimState state);
+    void playEnemyAnim(AnimState state);
+    void onAnimTimerTick();
 };
 
 #endif // BATTLEPAGE_H

@@ -3,6 +3,8 @@
 #include "uimanager.h"
 
 #include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMessageBox>
@@ -14,7 +16,14 @@ AchievementPage::AchievementPage(QWidget *parent)
     ui->setupUi(this);
     setupUI();
 
-    m_achievementManager.loadDefinitions(QCoreApplication::applicationDirPath() + "/data/achievements.json");
+    QString defPath = QCoreApplication::applicationDirPath() + "/data/achievements.json";
+    QDir dir(QCoreApplication::applicationDirPath());
+    for (int i = 0; i < 10; ++i) {
+        QString p = dir.filePath("data/achievements.json");
+        if (QFileInfo::exists(p)) { defPath = p; break; }
+        if (!dir.cdUp()) break;
+    }
+    m_achievementManager.loadDefinitions(defPath);
     m_achievementManager.loadProgress(QCoreApplication::applicationDirPath() + "/data/progress/achievements.json");
 }
 

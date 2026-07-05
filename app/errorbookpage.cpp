@@ -265,6 +265,21 @@ void ErrorBookPage::onRedoClicked()
         QPushButton *closeBtn = new QPushButton("关闭", m_redoDialog);
         connect(closeBtn, &QPushButton::clicked, m_redoDialog, &QDialog::accept);
         layout->addWidget(closeBtn);
+
+        connect(m_redoQuestionWidget, &QuestionWidget::answerSubmitted, this, [this]() {
+            QString answer = m_redoQuestionWidget->getAnswer();
+            bool correct = false;
+            if (m_redoQuestionType == QuestionType::Choice && m_redoCorrectIndex >= 0
+                && m_redoCorrectIndex < m_redoOptions.size()) {
+                correct = (answer.trimmed() == m_redoOptions[m_redoCorrectIndex].trimmed());
+            }
+            m_redoQuestionWidget->showFeedback(correct);
+            if (correct) {
+                m_wrongBookManager.removeEntry(m_selectedChapterId, m_selectedQuestionId);
+                m_wrongBookManager.save();
+                QTimer::singleShot(500, m_redoDialog, &QDialog::accept);
+            }
+        });
     }
 
     QuestionData d;
@@ -277,6 +292,12 @@ void ErrorBookPage::onRedoClicked()
     for (const QString& opt : q.options) {
         d.options.append(opt);
     }
+
+    m_redoQuestionType = d.type;
+    m_redoCorrectIndex = d.correctOptionIndex;
+    m_redoOptions.clear();
+    for (const QString& opt : q.options)
+        m_redoOptions.append(opt);
 
     m_redoQuestionWidget->setQuestion(d);
     m_redoQuestionWidget->reset();

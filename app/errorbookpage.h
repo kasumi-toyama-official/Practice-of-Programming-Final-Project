@@ -57,6 +57,9 @@ private:
     // 重做弹窗
     QDialog *m_redoDialog = nullptr;
     QuestionWidget *m_redoQuestionWidget = nullptr;
+    QuestionType m_redoQuestionType = QuestionType::Choice;
+    int m_redoCorrectIndex = -1;
+    QStringList m_redoOptions;
 
     void setupUI();
     void loadErrors();

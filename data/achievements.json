@@ -2,36 +2,106 @@
   {
     "id": "ch1_clear",
     "name": "初出茅庐",
-    "description": "通关第1章",
+    "description": "满足阈值条件下通关第1章",
     "category": "learning",
-    "iconPath": ":/icons/ach_ch1.png"
+    "iconPath": ""
   },
   {
     "id": "ch2_clear",
     "name": "稳步前行",
-    "description": "通关第2章",
+    "description": "满足阈值条件下通关第2章",
     "category": "learning",
-    "iconPath": ":/icons/ach_ch2.png"
+    "iconPath": ""
   },
   {
     "id": "ch3_clear",
     "name": "渐入佳境",
-    "description": "通关第3章",
+    "description": "满足阈值条件下通关第3章",
     "category": "learning",
-    "iconPath": ":/icons/ach_ch3.png"
+    "iconPath": ""
   },
   {
-    "id": "perfect_clear",
-    "name": "完美主义者",
-    "description": "在满足配置阈值条件下通关任意章节",
+    "id": "ch4_clear",
+    "name": "小有所成",
+    "description": "满足阈值条件下通关第4章",
     "category": "learning",
-    "iconPath": ":/icons/ach_perfect.png"
+    "iconPath": ""
+  },
+  {
+    "id": "ch5_clear",
+    "name": "百尺竿头",
+    "description": "满足阈值条件下通关第5章",
+    "category": "learning",
+    "iconPath": ""
+  },
+  {
+    "id": "ch6_clear",
+    "name": "炉火纯青",
+    "description": "满足阈值条件下通关第6章",
+    "category": "learning",
+    "iconPath": ""
+  },
+  {
+    "id": "ch7_clear",
+    "name": "登峰造极",
+    "description": "满足阈值条件下通关第7章",
+    "category": "learning",
+    "iconPath": ""
+  },
+  {
+    "id": "ch8_clear",
+    "name": "大圆满",
+    "description": "满足阈值条件下通关第8章",
+    "category": "learning",
+    "iconPath": ""
   },
   {
     "id": "first_blood",
     "name": "首战告捷",
-    "description": "在战斗中首次击败敌人",
+    "description": "首次击败敌人",
     "category": "combat",
-    "iconPath": ":/icons/ach_combat1.png"
+    "iconPath": ""
+  },
+  {
+    "id": "code_only_clear",
+    "name": "编程高手",
+    "description": "仅使用代码补全题通关任一章节",
+    "category": "learning",
+    "iconPath": ""
+  },
+  {
+    "id": "hard_only_clear",
+    "name": "自讨苦吃",
+    "description": "仅使用困难题通关任一章节",
+    "category": "learning",
+    "iconPath": ""
+  },
+  {
+    "id": "arena_100",
+    "name": "初试牛刀",
+    "description": "竞技模式单局总伤害达到100",
+    "category": "combat",
+    "iconPath": ""
+  },
+  {
+    "id": "arena_200",
+    "name": "渐入佳境",
+    "description": "竞技模式单局总伤害达到200",
+    "category": "combat",
+    "iconPath": ""
+  },
+  {
+    "id": "arena_500",
+    "name": "百战不殆",
+    "description": "竞技模式单局总伤害达到500",
+    "category": "combat",
+    "iconPath": ""
+  },
+  {
+    "id": "arena_1000",
+    "name": "无双战神",
+    "description": "竞技模式单局总伤害达到1000",
+    "category": "combat",
+    "iconPath": ""
   }
 ]

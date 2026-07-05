@@ -132,14 +132,11 @@ bool AchievementManager::saveProgress()
 
 void AchievementManager::checkChapterClear(int chapterId, bool trophyEarned)
 {
-    // 解锁对应章节的通关成就
+    if (!trophyEarned) return;
+
     QString chapterAchId = QString("ch%1_clear").arg(chapterId);
     unlockAchievement(chapterAchId);
-
-    // 若满足奖杯阈值，解锁完美通关成就
-    if (trophyEarned) {
-        unlockAchievement("perfect_clear");
-    }
+    unlockAchievement("first_blood");
 }
 
 int AchievementManager::findIndex(const QString& achievementId) const

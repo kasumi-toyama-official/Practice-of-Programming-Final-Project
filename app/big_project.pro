@@ -36,6 +36,7 @@ SOURCES += \
     ../src/models/RankingEntry.cpp \
     ../src/models/GameConfig.cpp \
     ../src/utils/JsonUtils.cpp \
+    ../src/utils/CodeJudge.cpp \
     ../src/utils/RandomUtils.cpp
 
 HEADERS += \

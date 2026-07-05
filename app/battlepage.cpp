@@ -1,11 +1,15 @@
 #include "battlepage.h"
 #include <climits>
+#include <QJsonDocument>
+#include <QJsonArray>
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include <QFileInfo>
 #include <QDir>
 #include <QCoreApplication>
 #include <QPixmap>
+#include <QDateTime>
+#include "utils/CodeJudge.h"
 #include <algorithm>
 
 static const int ARENA_TOLERANCE = 3;
@@ -28,12 +32,19 @@ static QString findDataFile(const QString& relativePath)
 }
 
 BattlePage::BattlePage(QWidget *parent)
-    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false),
+    :QWidget(parent),m_currentRound(1), m_roundsPerExtra(3), m_roundsSinceExtra(0), m_correctCount(0), m_chapterId(1), m_loadExisting(false), m_isExtraRound(false), m_paused(false), m_isArenaMode(false),
     m_arenaElapsedMs(0), m_arenaConsecutiveErrors(0), m_arenaLastQuestionId(-1)
 {
     setupUI();
 
     m_gameConfig = GameConfig::getDefault();
+    m_wrongBookManager.setFilePath(QCoreApplication::applicationDirPath() + "/data/progress/wrongbook.json");
+    m_wrongBookManager.load();
+    QString achPath = findDataFile("data/achievements.json");
+    m_achievementManager.loadDefinitions(achPath.isEmpty() ? QCoreApplication::applicationDirPath() + "/data/achievements.json" : achPath);
+    m_achievementManager.loadProgress(QCoreApplication::applicationDirPath() + "/data/progress/achievements.json");
+    m_rankingManager.setFilePath(QCoreApplication::applicationDirPath() + "/data/progress/ranking.json");
+    m_rankingManager.load();
 
     m_playerStats.hp = 100;
     m_playerStats.maxHp = 100;
@@ -68,6 +79,32 @@ BattlePage::BattlePage(QWidget *parent)
     m_leaderboardBtn = nullptr;
     m_arenaTimer = new QTimer(this);
     connect(m_arenaTimer, &QTimer::timeout, this, &BattlePage::onArenaTimerTick);
+
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Idle/Golem_03_Idle_", 12, m_enemyIdleFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Attacking/Golem_03_Attacking_", 12, m_enemyAttackFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Hurt/Golem_03_Hurt_", 12, m_enemyHurtFrames, true);
+    loadFrames(":/charactors/enemy/PNG/Golem_03/PNG Sequences/Dying/Golem_03_Dying_", 15, m_enemyDeathFrames, true);
+    if (!m_enemyIdleFrames.isEmpty())
+        m_enemySprite->setPixmap(m_enemyIdleFrames.first());
+
+    QPixmap sheet(":/charactors/players/PNG/Swordsman_lvl3/With_shadow/Swordsman_lvl3_Idle_with_shadow.png");
+    if (!sheet.isNull()) m_playerIdlePix = sheet.copy(QRect(19, 20, 20, 27));
+    sheet = QPixmap(":/charactors/players/PNG/Swordsman_lvl3/With_shadow/Swordsman_lvl3_attack_with_shadow.png");
+    if (!sheet.isNull()) m_playerAttackPix = sheet.copy(QRect(19, 20, 20, 27));
+    sheet = QPixmap(":/charactors/players/PNG/Swordsman_lvl3/With_shadow/Swordsman_lvl3_Hurt_with_shadow.png");
+    if (!sheet.isNull()) m_playerHurtPix = sheet.copy(QRect(19, 20, 20, 27));
+    sheet = QPixmap(":/charactors/players/PNG/Swordsman_lvl3/With_shadow/Swordsman_lvl3_Death_with_shadow.png");
+    if (!sheet.isNull()) m_playerDeathPix = sheet.copy(QRect(19, 20, 20, 27));
+    if (!m_playerIdlePix.isNull())
+        m_playerSprite->setPixmap(m_playerIdlePix);
+
+    m_animTimer = new QTimer(this);
+    connect(m_animTimer, &QTimer::timeout, this, &BattlePage::onAnimTimerTick);
+    m_animTimer->start(100);
+    m_playerState = Anim_Idle;
+    m_enemyState = Anim_Idle;
+    m_playerFrameIndex = 0;
+    m_enemyFrameIndex = 0;
 }
 
 void BattlePage::setArenaMode(bool isArena)
@@ -102,6 +139,29 @@ void BattlePage::setArenaMode(bool isArena)
         m_passBtn->setText(QString("Pass (%1)").arg(m_passCardCount));
         m_passBtn->show();
         m_passBtn->setEnabled(m_passCardCount > 0);
+
+        if (!m_leaderboardBtn) {
+            m_leaderboardBtn = new QPushButton("退出", this);
+            m_leaderboardBtn->setGeometry(555, 97, 80, 28);
+            m_leaderboardBtn->setStyleSheet(
+                "QPushButton { color: black; background-color: #f0c040; border: 2px solid #c09020;"
+                " border-radius: 6px; font-size: 16px; font-weight: bold; }"
+                "QPushButton:hover { background-color: #e0b030; }");
+            connect(m_leaderboardBtn, &QPushButton::clicked, this, [this]() {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("退出确认");
+                msgBox.setText("确定退出竞技模式吗？\n退出后将计算总伤害。\n注意：游戏计时不会暂停！");
+                msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+                QPushButton *btnYes = msgBox.addButton("确定退出", QMessageBox::YesRole);
+                msgBox.addButton("取消", QMessageBox::NoRole);
+                msgBox.exec();
+                if (msgBox.clickedButton() == btnYes) {
+                    onArenaBattleFinished();
+                }
+            });
+        }
+        m_leaderboardBtn->raise();
+        m_leaderboardBtn->show();
         m_statusBar->setArenaMode(true);
         m_enemyStats.hp = INT_MAX;
         m_enemyStats.maxHp = INT_MAX;
@@ -134,6 +194,7 @@ void BattlePage::setArenaMode(bool isArena)
     {
         if (m_countdownBar) m_countdownBar->hide();
         if (m_passBtn) m_passBtn->hide();
+        if (m_leaderboardBtn) m_leaderboardBtn->hide();
         m_arenaTimer->stop();
         m_statusBar->setArenaMode(false);
         m_statusBar->showRoundLabel(true);
@@ -204,7 +265,7 @@ void BattlePage::startArenaRound()
     }
 
     m_currentRoundSkills = skills;
-    m_skillPanel->setSkills(skills, true);
+    m_skillPanel->setSkills(skills, false);
     m_skillPanel->showWithAnimation();
     m_questionWidget->hide();
 }
@@ -307,7 +368,21 @@ void BattlePage::setupUI()
 
     connect(saveBtn, &QPushButton::clicked, this, &BattlePage::onSaveAndQuit);
     connect(quitBtn, &QPushButton::clicked, this, &BattlePage::onQuitWithoutSave);
-    connect(restartBtn, &QPushButton::clicked, this, &BattlePage::onRestart);
+    connect(restartBtn, &QPushButton::clicked, this, [this]() {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("重新开始");
+        msgBox.setText("请选择：");
+        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+        QPushButton *btnKeep = msgBox.addButton("使用当前配置", QMessageBox::ActionRole);
+        msgBox.addButton("修改配置后重开", QMessageBox::ActionRole);
+        msgBox.addButton("取消", QMessageBox::RejectRole);
+        msgBox.exec();
+        if (msgBox.clickedButton() == btnKeep) {
+            onRestart();
+        } else {
+            emit quitBattle();
+        }
+    });
     connect(resumeBtn, &QPushButton::clicked, [this](){
         m_pauseOverlay->hide();
         m_paused = false;
@@ -319,11 +394,49 @@ void BattlePage::setupUI()
 
 void BattlePage::showNextQuestion()
 {
-    // 按权重决定本次抽题难度
     int targetDifficulty = m_gameConfig.rollDifficulty();
-    auto result = m_questionBank.drawQuestion(m_chapterId, targetDifficulty, m_usedQuestionIds[targetDifficulty]);
+    int targetType = m_gameConfig.rollQuestionType();
 
-    // 该难度题库用完 → 只重置该难度
+    if (targetType == 1 && !m_completionQuestions.isEmpty()) {
+        QVector<int> candidates;
+        for (int d = 0; d <= 2 && candidates.isEmpty(); ++d) {
+            int diff = (targetDifficulty + d) % 3;
+            for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                if (static_cast<int>(it.value().difficulty) == diff
+                    && !m_usedQuestionIds[diff].contains(it.key()))
+                    candidates.append(it.key());
+            }
+            if (candidates.isEmpty()) {
+                m_usedQuestionIds[diff].clear();
+                for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                    if (static_cast<int>(it.value().difficulty) == diff)
+                        candidates.append(it.key());
+                }
+            }
+            if (!candidates.isEmpty()) {
+                int qid = candidates[QRandomGenerator::global()->bounded(candidates.size())];
+                m_usedQuestionIds[diff].insert(qid);
+                CodeCompletionQuestion cq = m_completionQuestions[qid];
+                QuestionData d;
+                d.type = QuestionType::CodeCompletion;
+                d.difficulty = cq.difficulty;
+                d.description = cq.title + "\n" + cq.description;
+                d.codeTemplate = cq.codeTemplate;
+                d.id = cq.id;
+                d.explanation = cq.explanation;
+                d.tolerance = 3;
+                m_currentQuestionData = d;
+                m_currentCompletionData = cq;
+                m_codeCompletionRetries = 3;
+                m_questionWidget->setQuestion(m_currentQuestionData);
+                m_questionWidget->setRemainingTolerance(m_codeCompletionRetries);
+                return;
+            }
+        }
+    }
+
+    // 选择题：从 QuestionBank 按难度抽
+    auto result = m_questionBank.drawQuestion(m_chapterId, targetDifficulty, m_usedQuestionIds[targetDifficulty]);
     if (!result.has_value()) {
         m_usedQuestionIds[targetDifficulty].clear();
         result = m_questionBank.drawQuestion(m_chapterId, targetDifficulty, m_usedQuestionIds[targetDifficulty]);
@@ -379,28 +492,40 @@ void BattlePage::onAnswerSubmitted()
         bool correct = false;
         if (q.type == QuestionType::Choice && q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
-        } else if (q.type == QuestionType::FillBlank) {
-            correct = (answer.trimmed().toLower() == q.blankAnswers.first().toLower());
+        } else if (q.type == QuestionType::CodeCompletion) {
+            CodeJudgeResult r = CodeJudge::compileAndRun(m_currentCompletionData, answer.trimmed());
+            correct = r.passed;
+            if (!r.passed) {
+                QMessageBox msgBox(this);
+                msgBox.setWindowTitle("判题结果");
+                msgBox.setText(r.errorMessage.isEmpty() ? "答案错误" : r.errorMessage);
+                msgBox.setStyleSheet("QMessageBox { background-color: #1e1e3a; } QMessageBox QLabel { color: white; }");
+                msgBox.exec();
+            }
         } else {
             correct = (QRandomGenerator::global()->bounded(2) == 1);
         }
 
         m_questionWidget->showFeedback(correct);
 
+        if (!correct) {
+            m_wrongBookManager.addWrongQuestion(m_chapterId, q.id);
+            m_wrongBookManager.save();
+        }
+
         if (correct && m_pendingBuffId > 0) {
-            if (m_pendingBuffId == 101) {
-                m_playerStats.attack += 10;
-                showFloatingText("攻击力 +10", QPoint(100, 160), QColor(255, 165, 0));
-            } else if (m_pendingBuffId == 102) {
-                m_playerStats.defence += 5;
-                showFloatingText("防御力 +5", QPoint(100, 160), QColor(100, 150, 255));
-            } else if (m_pendingBuffId == 103) {
-                int heal = qMin(30, m_playerStats.maxHp - m_playerStats.hp);
-                m_playerStats.hp += heal;
-                showFloatingText(QString("生命 +%1").arg(heal), QPoint(100, 160), Qt::green);
-            } else if (m_pendingBuffId == 104) {
-                m_playerStats.lifesteal += 0.02;
-                showFloatingText("吸血 +2%", QPoint(100, 160), Qt::green);
+            if (m_currentSkillAttr == "攻击力") {
+                m_playerStats.attack += m_currentSkillBonus;
+                showFloatingText(QString("攻击力 +%1").arg(m_currentSkillBonus), QPoint(100, 160), QColor(255, 165, 0));
+            } else if (m_currentSkillAttr == "防御力") {
+                m_playerStats.defence += m_currentSkillBonus;
+                showFloatingText(QString("防御力 +%1").arg(m_currentSkillBonus), QPoint(100, 160), QColor(100, 150, 255));
+            } else if (m_currentSkillAttr == "回复生命") {
+                m_playerStats.hp = qMin(m_playerStats.maxHp, m_playerStats.hp + m_currentSkillBonus);
+                showFloatingText(QString("生命 +%1").arg(m_currentSkillBonus), QPoint(100, 160), Qt::green);
+            } else if (m_currentSkillAttr == "吸血比例") {
+                m_playerStats.lifesteal += m_currentSkillBonus * 0.01;
+                showFloatingText(QString("吸血 +%1%").arg(m_currentSkillBonus), QPoint(100, 160), Qt::green);
             }
         }
 
@@ -425,21 +550,39 @@ void BattlePage::onAnswerSubmitted()
         if (q.correctOptionIndex >= 0 && q.correctOptionIndex < q.options.size()) {
             correct = (answer.trimmed() == q.options[q.correctOptionIndex].trimmed());
         }
-    } else if (q.type == QuestionType::FillBlank) {
-        // 填空题答案比较（忽略大小写）
-        correct = (answer.trimmed().toLower() == q.blankAnswers.first().toLower());
+    } else if (q.type == QuestionType::CodeCompletion) {
+        CodeJudgeResult r = CodeJudge::compileAndRun(m_currentCompletionData, answer.trimmed());
+        correct = r.passed;
+        if (!r.passed) {
+            m_codeCompletionRetries--;
+            m_questionWidget->setRemainingTolerance(m_codeCompletionRetries);
+            QMessageBox msgBox(this);
+            msgBox.setWindowTitle("判题结果");
+            msgBox.setText(r.errorMessage.isEmpty() ? "答案错误" : r.errorMessage);
+            msgBox.setStyleSheet("QMessageBox { background-color: #1e1e3a; } QMessageBox QLabel { color: white; }");
+            msgBox.exec();
+            if (m_codeCompletionRetries > 0) {
+                m_questionWidget->showFeedback(false);
+                return;
+            }
+        }
     } else {
-        // 编程题随机判定（模拟，待后续接入真实判题）
         correct = (QRandomGenerator::global()->bounded(2) == 1);
     }
-
-    // 反馈动画
     m_questionWidget->showFeedback(correct);
+
+    if (!correct) {
+        m_wrongBookManager.addWrongQuestion(m_chapterId, q.id);
+        m_wrongBookManager.save();
+    } else {
+        m_correctCount++;
+    }
 
     int playerDmg = 0, enemyDmg = 0;
 
     if (correct) {
-        // 玩家攻击伤害 = 攻击力 - 敌人防御，最少为1
+        playPlayerAnim(Anim_Attack);
+        playEnemyAnim(Anim_Hurt);
         playerDmg = qMax(1, m_playerStats.attack - m_enemyStats.defence);
         // 吸血回复
         int heal = static_cast<int>(playerDmg * m_playerStats.lifesteal);
@@ -452,7 +595,8 @@ void BattlePage::onAnswerSubmitted()
             showFloatingText(QString("+%1").arg(heal), QPoint(80, 160), Qt::green);
     }
 
-    // 敌人固定反击（普通回合结束时）
+    playEnemyAnim(Anim_Attack);
+    playPlayerAnim(Anim_Hurt);
     enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
     m_playerStats.hp = qMax(0, m_playerStats.hp - enemyDmg);
     showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
@@ -464,10 +608,12 @@ void BattlePage::onAnswerSubmitted()
 
     // 检查战斗结束
     if (m_playerStats.hp <= 0) {
+        playPlayerAnim(Anim_Death);
         onBattleFinished(false);
         return;
     }
     if (m_enemyStats.hp <= 0) {
+        playEnemyAnim(Anim_Death);
         onBattleFinished(true);
         return;
     }
@@ -556,6 +702,8 @@ void BattlePage::onArenaAnswerSubmitted()
 
         if (m_arenaConsecutiveErrors >= ARENA_TOLERANCE) {
             m_arenaConsecutiveErrors = 0;
+            m_wrongBookManager.addWrongQuestion(m_chapterId, m_currentQuestionData.id);
+            m_wrongBookManager.save();
             m_questionWidget->reset();
             m_passBtn->setEnabled(false);
             startArenaRound();
@@ -584,20 +732,19 @@ void BattlePage::onExtraRoundTrigger()
     for (int id : picked) {
         SkillData s;
         s.id = id; s.iconPath = "";
-        s.difficulty = Difficulty::Easy;
-        if (id == 101) {
-            s.name = "攻击力 +10"; s.attribute = "攻击力"; s.easyBonus = 10;
-        } else if (id == 102) {
-            s.name = "防御力 +5"; s.attribute = "防御力"; s.easyBonus = 5;
-        } else if (id == 103) {
-            s.name = "生命恢复 +30"; s.attribute = "生命上限"; s.easyBonus = 30;
-        } else {
-            s.name = "吸血 +2%"; s.attribute = "吸血比例"; s.easyBonus = 0;
-        }
+        if (id == 101) s.attribute = "攻击力";
+        else if (id == 102) s.attribute = "防御力";
+        else if (id == 103) s.attribute = "回复生命";
+        else s.attribute = "吸血比例";
+        s.name = s.attribute;
+        s.easyBonus = getArenaSkillBonus(s.attribute, Difficulty::Easy);
+        s.mediumBonus = getArenaSkillBonus(s.attribute, Difficulty::Medium);
+        s.hardBonus = getArenaSkillBonus(s.attribute, Difficulty::Hard);
         skills.append(s);
     }
 
-    m_skillPanel->setSkills(skills, true);
+    m_currentRoundSkills = skills;
+    m_skillPanel->setSkills(skills, false);
     m_skillPanel->showWithAnimation();
     m_dimOverlay->show();
     m_extraRoundTitle->show();
@@ -613,6 +760,8 @@ void BattlePage::onPassClicked()
     m_playerStats.passCards = m_passCardCount;
     m_passBtn->setText(QString("Pass (%1)").arg(m_passCardCount));
     m_statusBar->updatePlayer(m_playerStats);
+    m_wrongBookManager.addWrongQuestion(m_chapterId, m_currentQuestionData.id);
+    m_wrongBookManager.save();
     m_questionWidget->reset();
     m_questionWidget->hide();
     startArenaRound();
@@ -710,21 +859,78 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
         m_pendingBuffId = skillId;
         m_dimOverlay->hide();
         m_extraRoundTitle->hide();
-        int diff = m_gameConfig.rollDifficulty();
-        auto result = m_questionBank.drawQuestion(m_chapterId, diff, m_usedQuestionIds[diff]);
-        if (!result.has_value()) {
-            m_usedQuestionIds[diff].clear();
-            result = m_questionBank.drawQuestion(m_chapterId, diff, m_usedQuestionIds[diff]);
+
+        SkillData chosenSkill;
+        for (const SkillData& s : m_currentRoundSkills) {
+            if (s.id == skillId) { chosenSkill = s; break; }
         }
-        if (result.has_value()) {
-            Question q = result.value();
-            m_usedQuestionIds[static_cast<int>(q.difficulty)].insert(q.id);
-            m_currentQuestionData = questionToQuestionData(q);
-            m_questionWidget->reset();
-            m_questionWidget->setQuestion(m_currentQuestionData);
-            m_questionWidget->show();
-            m_extraRoundLabel->show();
-        } else {
+        m_currentSkillAttr = chosenSkill.attribute;
+        if (diff == Difficulty::Easy)      m_currentSkillBonus = chosenSkill.easyBonus;
+        else if (diff == Difficulty::Medium) m_currentSkillBonus = chosenSkill.mediumBonus;
+        else                                m_currentSkillBonus = chosenSkill.hardBonus;
+
+        int diffInt = static_cast<int>(diff);
+        int qType = m_gameConfig.rollQuestionType();
+
+        bool drawn = false;
+        if (qType == 1 && !m_completionQuestions.isEmpty()) {
+            QVector<int> candidates;
+            for (int d = 0; d <= 2 && candidates.isEmpty(); ++d) {
+                int searchDiff = (diffInt + d) % 3;
+                for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                    if (static_cast<int>(it.value().difficulty) == searchDiff
+                        && !m_usedQuestionIds[searchDiff].contains(it.key()))
+                        candidates.append(it.key());
+                }
+                if (candidates.isEmpty()) {
+                    m_usedQuestionIds[searchDiff].clear();
+                    for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                        if (static_cast<int>(it.value().difficulty) == searchDiff)
+                            candidates.append(it.key());
+                    }
+                }
+                if (!candidates.isEmpty()) {
+                    int qid = candidates[QRandomGenerator::global()->bounded(candidates.size())];
+                    m_usedQuestionIds[searchDiff].insert(qid);
+                    CodeCompletionQuestion cq = m_completionQuestions[qid];
+                    QuestionData d;
+                    d.type = QuestionType::CodeCompletion;
+                    d.difficulty = cq.difficulty;
+                    d.description = cq.title + "\n" + cq.description;
+                    d.codeTemplate = cq.codeTemplate;
+                    d.id = cq.id;
+                    d.explanation = cq.explanation;
+                    d.tolerance = 3;
+                    m_currentQuestionData = d;
+                    m_currentCompletionData = cq;
+                    m_questionWidget->reset();
+                    m_questionWidget->setQuestion(m_currentQuestionData);
+                    m_questionWidget->show();
+                    m_extraRoundLabel->show();
+                    drawn = true;
+                }
+            }
+        }
+
+        if (!drawn) {
+            auto result = m_questionBank.drawQuestion(m_chapterId, diffInt, m_usedQuestionIds[diffInt]);
+            if (!result.has_value()) {
+                m_usedQuestionIds[diffInt].clear();
+                result = m_questionBank.drawQuestion(m_chapterId, diffInt, m_usedQuestionIds[diffInt]);
+            }
+            if (result.has_value()) {
+                Question q = result.value();
+                m_usedQuestionIds[static_cast<int>(q.difficulty)].insert(q.id);
+                m_currentQuestionData = questionToQuestionData(q);
+                m_questionWidget->reset();
+                m_questionWidget->setQuestion(m_currentQuestionData);
+                m_questionWidget->show();
+                m_extraRoundLabel->show();
+                drawn = true;
+            }
+        }
+
+        if (!drawn) {
             m_isExtraRound = false;
             m_extraRoundLabel->hide();
             m_questionWidget->reset();
@@ -771,13 +977,15 @@ void BattlePage::keyPressEvent(QKeyEvent *event)
 {
         if (event->key() == Qt::Key_Escape) {
             if (m_isArenaMode) {
-                // 竞技模式：直接退出确认
-                QMessageBox::StandardButton btn = QMessageBox::question(
-                    this, "退出确认",
-                    "确定退出竞技模式吗？\n退出后将计算总伤害。",
-                    QMessageBox::Yes | QMessageBox::No);
-                if (btn == QMessageBox::Yes) {
-                    onArenaBattleFinished(); // 结束战斗，显示总伤害
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("退出确认");
+                msgBox.setText("确定退出竞技模式吗？\n退出后将计算总伤害。\n注意：游戏计时不会暂停！");
+                msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+                QPushButton *btnYes = msgBox.addButton("确定退出", QMessageBox::YesRole);
+                msgBox.addButton("取消", QMessageBox::NoRole);
+                msgBox.exec();
+                if (msgBox.clickedButton() == btnYes) {
+                    onArenaBattleFinished();
                 }
             } else {
                 // 学习模式：打开暂停菜单
@@ -817,6 +1025,7 @@ void BattlePage::onRestart()
     m_usedQuestionIds.clear();
     m_playerStats.totalDamage = 0;
     m_playerStats.buffs.clear();
+    m_correctCount = 0;
 
     m_statusBar->updatePlayer(m_playerStats);
     m_statusBar->updateEnemy(m_enemyStats);
@@ -832,26 +1041,73 @@ void BattlePage::onBattleFinished(bool victory)
     m_saveManager.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
     m_saveManager.deleteChapterArchive(m_chapterId);
 
-    QMessageBox msgBox(this);
-    msgBox.setWindowTitle("战斗结束");
-    msgBox.setText(victory ? "你胜利了！" : "你失败了...");
-    msgBox.setStyleSheet("color: black; background-color: #f0f0f0;");
-    msgBox.exec();
-    emit gameOver(victory, 1, m_playerStats.totalDamage);
+    bool trophy = victory && m_gameConfig.meetsThreshold();
+    if (victory) {
+        RankingEntry entry;
+        entry.chapterId = m_chapterId;
+        entry.totalDamage = m_playerStats.totalDamage;
+        entry.rounds = m_currentRound;
+        entry.correctCount = m_correctCount;
+        entry.timestamp = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+        entry.trophyEarned = trophy;
+        entry.victory = true;
+        m_rankingManager.addRecord(entry);
+        m_rankingManager.save();
+
+        m_achievementManager.checkChapterClear(m_chapterId, trophy);
+        if (trophy) {
+            if (m_gameConfig.choiceWeight == 0 && m_gameConfig.codeCompletionWeight > 0)
+                m_achievementManager.unlockAchievement("code_only_clear");
+            if (m_gameConfig.easyWeight == 0 && m_gameConfig.mediumWeight == 0 && m_gameConfig.hardWeight > 0)
+                m_achievementManager.unlockAchievement("hard_only_clear");
+        }
+        m_achievementManager.saveProgress();
+    }
+
+    if (victory) {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("战斗结束");
+        msgBox.setText("你胜利了！");
+        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+        msgBox.exec();
+        emit gameOver(victory, m_chapterId, m_playerStats.totalDamage, m_currentRound, m_correctCount, trophy);
+    } else {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("战斗失败");
+        msgBox.setText("你失败了...\n要重新开始吗？");
+        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+        QPushButton *btnKeep = msgBox.addButton("重新开始(当前配置)", QMessageBox::ActionRole);
+        QPushButton *btnChange = msgBox.addButton("修改配置后重开", QMessageBox::ActionRole);
+        QPushButton *btnQuit = msgBox.addButton("返回主菜单", QMessageBox::RejectRole);
+        msgBox.exec();
+        if (msgBox.clickedButton() == btnKeep) {
+            onRestart();
+        } else if (msgBox.clickedButton() == btnChange) {
+            emit quitBattle();
+        } else {
+            emit quitBattle();
+        }
+    }
 }
 
 void BattlePage::onArenaBattleFinished()
 {
     m_arenaTimer->stop();
+
+    int dmg = m_playerStats.totalDamage;
+    if (dmg >= 100)  m_achievementManager.unlockAchievement("arena_100");
+    if (dmg >= 200)  m_achievementManager.unlockAchievement("arena_200");
+    if (dmg >= 500)  m_achievementManager.unlockAchievement("arena_500");
+    if (dmg >= 1000) m_achievementManager.unlockAchievement("arena_1000");
+    m_achievementManager.saveProgress();
     QMessageBox msgBox;
     msgBox.setWindowTitle("战斗结束");
     msgBox.setText(QString("你被击败了！\n总伤害: %1").arg(m_playerStats.totalDamage));
-    msgBox.setStyleSheet("color: black; background-color: #f0f0f0;");
+    msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
     QPushButton *btnLeaderboard = msgBox.addButton("查看排行榜", QMessageBox::ActionRole);
     QPushButton *btnReturn = msgBox.addButton("返回主菜单", QMessageBox::AcceptRole);
     msgBox.exec();
     if (msgBox.clickedButton() == btnLeaderboard) {
-        // 跳转到排行榜页面（暂时没有，先回主菜单）
         emit arenaQuit();
     } else {
         emit arenaQuit();
@@ -902,14 +1158,23 @@ void BattlePage::resetBattle()
     m_pauseOverlay->hide();
     m_paused = false;
 
-    m_playerStats.hp = m_playerStats.maxHp;
-    m_enemyStats.hp = m_enemyStats.maxHp;
+    m_playerStats.hp = 100;
+    m_playerStats.maxHp = 100;
+    m_playerStats.attack = 25;
+    m_playerStats.defence = 8;
+    m_playerStats.lifesteal = 0.1;
+    m_playerStats.totalDamage = 0;
+    m_playerStats.buffs.clear();
+
+    m_enemyStats.hp = 150;
+    m_enemyStats.maxHp = 150;
+    m_enemyStats.attack = 15;
+    m_enemyStats.defence = 5;
+
     m_currentRound = 1;
     m_roundsSinceExtra = 0;
     m_usedQuestionIds.clear();
     m_isExtraRound = false;
-    m_playerStats.totalDamage = 0;
-    m_playerStats.buffs.clear();
 
     QString questionPath = findDataFile(QString("data/questions/chapter%1.json").arg(m_chapterId));
     if (!questionPath.isEmpty()) {
@@ -921,6 +1186,20 @@ void BattlePage::resetBattle()
         }
     } else {
         QMessageBox::critical(this, "错误", QString("找不到文件 data/questions/chapter%1.json").arg(m_chapterId));
+    }
+
+    m_completionQuestions.clear();
+    QString completionPath = findDataFile(QString("data/questions/chapter%1_completion.json").arg(m_chapterId));
+    if (!completionPath.isEmpty()) {
+        QFile f(completionPath);
+        if (f.open(QIODevice::ReadOnly)) {
+            QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
+            QJsonArray arr = root["questions"].toArray();
+            for (const auto& v : arr) {
+                CodeCompletionQuestion cq = CodeCompletionQuestion::fromJson(v.toObject());
+                m_completionQuestions[cq.id] = cq;
+            }
+        }
     }
 
     // 刷新状态栏
@@ -939,6 +1218,65 @@ void BattlePage::resetBattle()
     setArenaMode(m_isArenaMode);
     if (m_isArenaMode)
         QTimer::singleShot(50, this, [this](){ startArenaRound(); });
+}
+
+void BattlePage::loadFrames(const QString& prefix, int count, QList<QPixmap>& outFrames, bool flipHorizontal)
+{
+    outFrames.clear();
+    for (int i = 0; i < count; ++i) {
+        QString path = QString("%1%2.png").arg(prefix).arg(i, 3, 10, QLatin1Char('0'));
+        QPixmap pix(path);
+        if (!pix.isNull()) {
+            QPixmap scaled = pix.scaled(240, 240, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            if (flipHorizontal)
+                scaled = QPixmap::fromImage(scaled.toImage().mirrored(true, false));
+            outFrames.append(scaled);
+        }
+    }
+}
+
+void BattlePage::playPlayerAnim(AnimState state)
+{
+    if (m_playerState == Anim_Death && state != Anim_Death) return;
+    if (m_playerState == state) return;
+    m_playerState = state;
+    switch (state) {
+    case Anim_Idle:   if (!m_playerIdlePix.isNull())   m_playerSprite->setPixmap(m_playerIdlePix); break;
+    case Anim_Attack: if (!m_playerAttackPix.isNull()) m_playerSprite->setPixmap(m_playerAttackPix); break;
+    case Anim_Hurt:   if (!m_playerHurtPix.isNull())   m_playerSprite->setPixmap(m_playerHurtPix); break;
+    case Anim_Death:  if (!m_playerDeathPix.isNull())  m_playerSprite->setPixmap(m_playerDeathPix); break;
+    }
+    if (state == Anim_Attack || state == Anim_Hurt)
+        QTimer::singleShot(800, this, [this](){ playPlayerAnim(Anim_Idle); });
+}
+
+void BattlePage::playEnemyAnim(AnimState state)
+{
+    if (m_enemyState == Anim_Death && state != Anim_Death) return;
+    if (m_enemyState == state) return;
+    m_enemyState = state;
+    m_enemyFrameIndex = 0;
+}
+
+void BattlePage::onAnimTimerTick()
+{
+    QList<QPixmap>* frames = nullptr;
+    switch (m_enemyState) {
+    case Anim_Idle:   frames = &m_enemyIdleFrames; break;
+    case Anim_Attack: frames = &m_enemyAttackFrames; break;
+    case Anim_Hurt:   frames = &m_enemyHurtFrames; break;
+    case Anim_Death:  frames = &m_enemyDeathFrames; break;
+    }
+    if (frames && !frames->isEmpty()) {
+        int idx = m_enemyFrameIndex % frames->size();
+        m_enemySprite->setPixmap((*frames)[idx]);
+        m_enemyFrameIndex++;
+        if ((m_enemyState == Anim_Attack || m_enemyState == Anim_Hurt)
+            && m_enemyFrameIndex >= frames->size())
+            playEnemyAnim(Anim_Idle);
+        if (m_enemyState == Anim_Death && m_enemyFrameIndex >= frames->size())
+            m_enemyFrameIndex = frames->size() - 1;
+    }
 }
 
 QuestionData BattlePage::questionToQuestionData(const Question& q)

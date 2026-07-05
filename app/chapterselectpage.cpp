@@ -40,72 +40,103 @@ static QString chapterNameRead(int id)
 // 难度权重配置对话框，用户确认后 outConfig 被填充，返回 true
 static bool showConfigDialog(GameConfig& outConfig, QWidget* parent)
 {
-    QDialog dlg(parent);
-    dlg.setWindowTitle("难度权重配置");
-    dlg.setFixedSize(350, 250);
-    dlg.setStyleSheet(
+    QString dlgStyle =
         "QDialog { background-color: #1e1e3a; color: white; }"
         "QLabel { color: white; background: transparent; }"
-        "QLineEdit { color: white; background-color: #2a2a5a; border: 1px solid #555; padding: 4px; }");
-
-    QFormLayout* form = new QFormLayout(&dlg);
-
-    QLineEdit* easyEdit = new QLineEdit(QString::number(outConfig.easyWeight));
-    QLineEdit* mediumEdit = new QLineEdit(QString::number(outConfig.mediumWeight));
-    QLineEdit* hardEdit = new QLineEdit(QString::number(outConfig.hardWeight));
-
-    easyEdit->setValidator(new QIntValidator(0, 100, &dlg));
-    mediumEdit->setValidator(new QIntValidator(0, 100, &dlg));
-    hardEdit->setValidator(new QIntValidator(0, 100, &dlg));
-
-    form->addRow("简单题权重 (0-100):", easyEdit);
-    form->addRow("中等题权重 (0-100):", mediumEdit);
-    form->addRow("困难题权重 (0-100):", hardEdit);
-
-    QLabel* hint = new QLabel("三个权重不能全为 0");
-    hint->setStyleSheet("color: #aaa; font-size: 11px;");
-    form->addRow(hint);
-
-    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
-    buttons->button(QDialogButtonBox::Ok)->setText("确定");
-    buttons->button(QDialogButtonBox::Cancel)->setText("取消");
-    buttons->setStyleSheet(
+        "QLineEdit { color: white; background-color: #2a2a5a; border: 1px solid #555; padding: 4px; }";
+    QString btnStyle =
         "QPushButton { color: white; background-color: #3a3a6a; border: 1px solid #777;"
         " border-radius: 4px; padding: 6px 16px; }"
-        "QPushButton:hover { background-color: #5a5a8a; }");
+        "QPushButton:hover { background-color: #5a5a8a; }";
 
-    QObject::connect(buttons, &QDialogButtonBox::accepted, [&]() {
-        // 检查每个输入框是否合法
-        if (!easyEdit->hasAcceptableInput() || !mediumEdit->hasAcceptableInput() || !hardEdit->hasAcceptableInput()) {
-            QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！");
-            return;
-        }
+    // 第一步：难度权重
+    {
+        QDialog dlg(parent);
+        dlg.setWindowTitle("1/2 难度权重配置");
+        dlg.setFixedSize(300, 210);
+        dlg.setStyleSheet(dlgStyle);
+        QFormLayout* form = new QFormLayout(&dlg);
+        QLineEdit* easyEdit = new QLineEdit(QString::number(outConfig.easyWeight));
+        QLineEdit* mediumEdit = new QLineEdit(QString::number(outConfig.mediumWeight));
+        QLineEdit* hardEdit = new QLineEdit(QString::number(outConfig.hardWeight));
+        easyEdit->setValidator(new QIntValidator(0, 100, &dlg));
+        mediumEdit->setValidator(new QIntValidator(0, 100, &dlg));
+        hardEdit->setValidator(new QIntValidator(0, 100, &dlg));
+        form->addRow("简单 (0-100):", easyEdit);
+        form->addRow("中等 (0-100):", mediumEdit);
+        form->addRow("困难 (0-100):", hardEdit);
 
-        int easy = easyEdit->text().toInt();
-        int medium = mediumEdit->text().toInt();
-        int hard = hardEdit->text().toInt();
+        QLabel* trophyHint1 = new QLabel("奖杯条件：简单题权重不超过60%");
+        trophyHint1->setStyleSheet("color: #ffcc00; font-size: 11px; background: transparent;");
+        form->addRow(trophyHint1);
 
-        // 二次校验范围（QIntValidator 的 Intermediate 状态可能放过超限值）
-        if (easy < 0 || easy > 100 || medium < 0 || medium > 100 || hard < 0 || hard > 100) {
-            QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！");
-            return;
-        }
+        QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+        buttons->button(QDialogButtonBox::Ok)->setText("下一步");
+        buttons->button(QDialogButtonBox::Cancel)->setText("取消");
+        buttons->setStyleSheet(btnStyle);
+        bool accepted = false;
+        QObject::connect(buttons, &QDialogButtonBox::accepted, [&]() {
+            if (!easyEdit->hasAcceptableInput() || !mediumEdit->hasAcceptableInput() || !hardEdit->hasAcceptableInput()) {
+                QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！"); return;
+            }
+            int e = easyEdit->text().toInt(), m = mediumEdit->text().toInt(), h = hardEdit->text().toInt();
+            if (e < 0 || e > 100 || m < 0 || m > 100 || h < 0 || h > 100) {
+                QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！"); return;
+            }
+            if (e + m + h == 0) {
+                QMessageBox::warning(&dlg, "输入错误", "难度权重不能全为 0！"); return;
+            }
+            outConfig.easyWeight = e; outConfig.mediumWeight = m; outConfig.hardWeight = h;
+            accepted = true; dlg.accept();
+        });
+        QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+        form->addRow(buttons);
+        if (dlg.exec() != QDialog::Accepted || !accepted) return false;
+    }
 
-        if (easy + medium + hard == 0) {
-            QMessageBox::warning(&dlg, "输入错误", "三个权重不能全为 0！");
-            return;
-        }
+    // 第二步：题型权重
+    {
+        QDialog dlg(parent);
+        dlg.setWindowTitle("2/2 题型权重配置");
+        dlg.setFixedSize(300, 190);
+        dlg.setStyleSheet(dlgStyle);
+        QFormLayout* form = new QFormLayout(&dlg);
+        QLineEdit* choiceEdit = new QLineEdit(QString::number(outConfig.choiceWeight));
+        QLineEdit* completionEdit = new QLineEdit(QString::number(outConfig.codeCompletionWeight));
+        choiceEdit->setValidator(new QIntValidator(0, 100, &dlg));
+        completionEdit->setValidator(new QIntValidator(0, 100, &dlg));
+        form->addRow("选择题 (0-100):", choiceEdit);
+        form->addRow("代码补全题 (0-100):", completionEdit);
 
-        outConfig.easyWeight = easy;
-        outConfig.mediumWeight = medium;
-        outConfig.hardWeight = hard;
-        dlg.accept();
-    });
+        QLabel* trophyHint2 = new QLabel("奖杯条件：选择题权重不超过80%");
+        trophyHint2->setStyleSheet("color: #ffcc00; font-size: 11px; background: transparent;");
+        form->addRow(trophyHint2);
 
-    QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+        QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+        buttons->button(QDialogButtonBox::Ok)->setText("开始游戏");
+        buttons->button(QDialogButtonBox::Cancel)->setText("取消");
+        buttons->setStyleSheet(btnStyle);
+        bool accepted = false;
+        QObject::connect(buttons, &QDialogButtonBox::accepted, [&]() {
+            if (!choiceEdit->hasAcceptableInput() || !completionEdit->hasAcceptableInput()) {
+                QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！"); return;
+            }
+            int c = choiceEdit->text().toInt(), p = completionEdit->text().toInt();
+            if (c < 0 || c > 100 || p < 0 || p > 100) {
+                QMessageBox::warning(&dlg, "输入错误", "权重必须是 0~100 之间的整数！"); return;
+            }
+            if (c + p == 0) {
+                QMessageBox::warning(&dlg, "输入错误", "题型权重不能全为 0！"); return;
+            }
+            outConfig.choiceWeight = c; outConfig.codeCompletionWeight = p;
+            accepted = true; dlg.accept();
+        });
+        QObject::connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+        form->addRow(buttons);
+        if (dlg.exec() != QDialog::Accepted || !accepted) return false;
+    }
 
-    form->addRow(buttons);
-    return dlg.exec() == QDialog::Accepted;
+    return true;
 }
 
 ChapterSelectPage::ChapterSelectPage(QWidget *parent)

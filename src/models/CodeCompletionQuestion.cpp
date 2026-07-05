@@ -42,25 +42,12 @@ QJsonObject CodeCompletionQuestion::toJson() const
     obj["blankPlaceholder"] = blankPlaceholder;
     obj["referenceSolution"] = referenceSolution;
     obj["blankCount"] = blankCount;
-    obj["judgeMode"] = static_cast<int>(judgeMode);
 
     QJsonArray testCasesArr;
     for (const CodeCompletionTestCase& tc : testCases) {
         testCasesArr.append(tc.toJson());
     }
     obj["testCases"] = testCasesArr;
-
-    QJsonArray requiredArr;
-    for (const QString& kw : requiredKeywords) {
-        requiredArr.append(kw);
-    }
-    obj["requiredKeywords"] = requiredArr;
-
-    QJsonArray forbiddenArr;
-    for (const QString& kw : forbiddenKeywords) {
-        forbiddenArr.append(kw);
-    }
-    obj["forbiddenKeywords"] = forbiddenArr;
 
     obj["explanation"] = explanation;
     return obj;
@@ -78,23 +65,12 @@ CodeCompletionQuestion CodeCompletionQuestion::fromJson(const QJsonObject& obj)
     q.blankPlaceholder = obj["blankPlaceholder"].toString();
     q.referenceSolution = obj["referenceSolution"].toString();
     q.blankCount = obj["blankCount"].toInt(1);
-    q.judgeMode = static_cast<CodeCompletionJudgeMode>(obj["judgeMode"].toInt(0));
 
     QJsonArray testCasesArr = obj["testCases"].toArray();
     for (const auto& val : testCasesArr) {
         if (val.isObject()) {
             q.testCases.append(CodeCompletionTestCase::fromJson(val.toObject()));
         }
-    }
-
-    QJsonArray requiredArr = obj["requiredKeywords"].toArray();
-    for (const auto& val : requiredArr) {
-        q.requiredKeywords.append(val.toString());
-    }
-
-    QJsonArray forbiddenArr = obj["forbiddenKeywords"].toArray();
-    for (const auto& val : forbiddenArr) {
-        q.forbiddenKeywords.append(val.toString());
     }
 
     q.explanation = obj["explanation"].toString();
