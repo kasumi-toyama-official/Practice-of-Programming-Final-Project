@@ -46,6 +46,7 @@ signals:
     void quitBattle();
     void arenaQuit();
     void arenaGameFinished(int totalDamage);
+    void arenaGoToRanking();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

@@ -55,6 +55,12 @@ void UIManager::setContainer(QWidget *container)
         m_history.append(MainMenu);
         goTo(MainMenu);
     });
+    connect(battle, &BattlePage::arenaGoToRanking, this, [this]() {
+        // 清空页面历史，回到主菜单后再打开排行榜
+        m_history.clear();
+        m_history.append(MainMenu);
+        goTo(Ranking);
+    });
     registerPage(Result, new ResultPage());
     registerPage(ErrorBook, new ErrorBookPage());
     registerPage(Collection, new CollectionPage());

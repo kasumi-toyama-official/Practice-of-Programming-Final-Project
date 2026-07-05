@@ -832,8 +832,7 @@ void BattlePage::onArenaBattleFinished()
     QPushButton *btnReturn = msgBox.addButton("返回主菜单", QMessageBox::AcceptRole);
     msgBox.exec();
     if (msgBox.clickedButton() == btnLeaderboard) {
-        // 跳转到排行榜页面（暂时没有，先回主菜单）
-        emit arenaQuit();
+        emit arenaGoToRanking();
     } else {
         emit arenaQuit();
     }
