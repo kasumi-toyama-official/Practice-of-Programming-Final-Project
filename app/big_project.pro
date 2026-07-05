@@ -19,6 +19,7 @@ SOURCES += \
     mainwindow.cpp \
     questionwidget.cpp \
     resultpage.cpp \
+    rankingpage.cpp \
     settingspage.cpp \
     skillpanel.cpp \
     statusbar.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     mainwindow.h \
     questionwidget.h \
     resultpage.h \
+    rankingpage.h \
     settingspage.h \
     skillpanel.h \
     statusbar.h \
@@ -64,6 +66,7 @@ FORMS += \
     mainmenupage.ui \
     mainwindow.ui \
     resultpage.ui \
+    rankingpage.ui \
     settingspage.ui
 
 # Default rules for deployment.

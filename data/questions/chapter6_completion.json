@@ -1,0 +1,85 @@
+{
+  "chapterId": 6,
+  "chapterName": "虚函数与输入输出",
+  "questions": [
+    {
+      "id": 601,
+      "chapterId": 6,
+      "difficulty": 1,
+      "title": "D:你真的搞清楚为啥 while(cin >> n) 能成立了吗？",
+      "description": "读入两个整数，输出两个整数 ，直到碰到-1\n输入：多组数据，每组一行，是两个整数\n输出：对每组数据，原样输出 当碰到输入中出现-1 时，程序结束 输入中保证会有 -1",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass MyCin\n{\n{{BLANK}}\n};\nint main()\n{\n    MyCin m;\n    int n1,n2;\n    while( m >> n1 >> n2)\n        cout  << n1 << \" \" << n2 << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    bool fail;\npublic:\n    MyCin(): fail(false) {}\n    MyCin& operator>>(int & n) {\n        if (fail) return *this;\n        if (!(cin >> n)) fail = true;\n        else if (n == -1) fail = true;\n        return *this;\n    }\n    operator bool() { return !fail; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "12 44\n344 555\n-1\n2 3",
+          "output": "12 44\n344 555"
+        }
+      ],
+      "requiredKeywords": [
+        "operator>>",
+        "operator bool",
+        "-1"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "重载MyCin的>>运算符读取整数，读到-1或读取失败时置fail标志。提供到bool的类型转换，使while(m>>n1>>n2)能判断循环是否结束。"
+    },
+    {
+      "id": 602,
+      "chapterId": 6,
+      "difficulty": 2,
+      "title": "E:山寨版istream_iterator",
+      "description": "模仿C++标准模板库istream_iterator用法，实现CMyistream_iterator使得程序按要求输出\n输入：第一行是整数t，表示有t组数据每组数据一行，三个整数加两个字符串。字符串是不含空格的\n输出：对每组数据，输出二行 在第一行输出第一个数第二行原样输出输入的内容",
+      "codeTemplate": "#include <iostream>\n#include <string>\n\nusing namespace std;\ntemplate <class T>\nclass CMyistream_iterator\n{\n{{BLANK}}\n};\n\nint main()\n{\n\tint t;\n\tcin >> t;\n\twhile( t -- ) {\n\t\t CMyistream_iterator<int> inputInt(cin);\n\t\t int n1,n2,n3;\n\t\t n1 = * inputInt; //读入 n1\n\t\t int tmp = * inputInt;\n\t\t cout << tmp << endl;\n\t\t inputInt ++;\n\t\t n2 = * inputInt; //读入 n2\n\t\t inputInt ++;\n\t\t n3 = * inputInt; //读入 n3\n\t\t cout << n1 << \" \" << n2<< \" \" << n3 << \" \";\n\t\t CMyistream_iterator<string> inputStr(cin);\n\t\t string s1,s2;\n\t\t s1 = * inputStr;\n\t\t inputStr ++;\n\t\t s2 = * inputStr;\n\t\t cout << s1 << \" \" << s2 << endl;\n\t}\n\t return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    istream* is;\n    T value;\npublic:\n    CMyistream_iterator(istream& in): is(&in) { *is >> value; }\n    T& operator*() { return value; }\n    void operator++() { *is >> value; }\n    void operator++(int) { *is >> value; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n79 90 20 hello me\n12 34 19 take up",
+          "output": "79\n79 90 20 hello me\n12\n12 34 19 take up"
+        }
+      ],
+      "requiredKeywords": [
+        "istream",
+        "operator*",
+        "operator++"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "构造函数立即从输入流读入第一个元素；operator*返回当前缓存值；operator++读取下一个元素。实现类似STL istream_iterator的行为。"
+    },
+    {
+      "id": 603,
+      "chapterId": 6,
+      "difficulty": 1,
+      "title": "编程填空：流处理器",
+      "description": "完善代码，实现一个通用的字符串流解析函数`parse_and_sum()`。该函数接收一个`string`参数，字符串中包含若干由空格分隔的数据。对于整数，返回其累加的结果；对于字符串，返回其首尾拼接的结果。\n输入：第一行为测试组数。后续每组数据包含两行，第一行是以空格分隔的整数（至少1个整数），第二行是以空格分隔的字符串（至少1个字符串）。\n输出：对于每组数据，输出第一行为数字总和，第二行为字符串直接拼接的结果。",
+      "codeTemplate": "#include <iostream>\n#include <string>\n#include <sstream>\nusing namespace std;\n{{BLANK}}\nint main() {\n    int t;\n    cin >> t;\n    cin.ignore();\n    while (t--) {\n        string line1, line2;\n        getline(cin, line1);\n        getline(cin, line2);\n\n        cout << parse_and_sum<int>(line1) << endl;\n        cout << parse_and_sum<string>(line2) << endl;\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T>\nT parse_and_sum(const string& s) {\n    istringstream iss(s);\n    T sum = T();\n    T x;\n    while (iss >> x) sum += x;\n    return sum;\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n10 20 40\n10 20 40",
+          "output": "70\n102040"
+        },
+        {
+          "input": "2\n1 2 3\na b c\n100 200\nxyz",
+          "output": "6\nabc\n300\nxyz"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "parse_and_sum",
+        "istringstream"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "函数模板利用istringstream解析字符串中的空格分隔数据。对整数类型用+累加，对string类型用+=拼接。"
+    }
+  ]
+}

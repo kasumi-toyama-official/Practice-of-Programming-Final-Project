@@ -227,6 +227,7 @@ void ErrorBookPage::onItemClicked(QListWidgetItem *item)
     m_selectedQuestionId = questionId;
 
     QString explanation = item->data(Qt::UserRole + 3).toString();
+    explanation.replace("&", "&&");
     m_detailLabel->setText(QString("解析：\n%1").arg(explanation.isEmpty() ? "暂无解析" : explanation));
 
     m_redoButton->setEnabled(true);

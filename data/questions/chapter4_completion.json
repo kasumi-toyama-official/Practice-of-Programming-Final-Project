@@ -1,0 +1,82 @@
+{
+  "chapterId": 4,
+  "chapterName": "继承与派生",
+  "questions": [
+    {
+      "id": 401,
+      "chapterId": 4,
+      "difficulty": 1,
+      "title": "买肉付牛肉",
+      "description": "补全代码，使运行结果为：\nBuy Nothing\nPay Beef\nBuy Meat\nPay Beef\n输出：Buy NothingPay BeefBuy MeatPay Beef",
+      "codeTemplate": "#include<bits/stdc++.h>\nusing namespace std;\n\nclass Food {\npublic:\n{{BLANK}}\n};\n\nclass Meat : public Food {\npublic:\n\tvoid Buy() { cout << \"Buy Meat\" << endl; }\n\tvirtual void Pay() { cout << \"Pay Meat\" << endl; }\n};\n\nclass Beef : public Meat {\npublic:\n\tvoid Buy() { cout << \"Buy Beef\" << endl; }\n\tvoid Pay() { cout << \"Pay Beef\" << endl; }\n};\nint main() {\n\tBeef bf;\n\tMeat* pmt = &bf;\n\tFood* pfd = &bf;\n\n\tpfd->Buy();\n\tpfd->Pay();\n\tpmt->Buy();\n\tpmt->Pay();\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "\tvoid Buy() { cout << \"Buy Nothing\" << endl; }\n\tvirtual void Pay() { cout << \"Pay Meat\" << endl; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Buy Nothing\nPay Beef\nBuy Meat\nPay Beef"
+        }
+      ],
+      "requiredKeywords": [
+        "virtual",
+        "Buy",
+        "Pay"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "基类Food中定义虚函数Buy输出Buy Nothing、Pay输出Pay Meat。Pay为虚函数，Beef::Pay会覆盖，故通过Food*和Meat*调用时实际执行Beef::Pay输出Pay Beef。"
+    },
+    {
+      "id": 402,
+      "chapterId": 4,
+      "difficulty": 2,
+      "title": "编程填空：Base and Derived",
+      "description": "完善代码，使其能够按照指定方式输出\n输出：Hi BaseHi BaseHi DerivedHi BaseHi Derived060210360Goodbye BaseGoodbye BaseGoodbye DerivedGoodbye Base",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Base {\npublic:\n    static int gem;\n    static void print_total() {\n        cout << gem << endl;\n    }\n{{BLANK}}\nint main() {\n    Base    *A = new Base;\n    Base    *B = new Derived;\n    Derived *C = new Derived;\n    Base::print_total();\n    A->daily();\n    Base::print_total();\n    B->daily();\n    Base::print_total();\n    C->daily();\n    Base::print_total();\n    delete A;\n    delete B;\n    delete C;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "public:\n    Base() { cout << \"Hi Base\" << endl; }\n    ~Base() { cout << \"Goodbye Base\" << endl; }\n    virtual void daily() { gem += 60; }\n};\nint Base::gem = 0;\nclass Derived : public Base {\npublic:\n    Derived() { cout << \"Hi Derived\" << endl; }\n    ~Derived() { cout << \"Goodbye Derived\" << endl; }\n    void daily() override { gem += 150; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Hi Base\nHi Base\nHi Derived\nHi Base\nHi Derived\n0\n60\n210\n360\nGoodbye Base\nGoodbye Base\nGoodbye Derived\nGoodbye Base"
+        }
+      ],
+      "requiredKeywords": [
+        "Base::gem",
+        "Derived",
+        "daily"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Base含静态gem并在类外初始化为0。构造函数输出Hi Base，析构输出Goodbye Base。daily默认加60；Derived的daily覆盖为加150。注意Base析构非虚，故通过Base*删除Derived对象时只调用Base析构。"
+    },
+    {
+      "id": 403,
+      "chapterId": 4,
+      "difficulty": 1,
+      "title": "编程填空：角色攻击",
+      "description": "游戏中有基类 `Hero`（英雄），以及派生类 `Warrior`（战士）和 `Mage`（法师）。请补充完整的 `Hero` 类和 `Warrior` 类，使得主函数能够利用多态正确输出各种职业的攻击伤害。战士的伤害计算公式：基础伤害 + 武器加成法师的伤害计算公式：基础伤害 * 魔法倍率\n输出：Warrior attacks for 15 damage!Mage casts spell for 30 damage!",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nclass Mage : public Hero {\nprivate:\n    int magic_mult;\npublic:\n    Mage(int dmg, int mult) : Hero(dmg), magic_mult(mult) {}\n    void attack() const override {\n        cout << \"Mage casts spell for \" << base_damage * magic_mult << \" damage!\" << endl;\n    }\n};\n\nint main() {\n    Hero* heroes[2];\n\n    // Warrior构造函数参数：(基础伤害, 武器加成)\n    heroes[0] = new Warrior(10, 5);\n\n    // Mage构造函数参数：(基础伤害, 魔法倍率)\n    heroes[1] = new Mage(10, 3);\n\n    for (int i = 0; i < 2; ++i) {\n        heroes[i]->attack();\n        delete heroes[i]; // 确保不会发生内存泄漏\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class Hero {\nprotected:\n    int base_damage;\npublic:\n    Hero(int dmg) : base_damage(dmg) {}\n    virtual void attack() const = 0;\n    virtual ~Hero() {}\n};\nclass Warrior : public Hero {\nprivate:\n    int weapon_bonus;\npublic:\n    Warrior(int dmg, int bonus) : Hero(dmg), weapon_bonus(bonus) {}\n    void attack() const override {\n        cout << \"Warrior attacks for \" << base_damage + weapon_bonus << \" damage!\" << endl;\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Warrior attacks for 15 damage!\nMage casts spell for 30 damage!"
+        }
+      ],
+      "requiredKeywords": [
+        "Hero",
+        "Warrior",
+        "virtual",
+        "attack"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Hero作为抽象基类，提供base_damage和纯虚attack。Warrior继承Hero，重写attack输出基础伤害+武器加成。"
+    }
+  ]
+}

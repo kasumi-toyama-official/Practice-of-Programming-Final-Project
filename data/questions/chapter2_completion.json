@@ -106,6 +106,161 @@
       ],
       "forbiddenKeywords": [],
       "explanation": "Big类包含Base对象b，Base没有默认构造函数，因此Big的构造函数必须用初始化列表同时初始化v和b。默认拷贝构造会自动复制v和b.k。"
+    },
+    {
+      "id": 105,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "编程填空：两种计数",
+      "description": "填写代码，使输出结果为0211171143\n输入：-\n输出：0211171143",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Counter {\n\nprivate:\n\tstatic int nGlobalNumber;\n\tint nLocalNumber;\npublic:\n{{BLANK}}\nvoid add(int n) { nLocalNumber += n; }\n\n\tvoid PrintLocalNumber(){\n\t\tcout << nLocalNumber << endl;\n\t}\n\tstatic void PrintGlobalNumber() {\n\t\tcout << nGlobalNumber << endl;\n\t}\n\n};\nint Counter::nGlobalNumber = 0;\n\nint main()\n{\n\tCounter::PrintGlobalNumber();\n\tCounter b1, b2;\n\tCounter::PrintGlobalNumber();\n\tb1.PrintLocalNumber();\n\tb2.add(10);\n\tb2.PrintLocalNumber();\n\tCounter* b3 = new Counter(7);\n\tb3->PrintLocalNumber();\n\tCounter b4 = b2;\n\tb4.PrintLocalNumber();\n\tCounter::PrintGlobalNumber();\n\tif (b3 != NULL)\n\t{\n\t\tdelete b3;\n\t\tb3 = NULL;\n\t}\n\tCounter::PrintGlobalNumber();\n\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "\tCounter() { nLocalNumber = 1; nGlobalNumber++; }\n\tCounter(int n) { nLocalNumber = n; nGlobalNumber++; }\n\tCounter(const Counter& c) { nLocalNumber = c.nLocalNumber; nGlobalNumber++; }\n\t~Counter() { nGlobalNumber--; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "0\n2\n1\n11\n7\n11\n4\n3"
+        }
+      ],
+      "requiredKeywords": [
+        "Counter",
+        "nGlobalNumber",
+        "nLocalNumber"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "默认构造和拷贝构造均初始化本地计数并增加全局计数，带int参数的构造可设置本地初值，析构减少全局计数。"
+    },
+    {
+      "id": 106,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "编程填空：简单的对象",
+      "description": "程序填空，使得程序输出:2110\n输出：2110",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A\n{\n\tstatic int num;\npublic:\n\tA(){num+=1;}\n\tvoid func()\n\t{\n\t\tcout<< num <<endl;\n\t}\n{{BLANK}}\n};\n\nint A::num=1;\n\nint main()\n{\n\tA a1;\n\tconst A a2 = a1;\n\tA & a3 = a1;\n\tconst A & a4 = a1;\n\n\ta1.func();\n\ta2.func();\n\ta3.func();\n\ta4.func();\n\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "\tvoid func() const { cout << --num << endl; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "2\n1\n1\n0"
+        }
+      ],
+      "requiredKeywords": [
+        "func",
+        "const"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "为const对象重载func()，在其中先递减静态num再输出。非const版本只输出num，因此a1输出2后num变1，后续const调用依次输出1和0。"
+    },
+    {
+      "id": 107,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "编程填空：统计动物数量",
+      "description": "代码填空，使得程序能够自动统计当前各种动物的数量\n输出：0 animals in the zoo, 0 of them are dogs, 0 of them are cats3 animals in the zoo, 2 of them are dogs, 1 of them are cats6 animals in the zoo, 3 of them are dogs, 3 of them are cats3 animals in the zoo, 2 of them are dogs, 1 of them are cats",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nvoid print() {\n\tcout << Animal::number << \" animals in the zoo, \" << Dog::number << \" of them are dogs, \" << Cat::number << \" of them are cats\" << endl;\n}\n\nint main() {\n\tprint();\n\tDog d1, d2;\n\tCat c1;\n\tprint();\n\tDog* d3 = new Dog();\n\tAnimal* c2 = new Cat;\n\tCat* c3 = new Cat;\n\tprint();\n\tdelete c3;\n\tdelete c2;\n\tdelete d3;\n\tprint();\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class Animal {\npublic:\n    static int number;\n    Animal() { number++; }\n    virtual ~Animal() { number--; }\n};\nint Animal::number = 0;\nclass Dog : public Animal {\npublic:\n    static int number;\n    Dog() { number++; }\n    ~Dog() { number--; }\n};\nint Dog::number = 0;\nclass Cat : public Animal {\npublic:\n    static int number;\n    Cat() { number++; }\n    ~Cat() { number--; }\n};\nint Cat::number = 0;",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "0 animals in the zoo, 0 of them are dogs, 0 of them are cats\n3 animals in the zoo, 2 of them are dogs, 1 of them are cats\n6 animals in the zoo, 3 of them are dogs, 3 of them are cats\n3 animals in the zoo, 2 of them are dogs, 1 of them are cats"
+        }
+      ],
+      "requiredKeywords": [
+        "static",
+        "virtual",
+        "Animal",
+        "Dog",
+        "Cat"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "各类维护静态计数。构造时递增对应计数，析构时递减。Animal析构函数声明为虚函数，保证通过Animal*删除Cat/Dog时调用正确的析构函数。"
+    },
+    {
+      "id": 108,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "编程填空：MyClass",
+      "description": "补充下列代码，使得程序的输出为：A:3A:15B:53155\n输出：见样例",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass CMyClassA {\n\tint val;\npublic:\n\tCMyClassA(int);\n\tvoid virtual print();\n};\nCMyClassA::CMyClassA(int arg) {\n\tval = arg;\n\tprintf(\"A:%d\\n\", val);\n}\nvoid CMyClassA::print() {\n\tprintf(\"%d\\n\", val);\n\treturn;\n}\n{{BLANK}}\nint main(int argc, char** argv) {\n\tCMyClassA a(3), *ptr;\n\tCMyClassB b(5);\n\tptr = &a; ptr->print();\n\ta = b;\n\ta.print();\n\tptr = &b; ptr->print();\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class CMyClassB : public CMyClassA {\n    int n;\npublic:\n    CMyClassB(int arg) : CMyClassA(arg * 3), n(arg) {\n        printf(\"B:%d\\n\", n);\n    }\n    void print() {\n        printf(\"%d\\n\", n);\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "A:3\nA:15\nB:5\n3\n15\n5"
+        }
+      ],
+      "requiredKeywords": [
+        "CMyClassB",
+        "CMyClassA",
+        "print"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "B继承A，构造时以3*n调用基类构造（输出A:15）并输出B:n。print重写为输出B自己的n，而通过A*调用时因print为虚函数而调用B::print。"
+    },
+    {
+      "id": 109,
+      "chapterId": 2,
+      "difficulty": 1,
+      "title": "编程填空：构造与析构",
+      "description": "请完善程序，使得所有类型能够正确初始和消亡\n输入：31 0 1\n输出：New ANew BDelete BDelete ANew A Delete ANew ANew BDelete BDelete A",
+      "codeTemplate": "#include<cstdio>\n#include<iostream>\n#include<algorithm>\n#include<cstring>\nusing namespace std;\n{{BLANK}}\nint main(){\n\tint n;\n\tcin >> n;\n\tfor (int i = 1; i<=n; i++) {\n\t\tint x;\n\t\tcin >> x;\n\t\tif (x == 0) {\n\t\t\tA *a = new A();\n\t\t\tdelete a;\n\t\t}else {\n\t\t\tA *a = new B();\n\t\t\tdelete a;\n\t\t}\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class A {\npublic:\n    A() { cout << \"New A\" << endl; }\n    virtual ~A() { cout << \"Delete A\" << endl; }\n};\nclass B : public A {\npublic:\n    B() { cout << \"New B\" << endl; }\n    ~B() { cout << \"Delete B\" << endl; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3\n1 0 1",
+          "output": "New A\nNew B\nDelete B\nDelete A\nNew A\nDelete A\nNew A\nNew B\nDelete B\nDelete A"
+        },
+        {
+          "input": "2\n0 0",
+          "output": "New A\nDelete A\nNew A\nDelete A"
+        }
+      ],
+      "requiredKeywords": [
+        "New A",
+        "New B",
+        "virtual"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "A、B构造和析构按要求输出。A析构声明为虚函数，保证new B()赋值给A*后delete时正确调用B和A的析构。"
+    },
+    {
+      "id": 110,
+      "chapterId": 2,
+      "difficulty": 2,
+      "title": "编程填空：输出指定结果二",
+      "description": "通过填空使得程序输出的结果符合下面的要求。\n输入：不需要输入。\n输出：使得程序的输出结果是：23B::destructorA::destructor34B::destructorA::destructor3B::destructorA::destructorA::destructorA::destructor",
+      "codeTemplate": "#include <iostream>\n#include <map>\nusing namespace std;\n{{BLANK}}\nint A::count = 0;\nvoid func(B b) {  }\nint main()\n{\n\tA a1(5),a2;\n\tcout << A::count << endl;\n\tB b1(4);\n\tcout << A::count << endl;\n\tfunc(b1);\n\tcout << A::count << endl;\n\tA * pa = new B(4);\n\tcout << A::count << endl;\n\tdelete pa;\n\tcout << A::count << endl;\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class A {\npublic:\n    static int count;\n    A() { count++; }\n    A(int) { count++; }\n    A(const A&) { count++; }\n    virtual ~A() { count--; cout << \"A::destructor\" << endl; }\n};\nclass B : public A {\npublic:\n    B(int n): A(n) {}\n    ~B() { cout << \"B::destructor\" << endl; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "2\n3\nB::destructor\nA::destructor\n3\n4\nB::destructor\nA::destructor\n3\nB::destructor\nA::destructor\nA::destructor\nA::destructor"
+        }
+      ],
+      "requiredKeywords": [
+        "static int count",
+        "virtual",
+        "~A"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "A维护静态count记录对象总数。各类构造/拷贝构造增加count，析构减少。B析构先打印B::destructor，再调用A析构打印A::destructor并减count。"
     }
   ]
 }

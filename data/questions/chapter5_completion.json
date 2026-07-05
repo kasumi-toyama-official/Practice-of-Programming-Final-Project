@@ -1,0 +1,228 @@
+{
+  "chapterId": 5,
+  "chapterName": "多态和虚函数",
+  "questions": [
+    {
+      "id": 501,
+      "chapterId": 5,
+      "difficulty": 2,
+      "title": "A:看上去像多态",
+      "description": "程序填空产生指定输出\n输出：D::FunB::FunD::FunnBVal=2nBVal=24nDVal=8B::FunnBVal=12",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass B {\n\tprivate:\n\t\tint nBVal;\n\tpublic:\n\t\tvoid Print()\n\t\t{ cout << \"nBVal=\"<< nBVal << endl; }\n\t\tvoid Fun()\n\t\t{cout << \"B::Fun\" << endl; }\n\t\tB ( int n ) { nBVal = n;}\n};\n{{BLANK}}\nint main() {\n\tB * pb; D * pd;\n\tD d(4); d.Fun();\n\tpb = new B(2); pd = new D(8);\n\tpb -> Fun(); pd->Fun();\n\tpb->Print (); pd->Print ();\n\tpb = & d; pb->Fun();\n\tpb->Print();\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class D: public B {\n    int nDVal;\npublic:\n    D(int n): B(3*n), nDVal(n) {}\n    void Fun() { cout << \"D::Fun\" << endl; }\n    void Print() { B::Print(); cout << \"nDVal=\" << nDVal << endl; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "D::Fun\nB::Fun\nD::Fun\nnBVal=2\nnBVal=24\nnDVal=8\nB::Fun\nnBVal=12"
+        }
+      ],
+      "requiredKeywords": [
+        "class D",
+        "B::Print",
+        "nDVal"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "派生类D继承B，构造函数通过B(3*n)使nBVal=3*nDVal。Fun覆盖为输出D::Fun（非虚，故B*调用B::Fun）。Print先调用B::Print输出nBVal，再输出nDVal。"
+    },
+    {
+      "id": 502,
+      "chapterId": 5,
+      "difficulty": 1,
+      "title": "B:Fun和Do",
+      "description": "程序填空输出指定结果\n输出：A::Fun C::Do",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A {\n\tprivate:\n\tint nVal;\n\tpublic:\n\tvoid Fun()\n\t{ cout << \"A::Fun\" << endl; };\n\tvoid Do()\n\t{ cout << \"A::Do\" << endl; }\n};\nclass B:public A {\n\tpublic:\n\tvirtual void Do()\n\t{ cout << \"B::Do\" << endl;}\n};\nclass C:public B {\n\tpublic:\n\tvoid Do( )\n\t{ cout <<\"C::Do\"<<endl; }\n\tvoid Fun()\n\t{ cout << \"C::Fun\" << endl; }\n};\nvoid Call(\n{{BLANK}}\n) {\n\tp.Fun(); p.Do();\n}\nint main() {\n\tC c;\n\tCall( c);\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "B & p",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "A::Fun\nC::Do"
+        }
+      ],
+      "requiredKeywords": [
+        "A",
+        "p"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Call函数接收A的引用，p.Fun()调用A::Fun（非虚），p.Do()通过虚函数多态调用C::Do。"
+    },
+    {
+      "id": 503,
+      "chapterId": 5,
+      "difficulty": 1,
+      "title": "C:这是什么鬼delete",
+      "description": "程序填空输出指定结果\n输出：destructor Bdestructor A",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A\n{\npublic:\n\tA() { }\n{{BLANK}}\n};\nclass B:public A {\n\tpublic:\n\t~B() { cout << \"destructor B\" << endl; }\n};\nint main()\n{\n\tA * pa;\n\tpa = new B;\n\tdelete pa;\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    virtual ~A() { cout << \"destructor A\" << endl; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "destructor B\ndestructor A"
+        }
+      ],
+      "requiredKeywords": [
+        "virtual",
+        "~A"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "将A的析构函数声明为虚函数，这样通过A*删除B对象时会先调用B的析构函数，再调用A的析构函数。"
+    },
+    {
+      "id": 504,
+      "chapterId": 5,
+      "difficulty": 1,
+      "title": "D:怎么又是Fun和Do",
+      "description": "程序填空输出指定结果\n输出：A::FunA::DoA::FunC::Do",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A {\n\tprivate:\n\tint nVal;\n\tpublic:\n\tvoid Fun()\n\t{ cout << \"A::Fun\" << endl; };\n\tvirtual void Do()\n\t{ cout << \"A::Do\" << endl; }\n};\nclass B:public A {\n\tpublic:\n\tvirtual void Do()\n\t{ cout << \"B::Do\" << endl;}\n};\nclass C:public B {\n\tpublic:\n\tvoid Do( )\n\t{ cout <<\"C::Do\"<<endl; }\n\tvoid Fun()\n\t{ cout << \"C::Fun\" << endl; }\n};\nvoid Call(\n{{BLANK}}\n) {\n\tp->Fun(); p->Do();\n}\nint main() {\n\tCall( new A());\n\tCall( new C());\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "A * p",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "A::Fun\nA::Do\nA::Fun\nC::Do"
+        }
+      ],
+      "requiredKeywords": [
+        "A",
+        "*",
+        "p"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Call函数接收A指针，p->Fun()调用A::Fun（Fun非虚），p->Do()通过虚函数多态调用C::Do。"
+    },
+    {
+      "id": 505,
+      "chapterId": 5,
+      "difficulty": 1,
+      "title": "编程填空：Hero与Priest",
+      "description": "完善以下程序，使其输出为Hero::defense()Hero::attack()Priest::defense()Priest::attack()Priest::defense()\n输出：Hero::defense()Hero::attack()Priest::defense()Priest::attack()Priest::defense()",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass Hero {\npublic:\n{{BLANK}}\n};\nclass Priest: public Hero {\npublic:\n    virtual void attack() { cout << \"Priest::attack()\" << endl; }\n    virtual void defense() { cout << \"Priest::defense()\" << endl; }\n};\n\nint main() {\n    Priest anduin;\n    Hero h;\n    h.defense();\n    Hero *player = &anduin;\n    player->attack();\n    player->defense();\n    anduin.attack();\n    anduin.defense();\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    virtual void defense() { cout << \"Hero::defense()\" << endl; }\n    void attack() { cout << \"Hero::attack()\" << endl; }\n    virtual ~Hero() {}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Hero::defense()\nHero::attack()\nPriest::defense()\nPriest::attack()\nPriest::defense()"
+        }
+      ],
+      "requiredKeywords": [
+        "virtual",
+        "attack",
+        "defense"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Hero中定义虚函数attack和defense，默认实现输出Hero::。通过基类指针调用时，实际调用Priest重写版本。"
+    },
+    {
+      "id": 506,
+      "chapterId": 5,
+      "difficulty": 2,
+      "title": "编程填空：还是Fun和Do",
+      "description": "填写代码，使输出结果为A::FunB::DoC::FunC::DoA::FunB::Do\n输出：A::FunB::DoC::FunC::DoA::FunB::Do",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass A {\n\tpublic:\n\t\tvirtual void Fun() {\n\t\t\tcout << \"A::Fun\" << endl;\n\t\t};\n\t\tvirtual void Do() {\n\t\t\tcout << \"A::Do\" << endl;\n\t\t}\n};\n{{BLANK}}\n{\n\tp.Fun();\n\tp.Do();\n}\n\nvoid Call2(B p) {\n\tp.Fun();\n\tp.Do();\n}\n\nint main() {\n\tC c;\n\tB b;\n\tCall1(b);\n\tCall1(c);\n\tCall2(c);\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class B: public A {\npublic:\n    void Do() { cout << \"B::Do\" << endl; }\n};\nclass C: public B {\npublic:\n    void Fun() { cout << \"C::Fun\" << endl; }\n    void Do() { cout << \"C::Do\" << endl; }\n};\nvoid Call1(B &p)",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "A::Fun\nB::Do\nC::Fun\nC::Do\nA::Fun\nB::Do"
+        }
+      ],
+      "requiredKeywords": [
+        "Call1",
+        "B",
+        "C"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Call1按引用传递，保留多态性：B对象打印A::Fun和B::Do，C对象打印C::Fun和C::Do。Call2按值传递发生对象切片，C对象被切为B，打印A::Fun和B::Do。"
+    },
+    {
+      "id": 507,
+      "chapterId": 5,
+      "difficulty": 2,
+      "title": "编程填空：多态",
+      "description": "输入：-\n输出：derived fooderived funderived foobase funbase foobase fun",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Base {\npublic:\n   virtual Base& fun() { cout << \"base fun\" << endl; return *this; }\n   virtual Base& foo() { cout << \"base foo\" << endl; return *this; }\n};\n\nclass Derived: public Base {\npublic:\n   Base& fun() { cout << \"derived fun\" << endl; return *this; }\n   Base& foo() { cout << \"derived foo\" << endl; return *this; }\n};\n\nBase& foo();\nBase& fun();\n{{BLANK}}\nint main() {\n   foo().fun().foo();\n   fun().foo().fun();\n   return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "Base& foo() { static Derived d; d.foo(); return d; }\nBase& fun() { static Base b; b.fun(); return b; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "derived foo\nderived fun\nderived foo\nbase fun\nbase foo\nbase fun"
+        }
+      ],
+      "requiredKeywords": [
+        "Base&",
+        "Derived",
+        "static"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "foo返回Derived对象引用，fun返回Base对象引用。链式调用foo().fun().foo()全走Derived版本，fun().foo().fun()全走Base版本。"
+    },
+    {
+      "id": 508,
+      "chapterId": 5,
+      "difficulty": 2,
+      "title": "编程填空：又双叒叕是Fun和Do！",
+      "description": "程序填空输出指定结果\n输出：A::Do()1A::Fun()2B::Do()2 B::Fun()3",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass A{\npublic:\n    int n;\n    A(int m):n(m) {}\n    virtual void Do(){\n        cout <<\"A::Do()\" << n << endl;\n        Fun();\n    }\n{{BLANK}}\nvoid CallFun(){\n        Fun();\n    }\n};\n\nclass B: public A{\npublic:\n    B(int n):A(n){ }\n    void Do(){\n        cout <<\"B::Do()\" << ++n << endl;\n        CallFun();\n    }\n    void Fun(){\n        cout <<\"B::Fun()\" << ++n << endl;\n    }\n};\n\nint main(){\n    B bb(1);\n    A aa = bb;\n    aa.Do();\n    A *bp = &bb;\n    bp->Do();\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    virtual void Fun(){\n        cout << \"A::Fun()\" << ++n << endl;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "A::Do()1\nA::Fun()2\nB::Do()2\nB::Fun()3"
+        }
+      ],
+      "requiredKeywords": [
+        "virtual",
+        "Fun"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "A::Fun为虚函数，先++n再输出。aa是B切片得到的A对象，调用A::Do后执行A::Fun，n由1变2。bp指向B对象，B::Do中++n使n=2，CallFun调用B::Fun再++n输出3。"
+    },
+    {
+      "id": 509,
+      "chapterId": 5,
+      "difficulty": 1,
+      "title": "编程填空：Warrior&Mage",
+      "description": "程序填空，使其输出为：\nWarrior::defense()\nWarrior::attack()\nMage::attack()\nMage::defense()\nMage::attack()\nMage::castSpell()\n输出：Warrior::defense()Warrior::attack()Mage::attack()Mage::defense()Mage::attack()Mage::castSpell()",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Fighter {\npublic:\n{{BLANK}}\n};\n\nclass Warrior : public Fighter {\npublic:\n    void attack() { cout << \"Warrior::attack()\" << endl; }\n    void defense() { cout << \"Warrior::defense()\" << endl; }\n};\n\nclass Mage : public Fighter {\npublic:\n    void attack() { cout << \"Mage::attack()\" << endl; }\n    void defense() { cout << \"Mage::defense()\" << endl; }\n    void castSpell() { cout << \"Mage::castSpell()\" << endl; }\n};\n\nint main() {\n    Warrior grom;\n    Mage jaina;\n    Fighter *p = &grom;\n    p->defense();\n    p->attack();\n    p = &jaina;\n    p->attack();\n    p->defense();\n    jaina.attack();\n    jaina.castSpell();\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    virtual void attack() {}\n    virtual void defense() {}\n    virtual ~Fighter() {}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Warrior::defense()\nWarrior::attack()\nMage::attack()\nMage::defense()\nMage::attack()\nMage::castSpell()"
+        }
+      ],
+      "requiredKeywords": [
+        "virtual",
+        "attack",
+        "defense"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Fighter作为基类声明虚函数attack和defense，使通过Fighter*调用时能多态地执行Warrior或Mage版本。"
+    }
+  ]
+}

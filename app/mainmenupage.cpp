@@ -28,6 +28,9 @@ MainMenuPage::MainMenuPage(QWidget *parent)
     connect(ui->btn_achievement, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::Achievement);
     });
+    connect(ui->btn_ranking, &QPushButton::clicked, [](){
+        UIManager::instance()->goTo(UIManager::Ranking);
+    });
     connect(ui->btn_settings, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::Settings);
     });
