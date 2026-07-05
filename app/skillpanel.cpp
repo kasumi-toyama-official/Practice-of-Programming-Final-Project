@@ -33,13 +33,15 @@ void SkillPanel::setSkills(const QList<SkillData>& skills, bool isArenaMode)
         QPushButton* btn = new QPushButton;
         btn->setIcon(QIcon(skill.iconPath));
         btn->setIconSize(QSize(32, 32));
+        QString skillName = skill.name;
+        skillName.replace("&", "&&");
         if (isArenaMode) {
-            btn->setText(skill.name);
+            btn->setText(skillName);
             btn->setProperty("skillId", skill.id);
             btn->setProperty("difficulty", static_cast<int>(skill.difficulty));
         } else {
             // 学习模式：显示属性名和可选的难度范围
-            btn->setText(QString("%1\n(简单/中等/困难)").arg(skill.name));
+            btn->setText(QString("%1\n(简单/中等/困难)").arg(skillName));
             btn->setProperty("skillId", skill.id);
             // 存储各难度加成数值，用于弹出菜单后发送
             btn->setProperty("easyBonus", skill.easyBonus);

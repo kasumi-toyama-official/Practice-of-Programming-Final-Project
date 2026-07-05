@@ -1,0 +1,377 @@
+{
+  "chapterId": 8,
+  "chapterName": "标准模板库STL",
+  "questions": [
+    {
+      "id": 801,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：字符串排序",
+      "description": "请按照要求对输入的字符串进行排序。\\n输入：第一行是正整数T，表示测试数据的组数；每组测试数据输入共两行，第一行是正整数N，表示字符串个数；第二行是N个字符串，字符串间用空格分离。\\n输出：对于每组测试数据，先输出一行：Case: n；第二行按照字符串长度从小到大排序之后输出N个字符串，字符串之间以空格间隔（不会出现字符串长度相同的情况）；第三行按照字符串首字符ASCII码序从小到大排序之后输出N个字符串，字符串之间以空格间隔（不会出现字符串首字母相同的情况）。",
+      "codeTemplate": "#include <iostream>\n#include <string>\n#include <list>\nusing namespace std;\n\nclass A{\nprivate:\n\tstring name;\npublic:\n\tA(string n) :name(n){}\n\tfriend bool operator < (const class A& a1, const class A &a2);\n\tfriend bool operator == (const class A &a1, const class A &a2){\n\t\tif (a1.name.size() == a2.name.size())\n\t\t\treturn true;\n\t\telse\n\t\t\treturn false;\n\t}\n\tfriend ostream & operator << (ostream &o, const A &a){\n\t\to << a.name;\n\t\treturn o;\n\t}\n\tstring get_name() const{\n\t\treturn name;\n\t}\n\tint get_size() const{\n\t\treturn name.size();\n\t}\n};\n{{BLANK}}\n\nint main(int argc, char* argv[])\n{\n\tlist<A> lst;\n\tint ncase, n, i = 1;\n\tstring s;\n\tcin >> ncase;\n\twhile (ncase--){\n\t\tcout << \"Case: \"<<i++ << endl;\n\t\tcin >> n;\n\t\tfor (int i = 0; i < n; i++){\n\t\t\tcin >> s;\n\t\t\tlst.push_back(A(s));\n\t\t}\n\t\tlst.sort();\n\t\tShow(lst.begin(), lst.end(), Print());\n\n\t\tcout << endl;\n\t\tlst.sort(MyLarge<A>());\n\t\tShow(lst.begin(), lst.end(), Print());\n\t\tcout << endl;\n\t\tlst.clear();\n\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "bool operator<(const class A& a1, const class A& a2) {\n    return a1.get_size() < a2.get_size();\n}\nstruct Print {\n    void operator()(const A& a) { cout << a; }\n};\ntemplate<class It, class Op>\nvoid Show(It s, It e, Op op) {\n    if (s == e) return;\n    op(*s);\n    for (++s; s != e; ++s) { cout << \" \"; op(*s); }\n}\ntemplate<class T>\nstruct MyLarge {\n    bool operator()(const T& a1, const T& a2) {\n        return a1.get_name() < a2.get_name();\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n4\na bnss ds tsdfasg\n5\naaa bbbb ccccd sa q",
+          "output": "Case: 1\na ds bnss tsdfasg\na bnss ds tsdfasg\nCase: 2\nq sa aaa bbbb ccccd\naaa bbbb ccccd q sa"
+        }
+      ],
+      "requiredKeywords": [
+        "operator<",
+        "MyLarge",
+        "Show",
+        "Print"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "重载operator<按字符串长度排序；MyLarge按首字符排序；Show遍历调用函数对象Print输出。"
+    },
+    {
+      "id": 802,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "按距离排序",
+      "description": "程序填空，输出指定结果。\\n输入：多组数据，每组一行，是一个整数n和一个字符串s。\\n输出：定义两个整数的距离为两个整数差的绝对值，定义两个字符串的距离为两个字符串长度差的绝对值。对每组数据：对数组a按和n的距离从小到大排序后输出。距离相同的，值小的排在前面。然后对数组b，按照和s的距离从小到大输出。距离相同的，字典序小的排在前面。",
+      "codeTemplate": "#include <iostream>\n#include <cmath>\n#include <algorithm>\n#include <string>\nusing namespace std;\ntemplate <class T1,class T2>\nstruct Closer {\n{{BLANK}}\n};\n\nint Distance1(int n1,int n2) {\n\treturn abs(n1-n2);\n}\nint Distance2(const string & s1, const string & s2)\n{\n\treturn abs((int)s1.length()- (int) s2.length());\n}\nint a[10] = { 0,3,1,4,7,9,20,8,10,15};\nstring b[6] = {\"American\",\"Jack\",\"To\",\"Peking\",\"abcdefghijklmnop\",\"123456789\"};\nint main()\n{\n\tint n;string s;\n\twhile( cin >> n >> s ) {\n\t\tsort(a,a+10,Closer<int ,int (*)(int ,int)> (n,Distance1));\n\t\tfor(int i = 0;i < 10; ++i)\n\t\t\tcout << a[i] << \",\" ;\n\t\tcout << endl;\n\t\tsort(b,b+6,Closer<string,int (*)(const string &,const string &  )> (s,Distance2));\n\t\tfor(int i = 0;i < 6; ++i)\n\t\t\tcout << b[i] << \",\" ;\n\t\tcout << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T1 target;\n    T2 dist;\n    Closer(T1 t, T2 d): target(t), dist(d) {}\n    bool operator()(const T1& a, const T1& b) {\n        int da = dist(a, target);\n        int db = dist(b, target);\n        if (da != db) return da < db;\n        return a < b;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2 a123456\n4 a12345",
+          "output": "1,3,0,4,7,8,9,10,15,20,\nAmerican,Peking,123456789,Jack,To,abcdefghijklmnop,\n4,3,1,7,0,8,9,10,15,20,\nPeking,American,Jack,123456789,To,abcdefghijklmnop,"
+        }
+      ],
+      "requiredKeywords": [
+        "Closer",
+        "dist",
+        "target"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Closer保存目标值和距离函数，operator()比较两个元素到目标值的距离，距离相同按值本身比较。"
+    },
+    {
+      "id": 803,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：回调函数",
+      "description": "输入x1 x2 x3 x4 x5，输出y = x5^5 + x4^4 + x3^3 + x2^2 + x1^1 + 1的y的值。\\n输入：多组数据。第一行是数据组数n；每组数据为一行，5个整数x1 x2 x3 x4 x5。数值不大，不必考虑溢出。\\n输出：对每组数据，输出一个整数y。",
+      "codeTemplate": "#include <algorithm>\n#include <iostream>\n#include <stack>\n#include <queue>\n#include <vector>\n#include <cstring>\n#include <cstdlib>\n#include <string>\n#include <cmath>\n#include <map>\n#include <set>\n\nusing namespace std;\nclass MyFunc\n{\n{{BLANK}}\n};\nint main()\n{\n\tint n;\n\tcin >> n;\n\twhile(n--) {\n\t\tvector<MyFunc> v;\n\t\tfor (int i = 0; i < 5; ++i)\n\t\t\tv.push_back(MyFunc(i+1));\n\t\tint ans = 1;\n\t\tfor (int i = 0; i < 5; ++i)\n\t\t{\n\t\t\tint m;\n\t\t\tcin >> m;\n\t\t\tans += v[i](m);\n\t\t}\n\t\tcout << ans <<endl;\n\t}\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    int exp;\npublic:\n    MyFunc(int e): exp(e) {}\n    int operator()(int x) const {\n        int r = 1;\n        for (int i = 0; i < exp; ++i) r *= x;\n        return r;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n2 2 2 2 2\n1 1 1 1 1",
+          "output": "63\n6"
+        }
+      ],
+      "requiredKeywords": [
+        "operator()",
+        "exp"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "MyFunc保存指数exp，构造时初始化，operator()计算x的exp次幂。"
+    },
+    {
+      "id": 804,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：Printer",
+      "description": "完成以下程序，使得输入的整数x，以及若干正整数，将大于x的正整数输出；然后输入若干字符串，将字符串长度大于x的字符串输出。\\n输入：第一行是整数t，表示一共t组数据；每组数据有三行，第一行是整数x和整数n，第二行是n个整数，第三行是n个不带空格的字符串。\\n输出：对每组数据先按原序输出第一行中大于x的正整数（数据保证会有输出）；再按原序输出第二行中长度大于x的字符串（数据保证会有输出）。",
+      "codeTemplate": "#include<iostream>\n#include<algorithm>\n#include<vector>\n#include<bitset>\n\nusing namespace std;\n\nclass Printer{\n{{BLANK}}\n};\n\nint main(){\n\n\tint t;\n\tcin >> t;\n\twhile(t--) {\n\t\tint n,x;\n\t\tcin>>x>>n;\n\n\t\tvector<int> intVec;\n\t\tfor(int i = 0;i < n; ++i) {\n\t\t\tint y;\n\t\t\tcin >> y;\n\t\t\tintVec.push_back(y);\n\t\t}\n\t\tfor_each(intVec.begin(), intVec.end(), Printer(x));\n\t\tcout<<endl;\n\n\t\tvector<string> strVec;\n\t\tfor(int i = 0;i < n; ++i) {\n\t\t\tstring str;\n\t\t\tcin >> str;\n\t\t\tstrVec.push_back(str);\n\t\t}\n\t\tfor_each(strVec.begin(), strVec.end(), Printer(x));\n\t\tcout<<endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    int threshold;\npublic:\n    Printer(int x): threshold(x) {}\n    void operator()(int n) const {\n        if (n > threshold) cout << n << \",\";\n    }\n    void operator()(const string& s) const {\n        if ((int)s.length() > threshold) cout << s << \",\";\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n5 6\n1 3 59 30 2 40\nthis is hello please me ha\n1 1\n4\nthis",
+          "output": "59,30,40,\nplease,\n4,\nthis,"
+        }
+      ],
+      "requiredKeywords": [
+        "Printer",
+        "operator()"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Printer保存阈值threshold，重载operator()分别处理int和string，大于阈值则输出并加逗号。"
+    },
+    {
+      "id": 805,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：正向与反向输出",
+      "description": "输入一个序列，首先输出原序列，每个元素之间以\"---\"分开；再将序列的每个元素翻倍，并逆序输出原序列，每个元素之间以\"*\"分开。\\n输入：第一行是测试数据组数k。对于每组测试数据，先输入序列长度n，接下来n个整数分别代表序列的n个数。\\n输出：对于每组测试数据输出两行，分别是以\"---\"分割的原序列，和以\"*\"分割的翻倍后的逆序序列。",
+      "codeTemplate": "#include <cstring>\n#include <cstdlib>\n#include <string>\n#include <iostream>\n#include <vector>\n#include <iterator>\nusing namespace std;\nclass C1{\n{{BLANK}}\n};\n\nint main()\n{\n    vector<int> v;\n    int p;\n    int size;\n    int k;\n    cin >> k;\n    while(k--){\n        cin >> size;\n        v.clear();\n        for(int i = 0; i < size; ++i){\n            cin >> p;\n            v.push_back(p);\n        }\n        C1 o1 = C1(size,v);\n        ostream_iterator<int> it(cout,\"---\");\n        copy(*o1, (*o1)+size, it);\n        cout<<endl;\n        for(int i = 0; i < size; ++i){\n            o1[i]*=2;\n            cout<<o1[i]<<\"***\";\n        }\n        cout<<endl;\n    }\n\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    vector<int> v;\npublic:\n    C1(int n, const vector<int>& a): v(a) {}\n    int* operator*() { return &v[0]; }\n    int& operator[](int i) { return v[v.size()-1-i]; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n10\n1 2 3 4 5 6 7 8 9 10",
+          "output": "1---2---3---4---5---6---7---8---9---10---\n20***18***16***14***12***10***8***6***4***2***"
+        }
+      ],
+      "requiredKeywords": [
+        "operator*",
+        "operator[]"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "C1封装vector，operator*返回首元素指针以适配copy，operator[]返回元素引用支持翻倍修改。"
+    },
+    {
+      "id": 806,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "找第一个最小的",
+      "description": "写出FindFirstLess模板，用于寻找序列中小于某指定值的第一个元素。\\n输入：第一行是测试数据组数T；接下来有2T行，每两行是一组测试数据。每组数据第一行开始是一个整数，表示这组数据有n项；接下来是一个字母，如果是'N'，表示这组数据都是整数，如果是'S'表示这组数据都是字符串。第二行就是n个整数，或者n个字符串。\\n输出：对每组数据，输出第二行的前n-1项里面，第一个小于第n项的。如果找不到，输出\"Not Found\"。",
+      "codeTemplate": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n{{BLANK}}\nint main()\n{\n\tint t;\n\tcin >> t;\n\twhile(t--) {\n\t\tint n ;\n\t\tstring type;\n\t\tcin >> n >> type;\n\t\tvector<int> vi;\n\t\tvector<string> vs;\n\t\tif( type == \"N\") {\n\t\t\tint a,m;\n\t\t\tfor(int i = 0;i < n  - 1; ++i) {\n\n\t\t\t\tcin >> a;\n\t\t\t\tvi.push_back(a);\n\t\t\t}\n\t\t\tcin >> m;\n\t\t\tvector<int>::iterator p = FindFirstLess(vi.begin(),vi.end(),m,less<int>());\n\t\t\tif( p!= vi.end())\n\t\t\t\tcout << * p << endl;\n\t\t\telse\n\t\t\t\tcout << \"Not Found\" << endl;\n\n\t\t}\n\t\telse {\n\t\t\tstring a,m;\n\t\t\tfor(int i = 0;i < n - 1; ++i) {\n\t\t\t\tcin >> a;\n\t\t\t\tvs.push_back(a);\n\t\t\t}\n\t\t\tcin >> m;\n\t\t\tvector<string>::iterator p = FindFirstLess(vs.begin(),vs.end(),m,less<string>());\n\t\t\tif( p!= vs.end())\n\t\t\t\tcout << * p << endl;\n\t\t\telse\n\t\t\t\tcout << \"Not Found\" << endl;\n\n\t\t}\n\t}\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template<class It, class T, class Cmp>\nIt FindFirstLess(It s, It e, const T& val, Cmp cmp) {\n    for (; s != e; ++s)\n        if (cmp(*s, val)) return s;\n    return e;\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3\n4 N\n28 12 7 15\n4 S\nJack Tom Marry Ken\n4 N\n100 200 300 2",
+          "output": "12\nJack\nNot Found"
+        }
+      ],
+      "requiredKeywords": [
+        "FindFirstLess",
+        "less"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "FindFirstLess模板遍历区间，返回第一个满足cmp(*it, val)的元素迭代器，找不到返回end。"
+    },
+    {
+      "id": 807,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "输出Fibonacci数列",
+      "description": "Fibonacci数列指的是数列第一项和第二项为1，之后每一项是之前两项的和所构成的数列。现有多组数据，每组数据给出一个数字n，请你输出Fibonacci数列的前n-1项。\\n输入：每组数据一行，整数n；输入以0结尾。\\n输出：对每组数据输出前n-1项。",
+      "codeTemplate": "#include <iostream>\n#include <iterator>\nusing namespace std;\n\ntemplate<class T1, class T2>\nvoid Copy(T1 s, T1 e, T2 x) {\n    for(; s != e; ++s, ++x)\n        *x = *s;\n}\n{{BLANK}}\nint main() {\n\twhile(true) {\n\t\tint n;\n\t\tcin >> n;\n\t\tif(n == 0)\n\t\t\tbreak;\n\n\t    Fib f1(1), f2(n);\n\t    ostream_iterator<int> it(cout, \" \");\n\t    Copy(f1, f2, it);\n\t    cout << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class Fib {\n    int idx;\n    int a, b;\npublic:\n    Fib(int n): idx(n) {\n        a = 0; b = 1;\n        for (int i = 2; i <= n; ++i) {\n            int c = a + b; a = b; b = c;\n        }\n    }\n    int operator*() const { return b; }\n    Fib& operator++() {\n        int c = a + b; a = b; b = c; ++idx;\n        return *this;\n    }\n    bool operator!=(const Fib& o) const { return idx != o.idx; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3\n0",
+          "output": "1 1"
+        }
+      ],
+      "requiredKeywords": [
+        "Fib",
+        "operator++",
+        "operator!="
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Fib类实现输入迭代器，构造到第n项，operator*返回当前Fibonacci数，operator++推进到下一项。"
+    },
+    {
+      "id": 808,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：MyMap",
+      "description": "补充程序，使得程序输出指定的结果。\\n输入：第一行为一个整数n(n <= 1000)；接下来n行每行开头是一个字符串s，代表学生名字，后面是他们的分数g(0 <= g <= 100)，学生名字长度在1~5之间。\\n输出：对输入分数按照从大到小的顺序进行排序，每行输出一个分数，并在分数后面输出每个分数对应的名字，名字的顺序按照字典序从小到大排列。每个名字在每个分数中只能出现一次，即如果有两个同样名字的人考了同样的分数那么只保留一个即可。",
+      "codeTemplate": "#include <algorithm>\n#include <iostream>\n#include <queue>\n#include <vector>\n#include <map>\n#include <set>\nusing namespace std;\n\nclass MyMap{\n{{BLANK}}\n};\nint main()\n{\n    int n;\n    cin >> n;\n    MyMap mm;\n    for (int i = 0; i < n; ++i)\n        cin >> mm;\n    cout<<mm;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    map<int, set<string>, greater<int>> data;\npublic:\n    friend istream& operator>>(istream& is, MyMap& m) {\n        string name; int score;\n        is >> name >> score;\n        m.data[score].insert(name);\n        return is;\n    }\n    friend ostream& operator<<(ostream& os, const MyMap& m) {\n        for (const auto& p : m.data) {\n            os << p.first;\n            for (const auto& name : p.second) os << \" \" << name;\n            os << endl;\n        }\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "10\nabc 98\nd 97\na 98\nbc 98\nab 98\nc 0\na 0\nc 0\na 98\nd 0",
+          "output": "98 a ab abc bc\n97 d\n0 a c d"
+        }
+      ],
+      "requiredKeywords": [
+        "map",
+        "set",
+        "operator>>",
+        "operator<<"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "用map<int,set<string>,greater<int>>按分数降序、按名字字典序升序存储，输入输出运算符重载完成读写。"
+    },
+    {
+      "id": 809,
+      "chapterId": 8,
+      "difficulty": 0,
+      "title": "编程填空：sort",
+      "description": "补全代码，使用std::sort和Lambda表达式对vector<Person>按年龄降序排序。\\n输入：见代码，输入保证不存在重复的年龄。\\n输出：见代码。",
+      "codeTemplate": "#include <iostream>\n#include <algorithm>\n#include <vector>\n#include <string>\nusing namespace std;\n\nstruct Person {\n    string name;\n    int age;\n};\n\nint main() {\n\n    int n;  // 每组的人数\n    cin >> n;\n\n    vector<Person> people;\n    for (int i = 0; i < n; ++i) {\n        string name;\n        int age;\n        cin >> name >> age;\n        people.push_back({name, age});\n    }\n\n    sort(people.begin(), people.end(),\n{{BLANK}}\n);\n\n    for (const auto& p : people) {\n        cout << p.name << \"(\" << p.age << \") \";\n    }\n    cout << endl;\n\n    return 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "        [](const Person& a, const Person& b) { return a.age > b.age; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3\nAlice 25\nBob 30\nCharlie 20",
+          "output": "Bob(30) Alice(25) Charlie(20) "
+        }
+      ],
+      "requiredKeywords": [
+        "lambda",
+        "sort"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Lambda表达式按Person.age降序排序。"
+    },
+    {
+      "id": 810,
+      "chapterId": 8,
+      "difficulty": 2,
+      "title": "编程填空：最大最小",
+      "description": "完善程序，完成指定功能。\\n输入：第一行是整数n；接下来的一行有n个非负整数；再接下来输入若干条命令，每条命令占一行，是一个整数。\\n输出：针对每条命令都要产生输出。命令为0或1，均输出n个整数中的最大值；命令为2，输出n个整数中个位数最大的那个；命令为3，输出n个整数中最小的那个。",
+      "codeTemplate": "#include <iostream>\n#include <vector>\nusing namespace std;\n{{BLANK}}\nstruct myComp {\n\tbool operator ()(int a,int b) {\n\t\treturn a % 10 < b % 10;\n\t}\n};\nint main()\n{\n\tint n;\n\tcin >> n;\n\tvector<int> a,b,c;\n\tfor(int i=0;i<n;++i) {\n\t\tint x;\n\t\tcin >> x;\n\t\ta.push_back(x);\n\t}\n\tint cmd;\n\twhile( cin >> cmd ) {\n\t\tswitch(cmd) {\n\t\t\tcase 0:\n\t\t\t\tcout << getWanted<vector<int>::iterator,less<int>>(a.begin(),a.end()) << endl;\n\t\t\t\tbreak;\n\t\t\tcase 1:\n\t\t\t\tcout << getWanted<vector<int>::iterator>(a.begin(),a.end(), less<int>()) << endl;\n\t\t\t\tbreak;\n\t\t\tcase 2:\n\t\t\t\tcout << getWanted<vector<int>::iterator>(a.begin(),a.end(),myComp()) << endl;\n\t\t\t\tbreak;\n\t\t\tcase 3:\n\t\t\t\tcout << getWanted<vector<int>::iterator>(a.begin(),a.end()) << endl;\n\t\t\t\tbreak;\n\t\t}\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "#include <algorithm>\n#include <functional>\n#include <iterator>\nusing namespace std;\ntemplate<class It, class Cmp = greater<int>>\ntypename iterator_traits<It>::value_type getWanted(It s, It e, Cmp cmp = Cmp()) {\n    return *max_element(s, e, cmp);\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "4\n7 22 4 8\n0\n1\n2\n3",
+          "output": "22\n22\n8\n4"
+        }
+      ],
+      "requiredKeywords": [
+        "max_element",
+        "greater",
+        "iterator_traits"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "getWanted用max_element找元素。默认比较器greater<int>时返回最小值；less<int>时返回最大值；myComp时按个位数返回最大值。"
+    },
+    {
+      "id": 811,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：选择求和求积",
+      "description": "请实现一个模板函数myAccumulate，它能够接收一段区间（由迭代器指定），一个初始值，以及一个二元操作（仿函数），并将该操作依次应用到区间内的所有元素上。保证输出结果不会超过int的数值范围。\\n输入：第一行是整数n (n > 0)；接下来的一行有n个正整数；再接下来输入若干条命令，每条命令占一行，是一个整数。\\n输出：针对每条命令产生输出。命令为0，输出n个整数的累加和；命令为1，输出n个整数的累乘积。",
+      "codeTemplate": "#include <iostream>\n#include <vector>\n#define accumulate  1212\nusing namespace std;\n{{BLANK}}\nstruct SumOp {\n    int operator()(int a, int b) {\n        return a + b;\n    }\n};\n\nstruct ProdOp {\n    int operator()(int a, int b) {\n        return a * b;\n    }\n};\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> nums;\n    for (int i = 0; i < n; ++i) {\n        int x;\n        cin >> x;\n        nums.push_back(x);\n    }\n\n    int cmd;\n    while (cin >> cmd) {\n        if (cmd == 0) {\n            // 计算所有元素的和，初始值为0\n            cout << myAccumulate(nums.begin(), nums.end(), 0, SumOp()) << endl;\n        } else if (cmd == 1) {\n            // 计算所有元素的乘积，初始值为1\n            cout << myAccumulate(nums.begin(), nums.end(), 1, ProdOp()) << endl;\n        }\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template<class It, class T, class Op>\nT myAccumulate(It s, It e, T init, Op op) {\n    for (; s != e; ++s) init = op(init, *s);\n    return init;\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "4\n1 2 3 4\n0\n1",
+          "output": "10\n24"
+        }
+      ],
+      "requiredKeywords": [
+        "myAccumulate",
+        "template"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "myAccumulate模板与STL accumulate类似，遍历区间将二元操作依次应用到初始值和每个元素上。"
+    },
+    {
+      "id": 812,
+      "chapterId": 8,
+      "difficulty": 2,
+      "title": "编程填空：按指令求极值",
+      "description": "完善程序，完成指定功能。\\n输入：第一行是整数n；接下来的一行有n个整数（可能包含负数）；再接下来输入若干条命令，每条命令占一行，是一个整数。\\n输出：针对每条命令都要产生输出。命令为0或1，均输出n个整数中的最小值；命令为2，输出n个整数中绝对值最小的那个；命令为3，输出n个整数中的最大值。",
+      "codeTemplate": "#include <iostream>\n#include <vector>\n#include <cmath>\nusing namespace std;\n{{BLANK}}\nstruct AbsGreater {\n    bool operator ()(int a,int b) {\n        return abs(a) > abs(b);\n    }\n};\n\nint main()\n{\n    int n;\n    cin >> n;\n    vector<int> a;\n    for(int i=0;i<n;++i) {\n        int x;\n        cin >> x;\n        a.push_back(x);\n    }\n    int cmd;\n    while( cin >> cmd ) {\n        switch(cmd) {\n            case 0:\n                cout << findTarget<vector<int>::iterator,greater<int>>(a.begin(),a.end()) << endl;\n                break;\n            case 1:\n                cout << findTarget<vector<int>::iterator>(a.begin(),a.end(), greater<int>()) << endl;\n                break;\n            case 2:\n                cout << findTarget<vector<int>::iterator>(a.begin(),a.end(),AbsGreater()) << endl;\n                break;\n            case 3:\n                cout << findTarget<vector<int>::iterator>(a.begin(),a.end()) << endl;\n                break;\n        }\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "#include <algorithm>\n#include <functional>\nusing namespace std;\ntemplate<class It, class Cmp = less<int>>\nauto findTarget(It s, It e, Cmp cmp = Cmp()) -> decltype(*s) {\n    return *max_element(s, e, cmp);\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "5\n-10 2 5 -1 8\n0\n1\n2\n3",
+          "output": "-10\n-10\n-1\n8"
+        }
+      ],
+      "requiredKeywords": [
+        "max_element",
+        "greater",
+        "less"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "findTarget用max_element查找元素。greater<int>作为\"小于\"比较器时返回最小值；AbsGreater返回绝对值最小值；默认less<int>返回最大值。"
+    },
+    {
+      "id": 813,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：单词分组",
+      "description": "下面的程序读取了若干单词到vector。要求按照单词长度进行分组，长度相同的单词放入同一个集合（内部按字典序排列），最后按长度从大到小的顺序输出每组单词，每组内的单词以空格分隔。\\n输入：输入两行，第一行为单词数量；第二行为各个单词，以空格分隔。\\n输出：按长度从大到小的顺序输出长度和每组单词（每组一行），每组内的单词以空格分隔。",
+      "codeTemplate": "#include <iostream>\n#include <string>\n#include <vector>\n#include <map>\n#include <set>\n#include <algorithm>\n#include <iterator>\nusing namespace std;\n\nint main() {\n    vector<string> words;\n    int n;\n    cin >> n;\n    for (int i = 0; i < n; ++i){\n    \tstring w;\n    \tcin >> w;\n    \twords.push_back(w);\n\t}\n\tmap<int, set<string>, greater<int>> groups;\n{{BLANK}}\nreturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    for (const string& w : words) {\n        groups[w.length()].insert(w);\n    }\n    for (const auto& p : groups) {\n        cout << p.first << \": \";\n        bool first = true;\n        for (const string& s : p.second) {\n            if (!first) cout << \" \";\n            cout << s;\n            first = false;\n        }\n        cout << endl;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "8\napple banana kiwi pear grape melon peach plum",
+          "output": "6: banana\n5: apple grape melon peach\n4: kiwi pear plum"
+        }
+      ],
+      "requiredKeywords": [
+        "map",
+        "set",
+        "greater"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "用map按长度降序分组，set保证组内字典序，遍历输出即可。"
+    },
+    {
+      "id": 814,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：工具查找",
+      "description": "补充模板类Registry，使其支持通过[ ]注册和查找。\\n输入：第一行是整数n，表示要注册n个工具；接下来n行，每行是一个工具，格式为：工具名 前缀；接下来是整数m，表示有m条对工具的调用。接下来是m行，每行表示一个调用，格式为：工具名 参数。对每条调用，输出调用所对应的工具的前缀 + \" \" + 参数。\\n输出：对每条调用，若工具已注册，输出调用结果；否则输出'tool not found'。最后输出注册的工具总数。同名工具多次注册也只算一个。",
+      "codeTemplate": "#include <iostream>\n#include <map>\n#include <string>\n#include <functional>\nusing namespace std;\ntemplate<class T>\nclass Registry  {\n{{BLANK}}\n};\nint main()\n{\n    Registry<function<string(string)>> tools;\n    int n;\n    cin >> n;\n    while (n--) {\n        string name, prefix;\n        cin >> name >> prefix;\n        tools[name] = [prefix](string arg) {\n\t\t\treturn prefix + \" \" + arg;\n\t\t};\n    }\n    int  m;\n    cin >> m;\n    while  (m--) {\n        string name, arg;\n        cin >> name >> arg;\n        if (tools.has(name))\n            cout << tools[name](arg) << endl;\n        else\n            cout << \"tool not found\" << endl;\n    }\n    cout << \"total: \" << tools.size() << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    map<string, T> data;\npublic:\n    T& operator[](const string& name) { return data[name]; }\n    bool has(const string& name) const { return data.find(name) != data.end(); }\n    size_t size() const { return data.size(); }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\nsearch found:\ncalc result:\n3\nsearch cat\ncalc 1+1\nweather Beijing",
+          "output": "found: cat\nresult: 1+1\ntool not found\ntotal: 2"
+        }
+      ],
+      "requiredKeywords": [
+        "map",
+        "operator[]",
+        "has",
+        "size"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Registry用map存储工具名到function的映射，提供operator[]注册、has查询、size统计数量。"
+    },
+    {
+      "id": 815,
+      "chapterId": 8,
+      "difficulty": 1,
+      "title": "编程填空：奇怪的排序",
+      "description": "下面的程序输入n个整数(1<=n<=2000)。要求重新排列这n个整数，按偶数在前、奇数在后的顺序输出，并且偶数内部按降序、奇数内部按升序。请使用priority_queue实现上述逻辑，要求代码不可修改数组a。\\n输入：第一行为整数的数量n(1 ≤ n ≤ 2000)；第二行为具体的n个整数。\\n输出：输出排序后的整数。",
+      "codeTemplate": "#include <iostream>\n#include <queue>\n#include <vector>\nusing namespace std;\nint n;\nvector<int> a;\n\nint main() {\n\tcin >> n;\n\tfor (int i = 0, x; i < n; ++i) {\n\t\tcin >> x;\n\t\ta.push_back(x);\n\t}\n{{BLANK}}\nfor (int x : a) pq.push(x);\n    while (!pq.empty()) {\n        cout << pq.top() << \" \";\n        pq.pop();\n    }\n    return 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "    struct Comp {\n        bool operator()(int a, int b) const {\n            bool ea = a % 2 == 0, eb = b % 2 == 0;\n            if (ea && eb) return a < b;\n            if (!ea && !eb) return a > b;\n            return ea < eb;\n        }\n    };\n    priority_queue<int, vector<int>, Comp> pq;",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "9\n1 2 3 4 5 6 7 8 9",
+          "output": "8 6 4 2 1 3 5 7 9"
+        }
+      ],
+      "requiredKeywords": [
+        "priority_queue",
+        "Comp"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "自定义比较器Comp使priority_queue先按奇偶分组（偶数优先），再分别按偶数降序、奇数升序排列。"
+    }
+  ]
+}

@@ -169,6 +169,8 @@ void QuestionWidget::setQuestion(const QuestionData &data)
             {
                 QString opt = data.options[i];
                 opt.replace("\\n", "\n");
+                // QLabel::setText 会把 & 当作快捷键助记符，需要转义
+                opt.replace("&", "&&");
                 m_choiceLabels[i]->setText(opt);
                 m_choiceLabels[i]->show();
             }

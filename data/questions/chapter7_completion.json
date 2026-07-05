@@ -1,0 +1,525 @@
+{
+  "chapterId": 7,
+  "chapterName": "函数模板和类模板",
+  "questions": [
+    {
+      "id": 701,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "A:简单的SumArray",
+      "description": "填写模板 PrintArray,使得程序输出结果是：\n\nTomJackMaryJohn\n10\n\n不得编写SumArray函数\n输出：TomJackMaryJohn10",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\ntemplate <class T>\nT SumArray(\n{{BLANK}}\n}\nint main() {\n\tstring array[4] = { \"Tom\",\"Jack\",\"Mary\",\"John\"};\n\tcout << SumArray(array,array+4) << endl;\n\tint a[4] = { 1, 2, 3, 4};  //提示：1+2+3+4 = 10\n\tcout << SumArray(a,a+4) << endl;\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "T* begin, T* end) {\n    T sum = T();\n    for (T* p = begin; p != end; ++p) sum += *p;\n    return sum;",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "TomJackMaryJohn\n10"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "SumArray"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "模板函数SumArray遍历[begin,end)区间，将元素累加并返回。对string进行拼接，对int进行求和。"
+    },
+    {
+      "id": 702,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "C:简单的Filter",
+      "description": "编写Filter模板，使得程序产生指定输出\n不得编写 Filter函数\n输出：MikeJackLucy3,4,5,",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\n{{BLANK}}\nbool LargerThan2(int n)\n{\n\treturn n > 2;\n}\nbool LongerThan3(string s)\n{\n\treturn s.length() > 3;\n}\n\nstring as1[5] = {\"Tom\",\"Mike\",\"Jack\",\"Ted\",\"Lucy\"};\nstring as2[5];\nint  a1[5] = { 1,2,3,4,5};\nint a2[5];\nint main() {\n\tstring * p = Filter(as1,as1+5,as2,LongerThan3);\n\tfor(int i = 0;i < p - as2; ++i)\n\t\tcout << as2[i];\n\tcout << endl;\n\tint * p2 = Filter(a1,a1+5,a2,LargerThan2);\n\tfor(int i = 0;i < p2-a2; ++i)\n\t\tcout << a2[i] << \",\";\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T, class P>\nT* Filter(T* begin, T* end, T* out, P pred) {\n    for (T* p = begin; p != end; ++p)\n        if (pred(*p)) *out++ = *p;\n    return out;\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "MikeJackLucy\n3,4,5,"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "Filter"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "模板函数Filter将满足谓词pred的元素复制到out数组，返回out的末尾指针。"
+    },
+    {
+      "id": 703,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "F:这个模板并不难",
+      "description": "程序填空，输出指定结果\n输入：多组数据。每组第一行是一个不含空格的字符串第二行是整数n第三行是n个整数\n输出：对每组数据，先依次输出输入字符串的每个字母，并且在每个字母后面加逗号然后依次再输出输入的n个整数 ，在每个整数后面加逗号",
+      "codeTemplate": "#include <iostream>\n#include <string>\n#include <cstring>\nusing namespace std;\ntemplate <class T>\nclass myclass {\n{{BLANK}}\n~myclass( ) {\n\t\tdelete [] p;\n\t}\n\tvoid Show()\n\t{\n\t\tfor( int i = 0;i < size;i ++ ) {\n\t\t\tcout << p[i] << \",\";\n\t\t}\n\t\tcout << endl;\n\t}\n};\nint a[100];\nint main() {\n\tchar line[100];\n\twhile( cin >> line ) {\n\t\tmyclass<char> obj(line,strlen(line));;\n\t\tobj.Show();\n\t\tint n;\n\t\tcin >> n;\n\t\tfor(int i = 0;i < n; ++i)\n\t\t\tcin >> a[i];\n\t\tmyclass<int> obj2(a,n);\n\t\tobj2.Show();\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T* p;\n    int size;\npublic:\n    myclass(T* a, int n): size(n) {\n        p = new T[n];\n        for (int i = 0; i < n; ++i) p[i] = a[i];\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "Tom\n3\n3 4 5\nJack\n4\n1 2 3 4",
+          "output": "T,o,m,\n3,4,5,\nJ,a,c,k,\n1,2,3,4,"
+        }
+      ],
+      "requiredKeywords": [
+        "new T",
+        "size",
+        "p"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "myclass类在构造时分配数组并复制数据。析构和Show已由模板提供，只需补全构造和成员。"
+    },
+    {
+      "id": 704,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "G:排序，又见排序!",
+      "description": "自己编写一个能对任何类型的数组进行排序的mysort函数模版。只能写一个mysort模板，不能写mysort函数！\n输出：4,8,10,11,123,123,11,10,8,4,1.4,1.2,1.8,3.1,3.2,2.1,",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nbool Greater2(int n1,int n2)\n{\n\treturn n1 > n2;\n}\nbool Greater1(int n1,int n2)\n{\n\treturn n1 < n2;\n}\nbool Greater3(double d1,double d2)\n{\n\treturn d1 < d2;\n}\n\ntemplate <class T1,class T2>\nvoid mysort(\n{{BLANK}}\n#define NUM 5\nint main()\n{\n    int an[NUM] = { 8,123,11,10,4 };\n    mysort(an,an+NUM,Greater1); //从小到大排序\n    for( int i = 0;i < NUM; i ++ )\n       cout << an[i] << \",\";\n    mysort(an,an+NUM,Greater2); //从大到小排序\n    cout << endl;\n    for( int i = 0;i < NUM; i ++ )\n        cout << an[i] << \",\";\n    cout << endl;\n    double d[6] = { 1.4,1.8,3.2,1.2,3.1,2.1};\n    mysort(d+1,d+5,Greater3); //将数组从下标1到下标4从小到大排序\n    for( int i = 0;i < 6; i ++ )\n         cout << d[i] << \",\";\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "T1* begin, T1* end, T2 cmp) {\n    for (T1* i = begin; i != end; ++i)\n        for (T1* j = i + 1; j != end; ++j)\n            if (cmp(*j, *i)) swap(*i, *j);\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "4,8,10,11,123,\n123,11,10,8,4,\n1.4,1.2,1.8,3.1,3.2,2.1,"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "mysort",
+        "swap"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "模板函数mysort使用选择排序，根据比较函数cmp决定升序或降序。可对任意可比较类型排序。"
+    },
+    {
+      "id": 705,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：计算数列平方和",
+      "description": "请写出sum函数，使其可以计算输入数列的平方和。\n输入：第一行是一个整数 t (t <= 10)，表示数据组数；每组输入数据包含两行，第一行是一个整数 n (n <= 100)，第二行是 n 个用空格分隔开的整数\n输出：对每组输入数据，输出该组数据中 n 个整数的平方和",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nint sqr(int n) {\n    return n * n;\n}\nint main() {\n    int t, n, a[0x100];\n    cin >> t;\n    for (int c = 0; c < t; ++c) {\n        cin >> n;\n        for (int i = 0; i < n; ++i) cin >> a[i];\n        cout << sum(a, n, sqr) << endl;\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "int sum(int* a, int n, int (*f)(int)) {\n    int s = 0;\n    for (int i = 0; i < n; ++i) s += f(a[i]);\n    return s;\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n2\n4 3\n3\n0 1 2",
+          "output": "25\n5"
+        }
+      ],
+      "requiredKeywords": [
+        "sum",
+        "int (*f)(int)"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "sum函数接收数组、长度和函数指针，对每个元素调用f并累加结果。"
+    },
+    {
+      "id": 706,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：又见模板",
+      "description": "填写代码，按要求输出结果：\n输入：第一行是整数n，表示有n组数据每组数据有3行第一行是10个整数第二行是5个小数第三行是4个不带空格的字符串，它们之间用空格分隔\n输出：先输出10个整数里面的第三个再输出5个小数的和 (不用考虑小数点后面几位，用cout直接输出即可） 再输出4个字符串连在一起的字符串",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\n{{BLANK}}\nint main() {\n\n\tint t;\n\tcin >> t;\n\twhile( t -- ) {\n\t    int b1[10];\n\t    for(int i = 0;i < 10; ++i)\n\n\t    \tcin >> b1[i];\n\t    A<int, 10> a1 = b1;\n\t    cout << a1[2] << endl;\n\n\t    double b2[5] ;\n\t    for(int i = 0;i < 5; ++i)\n\t    \tcin >> b2[i];\n\n\t    A<double, 5> a2 = b2;\n\t    cout << a2.sum() << endl;\n\n\t    string b3[4] ;\n\t    for(int i = 0;i < 4; ++i)\n\t    \tcin >> b3[i];\n\n\t    A<string, 4> a3 = b3;\n\t    cout << a3.sum() << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T, int N>\nclass A {\n    T data[N];\npublic:\n    A(T* a) {\n        for (int i = 0; i < N; ++i) data[i] = a[i];\n    }\n    T& operator[](int i) { return data[i]; }\n    T sum() {\n        T s = T();\n        for (int i = 0; i < N; ++i) s += data[i];\n        return s;\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n1 2 3 4 5 6 7 8 9 10\n4.2 0.0 3.1 2.7 5.2\nHello , world !",
+          "output": "3\n15.2\nHello,world!"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "A",
+        "operator[]",
+        "sum"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "模板类A<T,N>从数组构造，提供下标访问和求和。对int取下标、对double和string求和。"
+    },
+    {
+      "id": 707,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：简单的计算",
+      "description": "补充代码，使程序按要求输出\n输入：有若干组数据每组数据三行第一行是一个浮点数f和一个整数 n第二行是两个浮点数 x 和 y第三行是两个整数  p 和q\n输出：对每组数据先输出 x + y - f再输出 p + q - n",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\ntemplate <class T>\nclass Add{\npublic:\n{{BLANK}}\n};\n\nint main(){\n\tdouble f;\n\tint n;\n\twhile( cin >> f >> n) {\n\n\t\tAdd<double> a1(f);\n\t\tAdd<int> a2(n);\n\t\tdouble x,y;\n\t\tint p,q;\n\t\tcin >> x >> y >> p >> q;\n\t\tcout << a1(x, y) << endl;\n\t\tcout << a2(p, q) << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T v;\npublic:\n    Add(T n): v(n) {}\n    T operator()(T a, T b) { return a + b - v; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2.2 3\n1.0 2.0\n10 20\n4.5 30\n4.8 9.2\n100 200",
+          "output": "0.8\n27\n9.5\n270"
+        }
+      ],
+      "requiredKeywords": [
+        "Add",
+        "operator()"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Add类保存一个值v，调用运算符返回a+b-v。对double和int分别实例化。"
+    },
+    {
+      "id": 708,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：反转",
+      "description": "补充代码，使得程序输出为50 4 34 21 107.1 8.1 9.1 10.1 11.1 4.1\n输入：-\n输出：50 4 34 21 107.1 8.1 9.1 10.1 11.1 4.1",
+      "codeTemplate": "#include<iostream>\nusing namespace std;\ntemplate<class T>\n{{BLANK}}\nint main()\n{\n\tint a[5] = { 10, 21, 34, 4, 50 };\n\tdouble d[6] = { 4.1, 11.1, 10.1, 9.1, 8.1, 7.1 };\n\tf(a, 5);\n\tf(d, 6);\n\tfor (int i = 0; i < 5; i++)\n\t{\n\t\tcout << a[i] << \" \";\n\t}\n\tcout << endl;\n\tfor (int j = 0; j < 6; j++)\n\t{\n\t\tcout << d[j] << \" \";\n\t}\n\tcout << endl;\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "void f(T* a, int n) {\n    for (int i = 0; i < n / 2; ++i) swap(a[i], a[n - 1 - i]);\n}",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "50 4 34 21 10 \n7.1 8.1 9.1 10.1 11.1 4.1 "
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "swap"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "模板函数f将数组前后元素对称交换，实现反转。"
+    },
+    {
+      "id": 709,
+      "chapterId": 7,
+      "difficulty": 2,
+      "title": "编程填空：很眼熟的模板题",
+      "description": "填写代码，按要求输出结果\n输入：第一行是整数n，表示有n组数据每组数据有2行第一行是10个整数第二行是4个不带空格的字符串，它们之间用空格分隔\n输出：先输出10个整数里面的第3个到第7个的平方和再输出10个整数里从第3个到第7个，按照字符串的方式，顺序连接的结果再输出4个字符串里，第1个到第4个串中，所有字符的ASCII码加和得到的整数再输出4个字符串里，第1个到第4个串，分别复制一遍后，按照字符串的方式，顺序连接的结果。",
+      "codeTemplate": "#include <cstdio>\n#include <iostream>\n#include <string>\n#include <cstring>\nusing namespace std;\n{{BLANK}}\nstring int2string(int x) { return to_string(x); }\nint int2squareint(int x) { return x * x; }\n\nint string2int(string str) {\n\tint res = 0;\n\tfor (string::iterator iter = str.begin(); iter != str.end(); ++iter)\n\t\tres += *iter;\n\treturn res;\n}\nstring string2longerstring(string str) { return str + str; }\n\nint main() {\n\n\tint t;\n\tcin >> t;\n\twhile (t--) {\n\t\tint b1[10];\n\t\tfor (int i = 0; i < 10; ++i)\n\n\t\t\tcin >> b1[i];\n\t\tA<int, 10> a1 = b1;\n\t\tcout << a1.sum(2, 6, int2squareint) << endl;\n\t\tcout << a1.sum(2, 6, int2string) << endl;\n\n\t\tstring b2[4];\n\t\tfor (int i = 0; i < 4; ++i)\n\t\t\tcin >> b2[i];\n\n\t\tA<string, 4> a2 = b2;\n\t\tcout << a2.sum(0, 3, string2int) << endl;\n\t\tcout << a2.sum(0, 3, string2longerstring) << endl;\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T, int N>\nclass A {\n    T data[N];\npublic:\n    A(T* a) {\n        for (int i = 0; i < N; ++i) data[i] = a[i];\n    }\n    template <class F>\n    auto sum(int start, int end, F f) -> decltype(f(data[0])) {\n        auto s = decltype(f(data[0]))();\n        for (int i = start; i <= end; ++i) s += f(data[i]);\n        return s;\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n1 2 3 4 5 6 7 8 9 10\nMachine , Learning !",
+          "output": "135\n34567\n1586\nMachineMachine,,LearningLearning!!"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "A",
+        "sum"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "A类存储数组，sum模板成员接收起始/结束下标和转换函数，返回累加结果。使用decltype推导返回类型，兼容int->string、int->int、string->int、string->string。"
+    },
+    {
+      "id": 710,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "奇怪的container",
+      "description": "程序填空：生成指定输出\n输入：第一行是整数n第二行是整数m第三行是字符串s1第四行是字符串s2\n输出：第一行是 n+2*m第二行是 n + m 第三行是 s1+s2+s2第四行是 s1+s2",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\ntemplate <class T>\nclass container{\n{{BLANK}}\n};\nint main(){\n\tint n,m;\n\tcin >> n >> m;\n\tstring s1,s2;\n\tcin >> s1 >> s2;\n    container <int> a = n;\n    container <int> b = m;\n    cout<<a+b<<endl;\n    cout<<a+m<<endl;\n    container <string> sa = string(s1);\n    container <string> sb = string(s2);\n    cout<<sa+sb<<endl;\n    cout<< sa + s2<<endl;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T v;\npublic:\n    container(T x): v(x) {}\n    container operator+(const container& b) const { return container(v + b.v + b.v); }\n    container operator+(const T& x) const { return container(v + x); }\n    friend ostream& operator<<(ostream& os, const container& c) { os << c.v; return os; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "5\n3\nfoo\nbar",
+          "output": "11\n8\nfoobarbar\nfoobar"
+        }
+      ],
+      "requiredKeywords": [
+        "container",
+        "operator+",
+        "operator<<"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "container包装一个T类型值，重载container+container、container+T以及输出运算符。"
+    },
+    {
+      "id": 711,
+      "chapterId": 7,
+      "difficulty": 3,
+      "title": "很难蒙混过关的CArray3d三维数组模板类",
+      "description": "实现一个三维数组模版CArray3D，可以用来生成元素为任意类型变量的三维数组，输出指定结果\n输出：等同于样例",
+      "codeTemplate": "#include <iostream>\n#include <iomanip>\n#include <cstring>\nusing namespace std;\ntemplate <class T>\nclass CArray3D\n{\n{{BLANK}}\n};\n\nCArray3D<int> a(3,4,5);\nCArray3D<double> b(3,2,2);\nvoid PrintA()\n{\n\tfor(int i = 0;i < 3; ++i) {\n\t\tcout << \"layer \" << i << \":\" << endl;\n\t\tfor(int j = 0; j < 4; ++j) {\n\t\t\tfor(int k = 0; k < 5; ++k)\n\t\t\t\tcout << a[i][j][k] << \",\" ;\n\t\t\tcout << endl;\n\t\t}\n\t}\n}\nvoid PrintB()\n{\n\tfor(int i = 0;i < 3; ++i) {\n\t\tcout << \"layer \" << i << \":\" << endl;\n\t\tfor(int j = 0; j < 2; ++j) {\n\t\t\tfor(int k = 0; k < 2; ++k)\n\t\t\t\tcout << b[i][j][k] << \",\" ;\n\t\t\tcout << endl;\n\t\t}\n\t}\n}\n\nint main()\n{\n\n\tint No = 0;\n\tfor( int i = 0; i < 3; ++ i ) {\n\t\ta[i];\n\t\tfor( int j = 0; j < 4; ++j ) {\n\t\t\ta[j][i];\n\t\t\tfor( int k = 0; k < 5; ++k )\n\t\t\t\ta[i][j][k] = No ++;\n\t\t\ta[j][i][i];\n\t\t}\n\t}\n\tPrintA();\n\tmemset(a[1],-1 ,20*sizeof(int));\n\tmemset(a[1],-1 ,20*sizeof(int));\n\tPrintA();\n\tmemset(a[1][1],0 ,5*sizeof(int));\n\tPrintA();\n\n\tfor( int i = 0; i < 3; ++ i )\n\t\tfor( int j = 0; j < 2; ++j )\n\t\t\tfor( int k = 0; k < 2; ++k )\n\t\t\t\tb[i][j][k] = 10.0/(i+j+k+1);\n\tPrintB();\n\tint n = a[0][1][2];\n\tdouble f = b[0][1][1];\n\tcout << \"****\" << endl;\n\tcout << n << \",\" << f << endl;\n\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T* data;\n    int d1, d2, d3;\npublic:\n    class Layer {\n        T* data;\n        int d2, d3;\n    public:\n        class Row {\n            T* data;\n        public:\n            Row(T* p): data(p) {}\n            T& operator[](int k) { return data[k]; }\n            operator T*() { return data; }\n        };\n        Layer(T* p, int x, int y): data(p), d2(x), d3(y) {}\n        Row operator[](int j) { return Row(data + j * d3); }\n        operator T*() { return data; }\n    };\n    CArray3D(int x, int y, int z): d1(x), d2(y), d3(z) {\n        data = new T[x * y * z];\n    }\n    ~CArray3D() { delete [] data; }\n    Layer operator[](int i) { return Layer(data + i * d2 * d3, d2, d3); }\n    operator T*() { return data; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "layer 0:\n0,1,2,3,4,\n5,6,7,8,9,\n10,11,12,13,14,\n15,16,17,18,19,\nlayer 1:\n20,21,22,23,24,\n25,26,27,28,29,\n30,31,32,33,34,\n35,36,37,38,39,\nlayer 2:\n40,41,42,43,44,\n45,46,47,48,49,\n50,51,52,53,54,\n55,56,57,58,59,\nlayer 0:\n0,1,2,3,4,\n5,6,7,8,9,\n10,11,12,13,14,\n15,16,17,18,19,\nlayer 1:\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\nlayer 2:\n40,41,42,43,44,\n45,46,47,48,49,\n50,51,52,53,54,\n55,56,57,58,59,\nlayer 0:\n0,1,2,3,4,\n5,6,7,8,9,\n10,11,12,13,14,\n15,16,17,18,19,\nlayer 1:\n-1,-1,-1,-1,-1,\n0,0,0,0,0,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\nlayer 2:\n40,41,42,43,44,\n45,46,47,48,49,\n50,51,52,53,54,\n55,56,57,58,59,\nlayer 0:\n10,5,\n5,3.33333,\nlayer 1:\n5,3.33333,\n3.33333,2.5,\nlayer 2:\n3.33333,2.5,\n2.5,2,\n****\n7,3.33333"
+        }
+      ],
+      "requiredKeywords": [
+        "CArray3D",
+        "Layer",
+        "Row",
+        "operator[]"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "三维数组模板通过嵌套Layer和Row类实现a[i][j][k]。Layer和Row均提供到T*的转换，支持memset按层或按行操作。"
+    },
+    {
+      "id": 712,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：又是MyClass",
+      "description": "补充下列代码，使得程序能够按要求输出\n输入：第一行是整数t表示数据组数 每组数据有两行 第一行开头是整数m，然后后面是m个整数(5 < m < 30)第二行是一个没有空格的字符串，长度不超过50\n输出：对每组数据 先输出m个整数中的第5个，然后输出字符串中的第7个字符。\"第i个\"中的 i 是从0开始算的。",
+      "codeTemplate": "#include <iostream>\n#include <cstring>\n#include <vector>\n#include <cstdio>\nusing namespace std;\n{{BLANK}}\nint  a[40];\nint main(int argc, char** argv) {\n\tint t;\n\tscanf(\"%d\",&t);\n\twhile ( t -- ) {\n\t\tint m;\n\t\tscanf(\"%d\",&m);\n\t\tfor (int i = 0;i < m; ++i)\n\t\t\tscanf(\"%d\",a+i);\n\t\tchar s[100];\n\t\tscanf(\"%s\",s);\n\t\tCMyClass<int> b(a, m);\n\t\tCMyClass<char> c(s, strlen(s));\n\t\tprintf(\"%d %c\\n\", b[5], c[7]);\n\t}\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T>\nclass CMyClass {\n    T* p;\n    int n;\npublic:\n    CMyClass(T* a, int m): p(a), n(m) {}\n    T& operator[](int i) { return p[i]; }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n6 1 3 5 5095 8 8\nhelloworld",
+          "output": "8 r"
+        }
+      ],
+      "requiredKeywords": [
+        "template",
+        "CMyClass",
+        "operator[]"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "CMyClass类包装数组指针和长度，operator[]直接返回对应元素引用。"
+    },
+    {
+      "id": 713,
+      "chapterId": 7,
+      "difficulty": 3,
+      "title": "改良过的CArray3d三维数组模板类",
+      "description": "程序填空，按要求输出\n输出：如样例",
+      "codeTemplate": "#include <iostream>\n#include <iomanip>\n#include <cstring>\nusing namespace std;\ntemplate <class T>\nclass CArray3D\n{\n{{BLANK}}\n};\n\nCArray3D<int> a(3,4,5);\nCArray3D<double> b(3,2,2);\nvoid PrintA()\n{\n    for(int i = 0;i < 3; ++i) {\n        cout << \"layer \" << i << \":\" << endl;\n        for(int j = 0; j < 4; ++j) {\n            for(int k = 0; k < 5; ++k)\n                cout << a[i][j][k] << \",\" ;\n            cout << endl;\n        }\n    }\n}\nvoid PrintB()\n{\n    for(int i = 0;i < 3; ++i) {\n        cout << \"layer \" << i << \":\" << endl;\n        for(int j = 0; j < 2; ++j) {\n            for(int k = 0; k < 2; ++k)\n                cout << b[i][j][k] << \",\" ;\n            cout << endl;\n        }\n    }\n}\n\nint main()\n{\n\n    int No = 0;\n    for( int i = 0; i < 3; ++ i )\n        for( int j = 0; j < 4; ++j )\n            for( int k = 0; k < 5; ++k )\n                a[i][j][k] = No ++;\n    PrintA();\n    memset(a, -1, 60 * sizeof(int));        //注意这里\n    memset(a[1][1], 0, 5 * sizeof(int));\n    PrintA();\n\n    for( int i = 0; i < 3; ++ i )\n        for( int j = 0; j < 2; ++j )\n            for( int k = 0; k < 2; ++k )\n                b[i][j][k] = 10.0 / (i + j + k + 1);\n    PrintB();\n    int n = a[0][1][2];\n    double f = b[0][1][1];\n    cout << \"****\" << endl;\n    cout << n << \",\" << f << endl;\n\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T* data;\n    int d1, d2, d3;\npublic:\n    class Layer {\n        T* data;\n        int d2, d3;\n    public:\n        class Row {\n            T* data;\n        public:\n            Row(T* p): data(p) {}\n            T& operator[](int k) { return data[k]; }\n            operator T*() { return data; }\n        };\n        Layer(T* p, int x, int y): data(p), d2(x), d3(y) {}\n        Row operator[](int j) { return Row(data + j * d3); }\n        operator T*() { return data; }\n    };\n    CArray3D(int x, int y, int z): d1(x), d2(y), d3(z) {\n        data = new T[x * y * z];\n    }\n    ~CArray3D() { delete [] data; }\n    Layer operator[](int i) { return Layer(data + i * d2 * d3, d2, d3); }\n    operator T*() { return data; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "layer 0:\n0,1,2,3,4,\n5,6,7,8,9,\n10,11,12,13,14,\n15,16,17,18,19,\nlayer 1:\n20,21,22,23,24,\n25,26,27,28,29,\n30,31,32,33,34,\n35,36,37,38,39,\nlayer 2:\n40,41,42,43,44,\n45,46,47,48,49,\n50,51,52,53,54,\n55,56,57,58,59,\nlayer 0:\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\nlayer 1:\n-1,-1,-1,-1,-1,\n0,0,0,0,0,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\nlayer 2:\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\n-1,-1,-1,-1,-1,\nlayer 0:\n10,5,\n5,3.33333,\nlayer 1:\n5,3.33333,\n3.33333,2.5,\nlayer 2:\n3.33333,2.5,\n2.5,2,\n****\n-1,3.33333"
+        }
+      ],
+      "requiredKeywords": [
+        "CArray3D",
+        "operator T*",
+        "operator[]"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "在基础三维数组模板之上，为CArray3D本身提供到T*的转换，使memset(a,-1,...)可直接作用整个数组。"
+    },
+    {
+      "id": 714,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：乘积",
+      "description": "读入 n 个数，输出 n 个数，其中输出的第 i 个数是读入中前 i 个数的乘积。\n输入：第一行输入整数n(n < 10)第二行n个整数（< 10）\n输出：输出 n 行，每行1个数，其中输出的第 i 行数是读入中前 i 个数的乘积。",
+      "codeTemplate": "#include<iostream>\n#include<vector>\nusing namespace std;\nclass B{\n{{BLANK}}\n};\nint B::product = 1;\nint main(){\n  int n; cin >> n;\n  vector<B*> p;\n  for(int i = 0; i < n; i++){\n    int x; cin >> x;\n    p.push_back(new B(x));\n  }\n  for(int i = 0; i < n; ++i)\n    p[i]->output();\n  return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    static int product;\n    int x;\n    int myProduct;\npublic:\n    B(int n): x(n) { product *= x; myProduct = product; }\n    void output() { cout << myProduct << endl; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "4\n2 3 4 5",
+          "output": "2\n6\n24\n120"
+        }
+      ],
+      "requiredKeywords": [
+        "static",
+        "product",
+        "output"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "B类维护静态product记录累计乘积，构造时将输入值乘入product，output输出当前乘积。"
+    },
+    {
+      "id": 715,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：模板类 Multiply",
+      "description": "要求实现模板类 Multiply，使程序按以下规则运行：\n\n构造对象时保存一个初始值\n调用对象时返回两个参数的乘积加上该初始值\n输入：首先输入一个高精度浮点数和一个整型，之后输入两个高精度浮点数和两个整型。上述输入不超过100，且为正数。\n输出：输出需要转换为整型，向下取整。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\ntemplate <class T>\nclass Multiply {\n{{BLANK}}\n};\nint main() {\n    double f;\n    int n;\n    cin >> f >> n;\n    Multiply<double> m1(f);\n    Multiply<int> m2(n);\n    double x, y;\n    int p, q;\n    cin >> x >> y >> p >> q;\n    cout << m1(x, y) << endl;\n    cout << m2(p, q) << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T init;\npublic:\n    Multiply(T n): init(n) {}\n    T operator()(T a, T b) { return a * b + init; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2.0 3\n4.0 5.0\n2 3",
+          "output": "22\n9"
+        }
+      ],
+      "requiredKeywords": [
+        "Multiply",
+        "operator()"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Multiply模板类保存初始值，调用时返回两参数乘积加初始值。"
+    },
+    {
+      "id": 716,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：矩阵操作",
+      "description": "程序填空，完成矩阵单个元素的修改。\n输入：第一行，输入一个整数t(0< t < 100)然后输入一个3*3的整数矩阵m，并将m[0][1]设置成t\n输出：第一行输出一个整数，表示m[1][2]第二行输出一个整数，表示m[0][1]",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Matrix {\nprivate:\n    int **data;\npublic:\n    Matrix(int n, int m) {\n        data = new int*[n];\n        for (int i=0; i<n; i++) {\n            data[i] = new int[m];\n            for (int j = 0; j < m; j++)\n                cin >> data[i][j];\n        }\n    }\n{{BLANK}}\n};\n\nint main() {\n    int t;\n    cin >> t;\n    Matrix m(3, 3);\n    cout << m[1][2] << endl;\n    m[0][1] = t;\n    cout << m[0][1] << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    int* operator[](int i) { return data[i]; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "10\n1 2 3\n2 3 4\n3 4 5",
+          "output": "4\n10"
+        }
+      ],
+      "requiredKeywords": [
+        "operator[]",
+        "data"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "重载operator[]返回data[i]，使m[i][j]可访问矩阵元素。"
+    },
+    {
+      "id": 717,
+      "chapterId": 7,
+      "difficulty": 2,
+      "title": "编程填空：cat",
+      "description": "程序填空，按要求输出",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Animal {\npublic:\n    Animal() { cout << \"Animal constructor...\\n\"; }\n    virtual ~Animal() { cout << \"Animal destructor...\\n\"; }\n    Animal(const Animal& rhs) { cout << \"Animal Copy Constructor...\\n\"; }\n    virtual void Sound() const { cout << \"Animal sound!\\n\"; }\n    virtual Animal* Clone() { return new Animal(*this); }\n};\n\nclass Cat : public Animal {\n{{BLANK}}\n};\n\nCat::Cat(){ cout << \"Cat constructor...\\n\"; }\nCat::~Cat(){ cout << \"Cat destructor...\\n\"; }\nvoid Cat::Sound()const { cout << \"Meow!\\n\"; }\n\nint main() {\n    Animal* a = new Cat, *b = new Animal;\n    Animal* a1 = a->Clone(), *b1 = b->Clone();\n    a1->Sound();\n    b1->Sound();\n    delete a; delete b; delete a1; delete b1;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "public:\n    Cat();\n    ~Cat();\n    Cat(const Cat& rhs): Animal(rhs) { cout << \"Cat copy constructor...\" << endl; }\n    Animal* Clone() { return new Cat(*this); }\n    void Sound() const;",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "Animal constructor...\nCat constructor...\nAnimal constructor...\nAnimal Copy Constructor...\nCat copy constructor...\nAnimal Copy Constructor...\nMeow!\nAnimal sound!\nCat destructor...\nAnimal destructor...\nAnimal destructor...\nCat destructor...\nAnimal destructor...\nAnimal destructor..."
+        }
+      ],
+      "requiredKeywords": [
+        "Cat",
+        "Clone",
+        "Animal(rhs)"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Cat继承Animal，重写Clone返回new Cat(*this)以触发Animal拷贝构造和Cat拷贝构造。Sound已在类外定义。"
+    },
+    {
+      "id": 718,
+      "chapterId": 7,
+      "difficulty": 2,
+      "title": "编程填空：Accumulator",
+      "description": "完善程序，完成指定功能\n输入：第一行一个正整数 n(1 ≤ n ≤ 103), 第二行 n 个整数 ai(0 ≤ ai ≤ 103).第三行一个正整数 n(1 ≤ n ≤ 103), 第四行 n 个非空, 不包含空白字符的字符串 si, 保证 ∑|si| ≤ 103.\n输出：第一行一个整数, 是所有 ai 的和.第二行一个字符串, 是所有 si 的拼接.",
+      "codeTemplate": "#include<iostream>\nusing namespace std;\n\ntemplate<class T>\nclass Accumulator\n{\npublic:\n\tT sum;\n\tAccumulator() {sum = T();}\n\tauto getAccumulator() {\n\t\treturn\n{{BLANK}}\n;\n\t}\n\tvoid printval() {\n\t\tcout << sum << endl;\n\t}\n};\n\nint main()\n{\n\tAccumulator<int> A;\n\tint n; cin >> n;\n\tauto funcA = A.getAccumulator();\n\tfor (int i = 0; i < n; i++) {\n\t\tint v; cin >> v;\n\t\tfuncA(v);\n\t}\n\tA.printval();\n\n\tAccumulator<string> B;\n\tcin >> n;\n\tauto funcB = B.getAccumulator();\n\tfor (int i = 0; i < n; i++) {\n\t\tstring v; cin >> v;\n\t\tfuncB(v);\n\t}\n\tB.printval();\n\treturn 0;\n}",
+      "blankPlaceholder": "",
+      "referenceSolution": "    [this](const T& x) { sum += x; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "5\n1 2 3 4 5\n5\nabc qwe . 123 4",
+          "output": "15\nabcqwe.1234"
+        }
+      ],
+      "requiredKeywords": [
+        "lambda",
+        "sum"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "getAccumulator返回捕获this的lambda，调用时将参数累加到sum成员。"
+    },
+    {
+      "id": 719,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：放大器模板类",
+      "description": "实现模板类 Scaler：构造时保存缩放因子，调用时返回参数乘以缩放因子。\n输入：一行四个数：f n x p。• 其中 f 和 x 为 double，n 和 p 为 int。\n输出：第一行输出 f*x第二行输出 n*p",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\ntemplate <class T>\nclass Scaler  {\n{{BLANK}}\n};\n\nint main()\n{\n    double f; int n;\n    cin >> f >> n;\n    Scaler<double> sd(f);\n    Scaler<int> si(n);\n    double x; int p;\n    cin >> x >> p;\n    cout << sd(x) << endl;\n    cout << si(p) << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    T factor;\npublic:\n    Scaler(T f): factor(f) {}\n    T operator()(T x) { return x * factor; }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2.5 3\n4.0 7",
+          "output": "10\n21"
+        }
+      ],
+      "requiredKeywords": [
+        "Scaler",
+        "operator()"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "Scaler模板类保存缩放因子，调用时返回参数乘以因子。"
+    },
+    {
+      "id": 720,
+      "chapterId": 7,
+      "difficulty": 1,
+      "title": "编程填空：交换盒子",
+      "description": "完善代码，实现一个模板类`PairBox`，它可以存放两个相同类型的数据成员，并且能够通过`swap_items()`成员函数交换内部两个元素。\n输入：第一行为测试组数。其后每行包含两个整数和两个字符串。\n输出：按指定格式输出交换后的整数盒子与原始的字符串盒子。",
+      "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\n{{BLANK}}\nint main() {\n    int t;\n    cin >> t;\n    while (t--) {\n        int n1, n2;\n        string s1, s2;\n        cin >> n1 >> n2 >> s1 >> s2;\n\n        PairBox<int> pb1(n1, n2);\n        PairBox<string> pb2(s1, s2);\n\n        pb1.swap_items();\n\n        cout << pb1 << \" | \" << pb2 << endl;\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "template <class T>\nclass PairBox {\n    T a, b;\npublic:\n    PairBox(T x, T y): a(x), b(y) {}\n    void swap_items() { swap(a, b); }\n    friend ostream& operator<<(ostream& os, const PairBox<T>& p) {\n        os << \"[\" << p.a << \", \" << p.b << \"]\";\n        return os;\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "1\n1 2 Hello World",
+          "output": "[2, 1] | [Hello, World]"
+        }
+      ],
+      "requiredKeywords": [
+        "PairBox",
+        "swap_items",
+        "operator<<"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "PairBox模板类存储两个同类型元素，swap_items交换两者，operator<<按指定格式输出。"
+    },
+    {
+      "id": 721,
+      "chapterId": 7,
+      "difficulty": 3,
+      "title": "编程填空：神秘的数组类",
+      "description": "程序填空，输出指定结果。\n输入：第一行一个整数 n第二行是n个整数\n输出：四行，每行n个整数。输出的内容参看程序注释",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nclass MyArray {\npublic:\n    int *a;\n    int n;\n    MyArray(int _n, int A[]):n(_n) {\n        a = new int[n];\n        for (int i = 0; i < n; i++)\n            a[i] = A[i];\n    }\n    ~MyArray() { delete[] a; }\n{{BLANK}}\n};\n\nint main()\n{\n    int n;\n    cin >> n;\n    int a[105] = {0};\n    for (int i = 0; i < n; i++)\n        cin >> a[i];\n    MyArray arr(n, a);\n\n     cout << arr++ << endl;  // 对数组中所有元素+1，输出修改前的元素\n    cout << ++arr << endl;  // 对数组中所有元素+1，输出修改后的元素\n    arr -= 5;               // 对数组中所有元素-5\n    cout << 3 + arr << endl;    // 输出数组中所有元素+3的值\n    arr.get_first() = arr.get_last(); // 将第一个元素值修改为改为最后一个元素的值\n    cout << arr << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    MyArray(const MyArray& o): n(o.n) {\n        a = new int[n];\n        for (int i = 0; i < n; i++) a[i] = o.a[i];\n    }\n    MyArray& operator=(const MyArray& o) {\n        if (this != &o) {\n            delete[] a;\n            n = o.n;\n            a = new int[n];\n            for (int i = 0; i < n; i++) a[i] = o.a[i];\n        }\n        return *this;\n    }\n    MyArray operator++(int) {\n        MyArray old(*this);\n        for (int i = 0; i < n; i++) a[i]++;\n        return old;\n    }\n    MyArray& operator++() {\n        for (int i = 0; i < n; i++) a[i]++;\n        return *this;\n    }\n    MyArray& operator-=(int x) {\n        for (int i = 0; i < n; i++) a[i] -= x;\n        return *this;\n    }\n    MyArray operator+(int x) const {\n        MyArray t(*this);\n        for (int i = 0; i < n; i++) t.a[i] += x;\n        return t;\n    }\n    friend MyArray operator+(int x, const MyArray& o) { return o + x; }\n    int& get_first() { return a[0]; }\n    int& get_last() { return a[n-1]; }\n    friend ostream& operator<<(ostream& os, const MyArray& m) {\n        for (int i = 0; i < m.n; i++) {\n            if (i) os << \" \";\n            os << m.a[i];\n        }\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "5\n1 2 3 4 5",
+          "output": "1 2 3 4 5\n3 4 5 6 7\n1 2 3 4 5\n2 -1 0 1 2"
+        }
+      ],
+      "requiredKeywords": [
+        "operator++",
+        "operator+=",
+        "get_first",
+        "get_last"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "MyArray支持深拷贝、后置/前置++、-=、与int相加、首尾元素引用访问以及流输出。"
+    }
+  ]
+}

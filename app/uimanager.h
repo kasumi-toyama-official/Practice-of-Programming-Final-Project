@@ -21,7 +21,8 @@ public:
         ErrorBook,
         Collection,
         Achievement,
-        Settings
+        Settings,
+        Ranking
     };
 
     static UIManager* instance();  // 单例获取

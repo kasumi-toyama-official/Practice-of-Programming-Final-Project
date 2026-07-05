@@ -8,6 +8,7 @@
 #include <collectionpage.h>
 #include <achievementpage.h>
 #include <settingspage.h>
+#include <rankingpage.h>
 
 UIManager* UIManager::m_instance = nullptr;
 
@@ -59,6 +60,7 @@ void UIManager::setContainer(QWidget *container)
     registerPage(Collection, new CollectionPage());
     registerPage(Achievement, new AchievementPage());
     registerPage(Settings, new SettingsPage());
+    registerPage(Ranking, new RankingPage());
 
     QWidget* mainMenu = m_pages[MainMenu];
     mainMenu->show();

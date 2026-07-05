@@ -135,6 +135,84 @@
       ],
       "forbiddenKeywords": [],
       "explanation": "实现大整数类，支持从字符串/整数构造、加减进位、友元+、前置/后置++、+=和输出运算符。"
+    },
+    {
+      "id": 106,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "编程填空：实现复数Complex类",
+      "description": "实现复数Complex类，使输出结果为：3+2i3+2i-15-12+2i05+12i-12+2i2i5+12i\n输出：3+2i3+2i-15-12+2i05+12i-12+2i2i5+12i",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nint main() {\n\tComplex c1;\n\tComplex c2(\"3+2i\"); // 用字符串初始化时，只需考虑\"a+bi\"的形式，其中a和b都是1位数字\n\tComplex c3(c2);\n\tComplex c4(-15);\n\tcout << c2 << endl;\n\tcout << c3 << endl;\n\tcout << c4 << endl;\n\tcout << c2 + c4 << endl;\n\tcout << c2 - c3 << endl;\n\tcout << c2 * c3 << endl;\n\tc2 += c4;\n\tcout << c2 << endl;\n\tc2 -= -12;\n\tcout << c2 << endl;\n\tc3 *= c3;\n\tcout << c3 << endl;\n\treturn 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "class Complex {\n    int r, i;\npublic:\n    Complex(int a=0, int b=0): r(a), i(b) {}\n    Complex(const char* s) { r = s[0]-'0'; i = s[2]-'0'; }\n    Complex(const Complex& c): r(c.r), i(c.i) {}\n    Complex operator+(const Complex& b) const { return Complex(r+b.r, i+b.i); }\n    Complex operator-(const Complex& b) const { return Complex(r-b.r, i-b.i); }\n    Complex operator*(const Complex& b) const {\n        return Complex(r*b.r - i*b.i, r*b.i + i*b.r);\n    }\n    Complex& operator+=(const Complex& b) { r += b.r; i += b.i; return *this; }\n    Complex& operator-=(int n) { r -= n; return *this; }\n    Complex& operator*=(const Complex& b) {\n        int nr = r*b.r - i*b.i, ni = r*b.i + i*b.r;\n        r = nr; i = ni; return *this;\n    }\n    friend ostream& operator<<(ostream& os, const Complex& c) {\n        if (c.r && c.i) os << c.r << \"+\" << c.i << \"i\";\n        else if (c.r) os << c.r;\n        else if (c.i) os << c.i << \"i\";\n        else os << 0;\n        return os;\n    }\n};",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "3+2i\n3+2i\n-15\n-12+2i\n0\n5+12i\n-12+2i\n2i\n5+12i"
+        }
+      ],
+      "requiredKeywords": [
+        "Complex",
+        "operator+",
+        "operator*",
+        "operator<<"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "实现复数类，包括多种构造、加减乘及复合赋值运算符，以及按要求格式化的输出运算符。"
+    },
+    {
+      "id": 107,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "编程填空：分数类",
+      "description": "请实现一个分数类，使程序输出正确结果（保证运算过程中不会出现分母为0的情况）\n输入：见样例\n输出：见样例",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nint gcd(int x, int y){\n\treturn x%y==0?y:gcd(y,x%y);\n}\nclass Fraction\n{\n    int num, den;\npublic:\n{{BLANK}}\n};\n\nint main() {\n\tint a,b,c;\n\tcin >> a >> b >> c;\n    Fraction f(a, b), g(c);\n\tf *= g;\n\tcout << f << endl;\n\tf /= g;\n\tcout << f << endl;\n\tf = f * f;\n\tcout << f << endl;\n\tf = f / g;\n\tcout << f << endl;\n\tcout << (float) f << endl;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    Fraction(int n=0, int d=1): num(n), den(d) {\n        if (den < 0) { num = -num; den = -den; }\n        int g = gcd(abs(num), den);\n        num /= g; den /= g;\n    }\n    Fraction& operator*=(const Fraction& b) {\n        num *= b.num; den *= b.den;\n        int g = gcd(abs(num), den); num /= g; den /= g;\n        return *this;\n    }\n    Fraction& operator/=(const Fraction& b) {\n        num *= b.den; den *= b.num;\n        if (den < 0) { num = -num; den = -den; }\n        int g = gcd(abs(num), den); num /= g; den /= g;\n        return *this;\n    }\n    Fraction operator*(const Fraction& b) const { Fraction t(*this); t *= b; return t; }\n    Fraction operator/(const Fraction& b) const { Fraction t(*this); t /= b; return t; }\n    operator float() const { return (float)num / den; }\n    friend ostream& operator<<(ostream& os, const Fraction& f) {\n        os << f.num;\n        if (f.den != 1) os << \"/\" << f.den;\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "3 5 7",
+          "output": "21/5\n3/5\n9/25\n9/175\n0.0514286"
+        }
+      ],
+      "requiredKeywords": [
+        "Fraction",
+        "operator*=",
+        "operator/=",
+        "gcd"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "实现分数类，构造时约分。重载乘除及复合赋值运算符，使用gcd约分。提供到float的类型转换和输出运算符。"
+    },
+    {
+      "id": 108,
+      "chapterId": 3,
+      "difficulty": 2,
+      "title": "编程填空：惊呆！分数竟然也能这样输入输出和运算！",
+      "description": "程序填空，使这段代码可以完成分数的输入、输出和乘法运算。\n输入：多组数据，第一行一个数 t 表示数据组数。( t≤ 100)接下来 t 行，每行读入四个整数 a, b, c, d，表示两个分数 a/b 和 c/d。(1 ≤ a,b,c,d ≤ 100)\n输出：对每组数据都输出 a * b，2 * a，b * 3 的结果。打印分数时，如果是整数，请直接输出整数；如果分子和分母可以约分，请约分后再输出。细节请参考样例。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\nint gcd(int a, int b) { // 计算两个数的最大公约数\n    return (!b) ? a : gcd(b, a % b);\n}\nclass Fraction {\n    int p, q;\npublic:\n{{BLANK}}\n};\n\nint main(){\n    int testcases;\n    cin >> testcases;\n    while (testcases --) {\n        Fraction a, b, two(2);\n        cin >> a >> b;\n        cout << a << \" * \" << b << \" = \" << a * b << endl;\n        cout << \"2 * \" << a << \" = \" << two * a << endl;\n        cout << b << \" * 3 = \" << b * 3 << endl;\n    }\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "    Fraction(int n=0, int d=1): p(n), q(d) { reduce(); }\n    void reduce() {\n        if (q < 0) { p = -p; q = -q; }\n        int g = gcd(abs(p), q);\n        p /= g; q /= g;\n    }\n    Fraction operator*(const Fraction& b) const {\n        return Fraction(p * b.p, q * b.q);\n    }\n    friend Fraction operator*(int n, const Fraction& f) {\n        return Fraction(n * f.p, f.q);\n    }\n    friend Fraction operator*(const Fraction& f, int n) {\n        return Fraction(f.p * n, f.q);\n    }\n    friend istream& operator>>(istream& is, Fraction& f) {\n        is >> f.p >> f.q;\n        f.reduce();\n        return is;\n    }\n    friend ostream& operator<<(ostream& os, const Fraction& f) {\n        os << f.p;\n        if (f.q != 1) os << \"/\" << f.q;\n        return os;\n    }",
+      "blankCount": 1,
+      "judgeMode": 1,
+      "testCases": [
+        {
+          "input": "2\n1 2 8 3\n5 18 12 2",
+          "output": "1/2 * 8/3 = 4/3\n2 * 1/2 = 1\n8/3 * 3 = 8\n5/18 * 6 = 5/3\n2 * 5/18 = 5/9\n6 * 3 = 18"
+        }
+      ],
+      "requiredKeywords": [
+        "operator*",
+        "operator>>",
+        "operator<<",
+        "reduce"
+      ],
+      "forbiddenKeywords": [],
+      "explanation": "分数类支持从两个整数构造并约分。重载输入（每次读入分子分母）、输出（整数不输出分母）、分数与整数/分数乘法。"
     }
   ]
 }
