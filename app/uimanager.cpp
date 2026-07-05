@@ -5,9 +5,9 @@
 #include "battlepage.h"
 #include "resultpage.h"
 #include "errorbookpage.h"
-#include "collectionpage.h"
 #include "achievementpage.h"
 #include "settingspage.h"
+#include "rankingpage.h"
 
 UIManager* UIManager::m_instance = nullptr;
 
@@ -49,16 +49,20 @@ void UIManager::setContainer(QWidget *container)
         goTo(MainMenu);
     });
     connect(battle, &BattlePage::arenaQuit, this, [this]() {
-        // 清空页面历史，回到主菜单
         m_history.clear();
         m_history.append(MainMenu);
         goTo(MainMenu);
     });
+    connect(battle, &BattlePage::arenaGoToRanking, this, [this]() {
+        m_history.clear();
+        m_history.append(MainMenu);
+        goTo(Ranking);
+    });
     registerPage(Result, new ResultPage());
     registerPage(ErrorBook, new ErrorBookPage());
-    registerPage(Collection, new CollectionPage());
     registerPage(Achievement, new AchievementPage());
     registerPage(Settings, new SettingsPage());
+    registerPage(Ranking, new RankingPage());
 
     QWidget* mainMenu = m_pages[MainMenu];
     mainMenu->show();

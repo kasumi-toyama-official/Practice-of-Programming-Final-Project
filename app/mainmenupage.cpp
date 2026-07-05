@@ -22,15 +22,15 @@ MainMenuPage::MainMenuPage(QWidget *parent)
     connect(ui->btn_errorbook, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::ErrorBook);
     });
-    connect(ui->btn_collection, &QPushButton::clicked, [](){
-        UIManager::instance()->goTo(UIManager::Collection);
-    });
+    delete ui->btn_collection;
+    ui->btn_collection = nullptr;
     connect(ui->btn_achievement, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::Achievement);
     });
     connect(ui->btn_ranking, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::Ranking);
     });
+    ui->btn_settings->setText("帮助");
     connect(ui->btn_settings, &QPushButton::clicked, [](){
         UIManager::instance()->goTo(UIManager::Settings);
     });

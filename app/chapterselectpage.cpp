@@ -1,4 +1,5 @@
 #include "chapterselectpage.h"
+#include "battlepage.h"
 #include "uimanager.h"
 
 #include <QPushButton>
@@ -38,7 +39,7 @@ static QString chapterNameRead(int id)
 }
 
 // 难度权重配置对话框，用户确认后 outConfig 被填充，返回 true
-static bool showConfigDialog(GameConfig& outConfig, QWidget* parent)
+bool showConfigDialog(GameConfig& outConfig, QWidget* parent)
 {
     QString dlgStyle =
         "QDialog { background-color: #1e1e3a; color: white; }"
@@ -157,8 +158,8 @@ ChapterSelectPage::ChapterSelectPage(QWidget *parent)
     QGridLayout* grid = new QGridLayout;
     grid->setSpacing(15);
 
-    for (int i = 0; i < 8; ++i) {
-        int chapterId = i + 1;
+    for (int i = 0; i < 9; ++i) {
+        int chapterId = i;
 
         QWidget* cell = new QWidget;
         QVBoxLayout* cellLayout = new QVBoxLayout(cell);

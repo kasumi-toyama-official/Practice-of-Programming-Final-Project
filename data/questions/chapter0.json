@@ -1,0 +1,51 @@
+{
+  "chapterId": 0,
+  "chapterName": "机制展示",
+  "questions": [
+    {
+      "id": 1,
+      "chapterId": 0,
+      "difficulty": 0,
+      "type": 0,
+      "questionText": "本题是什么难度？",
+      "options": [
+        "A. 简单",
+        "B. 中等",
+        "C. 困难",
+        "D. 俺不知道"
+      ],
+      "correctOptionIndex": 0,
+      "explanation": "本题标注为简单难度，正确答案是A。"
+    },
+    {
+      "id": 2,
+      "chapterId": 0,
+      "difficulty": 1,
+      "type": 0,
+      "questionText": "本题是什么难度？",
+      "options": [
+        "A. 简单",
+        "B. 中等",
+        "C. 困难",
+        "D. 俺不知道"
+      ],
+      "correctOptionIndex": 1,
+      "explanation": "本题标注为中等难度，正确答案是B。"
+    },
+    {
+      "id": 3,
+      "chapterId": 0,
+      "difficulty": 2,
+      "type": 0,
+      "questionText": "本题是什么难度？",
+      "options": [
+        "A. 简单",
+        "B. 中等",
+        "C. 困难",
+        "D. 俺不知道"
+      ],
+      "correctOptionIndex": 2,
+      "explanation": "本题标注为困难难度，正确答案是C。"
+    }
+  ]
+}

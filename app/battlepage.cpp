@@ -10,6 +10,7 @@
 #include <QPixmap>
 #include <QDateTime>
 #include "utils/CodeJudge.h"
+#include "chapterselectpage.h"
 #include <algorithm>
 
 static const int ARENA_TOLERANCE = 3;
@@ -70,7 +71,7 @@ BattlePage::BattlePage(QWidget *parent)
     m_statusBar->updateEnemy(m_enemyStats);
 
     m_isArenaMode = false;
-    m_attackInterval = 60000;
+    m_attackInterval = 120000;
     m_elapsed = 0;
     m_passCardCount = 3;
     m_arenaState = Idle;
@@ -112,17 +113,19 @@ void BattlePage::setArenaMode(bool isArena)
     m_isArenaMode = isArena;
     if (isArena)
     {
+        m_chapterId = -1;
         m_statusBar->showRoundLabel(false);
         if (!m_countdownBar)
         {
             m_countdownBar = new QProgressBar(this);
             m_countdownBar->setGeometry(10, 143, 940, 12);
-            m_countdownBar->setRange(0, m_attackInterval);
-            m_countdownBar->setValue(0);
             m_countdownBar->setTextVisible(false);
-            m_countdownBar->setStyleSheet("QProgressBar { border: 1px solid #aaa; background: #222; }"
-                                          "QProgressBar::chunk { background: #e55; }");
+            m_countdownBar->setStyleSheet("QProgressBar { border: 1px solid #aaa; background: #222;"
+                                          " min-height: 12px; margin: 0px; padding: 0px; }"
+                                          "QProgressBar::chunk { background: #e55; margin: 0px; }");
         }
+        m_countdownBar->setRange(0, m_attackInterval);
+        m_countdownBar->setValue(0);
         m_countdownBar->show();
         if (!m_passBtn)
         {
@@ -184,10 +187,18 @@ void BattlePage::setArenaMode(bool isArena)
         m_arenaLastQuestionId = -1;
         m_arenaState = Idle;
         m_pauseOverlay->hide();
+        m_completionQuestions.clear();
         for (int ch = 1; ch <= 8; ++ch) {
-            QString path = findDataFile(QString("data/questions/chapter%1.json").arg(ch));
-            if (!path.isEmpty())
-                m_questionBank.loadChapter(ch, path);
+            QString path = findDataFile(QString("data/questions/chapter%1_completion.json").arg(ch));
+            if (!path.isEmpty()) {
+                QFile f(path);
+                if (f.open(QIODevice::ReadOnly)) {
+                    QJsonObject root = QJsonDocument::fromJson(f.readAll()).object();
+                    QJsonArray arr = root["questions"].toArray();
+                    for (const auto& v : arr)
+                        m_completionQuestions[CodeCompletionQuestion::fromJson(v.toObject()).id] = CodeCompletionQuestion::fromJson(v.toObject());
+                }
+            }
         }
     }
     else
@@ -372,15 +383,20 @@ void BattlePage::setupUI()
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("重新开始");
         msgBox.setText("请选择：");
-        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; } QPushButton { color: black; background-color: #e0e0e0; border: 1px solid #aaa; padding: 4px 12px; } QPushButton:hover { background-color: #d0d0d0; }");
         QPushButton *btnKeep = msgBox.addButton("使用当前配置", QMessageBox::ActionRole);
-        msgBox.addButton("修改配置后重开", QMessageBox::ActionRole);
+        QPushButton *btnChange = msgBox.addButton("修改配置后重开", QMessageBox::ActionRole);
         msgBox.addButton("取消", QMessageBox::RejectRole);
         msgBox.exec();
-        if (msgBox.clickedButton() == btnKeep) {
-            onRestart();
-        } else {
-            emit quitBattle();
+        QAbstractButton *clicked = msgBox.clickedButton();
+        if (clicked == btnKeep) {
+            resetBattle();
+        } else if (clicked == btnChange) {
+            GameConfig newConfig = m_gameConfig;
+            if (showConfigDialog(newConfig, this)) {
+                m_gameConfig = newConfig;
+                resetBattle();
+            }
         }
     });
     connect(resumeBtn, &QPushButton::clicked, [this](){
@@ -425,6 +441,10 @@ void BattlePage::showNextQuestion()
                 d.id = cq.id;
                 d.explanation = cq.explanation;
                 d.tolerance = 3;
+                if (!cq.testCases.isEmpty()) {
+                    d.testCaseInput = cq.testCases.first().input;
+                    d.testCaseOutput = cq.testCases.first().output;
+                }
                 m_currentQuestionData = d;
                 m_currentCompletionData = cq;
                 m_codeCompletionRetries = 3;
@@ -483,9 +503,7 @@ void BattlePage::showNextQuestion()
 
 void BattlePage::onAnswerSubmitted()
 {
-    // 额外回合答题：答对给奖励，答错无奖励，双方都不攻击
     if (m_isExtraRound) {
-        m_isExtraRound = false;
         QuestionData q = m_currentQuestionData;
         QString answer = m_questionWidget->getAnswer();
 
@@ -496,16 +514,23 @@ void BattlePage::onAnswerSubmitted()
             CodeJudgeResult r = CodeJudge::compileAndRun(m_currentCompletionData, answer.trimmed());
             correct = r.passed;
             if (!r.passed) {
+                m_codeCompletionRetries--;
+                m_questionWidget->setRemainingTolerance(m_codeCompletionRetries);
                 QMessageBox msgBox(this);
                 msgBox.setWindowTitle("判题结果");
                 msgBox.setText(r.errorMessage.isEmpty() ? "答案错误" : r.errorMessage);
-                msgBox.setStyleSheet("QMessageBox { background-color: #1e1e3a; } QMessageBox QLabel { color: white; }");
+                msgBox.setStyleSheet("QMessageBox { background-color: #1e1e3a; } QMessageBox QLabel { color: white; } QPushButton { color: black; background-color: #e0e0e0; border: 1px solid #aaa; padding: 4px 12px; }");
                 msgBox.exec();
+                if (m_codeCompletionRetries > 0) {
+                    m_questionWidget->showFeedback(false);
+                    return;
+                }
             }
         } else {
             correct = (QRandomGenerator::global()->bounded(2) == 1);
         }
 
+        m_isExtraRound = false;
         m_questionWidget->showFeedback(correct);
 
         if (!correct) {
@@ -635,9 +660,16 @@ void BattlePage::onArenaAnswerSubmitted()
 {
     QString answer = m_questionWidget->getAnswer();
     bool correct = false;
-    if (m_currentQuestionData.type == QuestionType::Choice && m_currentQuestionData.correctOptionIndex >= 0
-        && m_currentQuestionData.correctOptionIndex < m_currentQuestionData.options.size()) {
-        correct = (answer.trimmed() == m_currentQuestionData.options[m_currentQuestionData.correctOptionIndex].trimmed());
+    if (m_currentQuestionData.type == QuestionType::CodeCompletion) {
+        CodeJudgeResult r = CodeJudge::compileAndRun(m_currentCompletionData, answer.trimmed());
+        correct = r.passed;
+        if (!r.passed) {
+            QMessageBox msgBox(this);
+            msgBox.setWindowTitle("判题结果");
+            msgBox.setText(r.errorMessage.isEmpty() ? "答案错误" : r.errorMessage);
+            msgBox.setStyleSheet("QMessageBox { background-color: #1e1e3a; } QMessageBox QLabel { color: white; }");
+            msgBox.exec();
+        }
     } else {
         correct = !answer.trimmed().isEmpty();
     }
@@ -689,19 +721,16 @@ void BattlePage::onArenaAnswerSubmitted()
         m_arenaConsecutiveErrors++;
         m_questionWidget->setRemainingTolerance(ARENA_TOLERANCE - m_arenaConsecutiveErrors);
 
-        int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
-        m_playerStats.hp -= enemyDmg;
-        showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
-
-        m_statusBar->updatePlayer(m_playerStats);
-
-        if (m_playerStats.hp <= 0) {
-            onArenaBattleFinished();
-            return;
-        }
-
         if (m_arenaConsecutiveErrors >= ARENA_TOLERANCE) {
             m_arenaConsecutiveErrors = 0;
+            int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
+            m_playerStats.hp -= enemyDmg;
+            showFloatingText(QString("-%1").arg(enemyDmg), QPoint(100, 200), Qt::yellow);
+            m_statusBar->updatePlayer(m_playerStats);
+            if (m_playerStats.hp <= 0) {
+                onArenaBattleFinished();
+                return;
+            }
             m_wrongBookManager.addWrongQuestion(m_chapterId, m_currentQuestionData.id);
             m_wrongBookManager.save();
             m_questionWidget->reset();
@@ -773,9 +802,10 @@ void BattlePage::onArenaTimerTick()
     m_elapsed += 50;
     m_arenaElapsedMs += 50;
     double seconds = m_arenaElapsedMs / 1000.0;
-    m_enemyStats.attack = 15 + static_cast<int>(0.05 * seconds + 0.0001 * seconds * seconds);
-    m_enemyStats.defence = 5 + static_cast<int>(0.025 * seconds + 0.00005 * seconds * seconds);
+    m_enemyStats.attack = 15 + static_cast<int>(0.025 * seconds + 0.0001 * seconds * seconds);
+    m_enemyStats.defence = 5 + static_cast<int>(0.0125 * seconds + 0.00005 * seconds * seconds);
     m_countdownBar->setValue(m_elapsed);
+    m_countdownBar->repaint();
     if (m_elapsed >= m_attackInterval) {
         m_elapsed = 0;
         int enemyDmg = qMax(1, m_enemyStats.attack - m_playerStats.defence);
@@ -814,25 +844,44 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
         else                    bonus = chosenSkill.hardBonus;
         m_currentSkillBonus = bonus;
 
-        // 按选定难度从全部章节题库中抽选择题
         int diffInt = static_cast<int>(diff);
-        std::optional<Question> drawn;
-        for (int ch = 1; ch <= 8 && !drawn.has_value(); ++ch)
-            drawn = m_questionBank.drawQuestion(ch, diffInt, m_usedQuestionIds[diffInt]);
-
-        // 该难度用完 → 只重置该难度
-        if (!drawn.has_value()) {
-            m_usedQuestionIds[diffInt].clear();
-            for (int ch = 1; ch <= 8 && !drawn.has_value(); ++ch)
-                drawn = m_questionBank.drawQuestion(ch, diffInt, m_usedQuestionIds[diffInt]);
+        QVector<int> candidates;
+        for (int d = 0; d <= 2 && candidates.isEmpty(); ++d) {
+            int searchDiff = (diffInt + d) % 3;
+            for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                if (static_cast<int>(it.value().difficulty) == searchDiff
+                    && !m_usedQuestionIds[searchDiff].contains(it.key()))
+                    candidates.append(it.key());
+            }
+            if (candidates.isEmpty()) {
+                m_usedQuestionIds[searchDiff].clear();
+                for (auto it = m_completionQuestions.begin(); it != m_completionQuestions.end(); ++it) {
+                    if (static_cast<int>(it.value().difficulty) == searchDiff)
+                        candidates.append(it.key());
+                }
+            }
         }
-
-        if (drawn.has_value()) {
-            Question backendQ = drawn.value();
-            m_usedQuestionIds[static_cast<int>(backendQ.difficulty)].insert(backendQ.id);
-            m_currentQuestionData = questionToQuestionData(backendQ);
+        if (!candidates.isEmpty()) {
+            int qid = candidates[QRandomGenerator::global()->bounded(candidates.size())];
+            int qDiff = static_cast<int>(m_completionQuestions[qid].difficulty);
+            m_usedQuestionIds[qDiff].insert(qid);
+            CodeCompletionQuestion cq = m_completionQuestions[qid];
+            QuestionData d;
+            d.type = QuestionType::CodeCompletion;
+            d.difficulty = cq.difficulty;
+            d.description = cq.title + "\n" + cq.description;
+            d.codeTemplate = cq.codeTemplate;
+            d.id = cq.id;
+            d.explanation = cq.explanation;
+            d.tolerance = 3;
+            if (!cq.testCases.isEmpty()) {
+                d.testCaseInput = cq.testCases.first().input;
+                d.testCaseOutput = cq.testCases.first().output;
+            }
+            m_currentQuestionData = d;
+            m_currentCompletionData = cq;
         } else {
-            QMessageBox::warning(this, "错误", "所有章节均无该难度题目，请联系出题人补充！");
+            QMessageBox::warning(this, "错误", "所有章节均无该难度补全题，请联系出题人补充！");
             return;
         }
         m_questionWidget->setQuestion(m_currentQuestionData);
@@ -901,6 +950,10 @@ void BattlePage::onSkillSelected(int skillId, Difficulty diff)
                     d.id = cq.id;
                     d.explanation = cq.explanation;
                     d.tolerance = 3;
+                    if (!cq.testCases.isEmpty()) {
+                        d.testCaseInput = cq.testCases.first().input;
+                        d.testCaseOutput = cq.testCases.first().output;
+                    }
                     m_currentQuestionData = d;
                     m_currentCompletionData = cq;
                     m_questionWidget->reset();
@@ -1012,6 +1065,8 @@ void BattlePage::onSaveAndQuit()
 
 void BattlePage::onQuitWithoutSave()
 {
+    m_saveManager.setSaveDirectory(QCoreApplication::applicationDirPath() + "/saves");
+    m_saveManager.deleteChapterArchive(m_chapterId);
     emit quitBattle();
 }
 
@@ -1075,16 +1130,21 @@ void BattlePage::onBattleFinished(bool victory)
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("战斗失败");
         msgBox.setText("你失败了...\n要重新开始吗？");
-        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; }");
+        msgBox.setStyleSheet("QMessageBox { background-color: #f0f0f0; } QMessageBox QLabel { color: black; } QPushButton { color: black; background-color: #e0e0e0; border: 1px solid #aaa; padding: 4px 12px; } QPushButton:hover { background-color: #d0d0d0; }");
         QPushButton *btnKeep = msgBox.addButton("重新开始(当前配置)", QMessageBox::ActionRole);
         QPushButton *btnChange = msgBox.addButton("修改配置后重开", QMessageBox::ActionRole);
         QPushButton *btnQuit = msgBox.addButton("返回主菜单", QMessageBox::RejectRole);
         msgBox.exec();
-        if (msgBox.clickedButton() == btnKeep) {
-            onRestart();
-        } else if (msgBox.clickedButton() == btnChange) {
-            emit quitBattle();
-        } else {
+        QAbstractButton *clicked = msgBox.clickedButton();
+        if (clicked == btnKeep) {
+            resetBattle();
+        } else if (clicked == btnChange) {
+            GameConfig newConfig = m_gameConfig;
+            if (showConfigDialog(newConfig, this)) {
+                m_gameConfig = newConfig;
+                resetBattle();
+            }
+        } else if (clicked == btnQuit) {
             emit quitBattle();
         }
     }
@@ -1100,6 +1160,15 @@ void BattlePage::onArenaBattleFinished()
     if (dmg >= 500)  m_achievementManager.unlockAchievement("arena_500");
     if (dmg >= 1000) m_achievementManager.unlockAchievement("arena_1000");
     m_achievementManager.saveProgress();
+
+    RankingEntry arenaEntry;
+    arenaEntry.chapterId = -1;
+    arenaEntry.totalDamage = dmg;
+    arenaEntry.timestamp = QDateTime::currentDateTimeUtc().toSecsSinceEpoch();
+    arenaEntry.victory = false;
+    m_rankingManager.addRecord(arenaEntry);
+    m_rankingManager.save();
+
     QMessageBox msgBox;
     msgBox.setWindowTitle("战斗结束");
     msgBox.setText(QString("你被击败了！\n总伤害: %1").arg(m_playerStats.totalDamage));
@@ -1108,7 +1177,7 @@ void BattlePage::onArenaBattleFinished()
     QPushButton *btnReturn = msgBox.addButton("返回主菜单", QMessageBox::AcceptRole);
     msgBox.exec();
     if (msgBox.clickedButton() == btnLeaderboard) {
-        emit arenaQuit();
+        emit arenaGoToRanking();
     } else {
         emit arenaQuit();
     }
@@ -1188,6 +1257,7 @@ void BattlePage::resetBattle()
         QMessageBox::critical(this, "错误", QString("找不到文件 data/questions/chapter%1.json").arg(m_chapterId));
     }
 
+    if (!m_isArenaMode) {
     m_completionQuestions.clear();
     QString completionPath = findDataFile(QString("data/questions/chapter%1_completion.json").arg(m_chapterId));
     if (!completionPath.isEmpty()) {
@@ -1200,6 +1270,7 @@ void BattlePage::resetBattle()
                 m_completionQuestions[cq.id] = cq;
             }
         }
+    }
     }
 
     // 刷新状态栏

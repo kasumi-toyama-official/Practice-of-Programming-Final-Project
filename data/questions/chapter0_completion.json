@@ -1,0 +1,60 @@
+{
+  "chapterId": 0,
+  "chapterName": "机制展示",
+  "questions": [
+    {
+      "id": 101,
+      "chapterId": 0,
+      "difficulty": 0,
+      "title": "代码填空：本题是什么难度（简单）",
+      "description": "本题是什么难度（简单题）？\\n请补全代码，使程序输出结果为 ez。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nint main() {\n    {{BLANK}}\n    cout << a;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "string a = \"ez\";",
+      "blankCount": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "ez"
+        }
+      ],
+      "explanation": "简单题的正确答案是 ez。"
+    },
+    {
+      "id": 102,
+      "chapterId": 0,
+      "difficulty": 1,
+      "title": "代码填空：本题是什么难度（中等）",
+      "description": "本题是什么难度（中等题）？\\n请补全代码，使程序输出结果为 mid。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nint main() {\n    {{BLANK}}\n    cout << a;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "string a = \"mid\";",
+      "blankCount": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "mid"
+        }
+      ],
+      "explanation": "中等题的正确答案是 mid。"
+    },
+    {
+      "id": 103,
+      "chapterId": 0,
+      "difficulty": 2,
+      "title": "代码填空：本题是什么难度（困难）",
+      "description": "本题是什么难度（困难题）？\\n请补全代码，使程序输出结果为 hd。",
+      "codeTemplate": "#include <iostream>\nusing namespace std;\n\nint main() {\n    {{BLANK}}\n    cout << a;\n    return 0;\n}",
+      "blankPlaceholder": "// 在此处补充你的代码",
+      "referenceSolution": "string a = \"hd\";",
+      "blankCount": 1,
+      "testCases": [
+        {
+          "input": "",
+          "output": "hd"
+        }
+      ],
+      "explanation": "困难题的正确答案是 hd。"
+    }
+  ]
+}

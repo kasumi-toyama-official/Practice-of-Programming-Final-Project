@@ -64,7 +64,7 @@
     {
       "id": 103,
       "chapterId": 1,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：输出200",
       "description": "使以下代码输出结果为200.\n输入：不需要输入。\n输出：输出结果为200。",
       "codeTemplate": "#include<iostream>\nusing namespace std;\nclass Number {\npublic:\n    int num;\n    Number(int n=0): num(n) {}\n{{BLANK}}\n};\n\nint main() {\n    Number n1(10), n2(20);\n    Number n3;\n    n3 = n1*n2;\n    cout << int(n3) << endl;\n    return 0;\n}",
@@ -112,7 +112,7 @@
     {
       "id": 105,
       "chapterId": 1,
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "编程填空：计算整数平方和",
       "description": "下列程序每次读入一个整数N，若N为0则退出，否则输出N和N的平方。\n输入：K个整数。除最后一个数据外，其他数据均不为0。\n输出：K-1行。第I行输出第I个输入数和它的平方。",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nint main(int argc, char* argv[]) {\n\tCType obj;\n\tint   n;\n\tcin>>n;\n\twhile ( n ) {\n\t\tobj.setvalue(n);\n\t\tcout<<obj++<<\" \"<<obj<<endl;\n\t\tcin>>n;\n\t}\n\treturn 0;\n}",
@@ -166,7 +166,7 @@
     {
       "id": 107,
       "chapterId": 1,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "简单的整数类",
       "description": "输入两个数 m,n( 0<=m,n <= 9)，输出它们的乘积\n输入：两个数，m,n，确保乘积小于10\n输出：它们的乘积",
       "codeTemplate": "#include <stdio.h>\n#include <iostream>\nusing namespace std;\nclass MyNum{\npublic:\n    char C;\n    MyNum(char c='0'): C(c) {}\n{{BLANK}}\n};\n\nint main() {\n    char m,n;\n    cin >> m >>  n;\n    MyNum n1(m), n2(n);\n    MyNum n3;\n    n3 = n1*n2;\n    cout << int(n3) << endl;\n    return 0;\n}",

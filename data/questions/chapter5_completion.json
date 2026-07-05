@@ -5,7 +5,7 @@
     {
       "id": 501,
       "chapterId": 5,
-      "difficulty": 2,
+      "difficulty": 1,
       "title": "A:看上去像多态",
       "description": "程序填空产生指定输出\n输出：D::FunB::FunD::FunnBVal=2nBVal=24nDVal=8B::FunnBVal=12",
       "codeTemplate": "#include <iostream>\nusing namespace std;\nclass B {\n\tprivate:\n\t\tint nBVal;\n\tpublic:\n\t\tvoid Print()\n\t\t{ cout << \"nBVal=\"<< nBVal << endl; }\n\t\tvoid Fun()\n\t\t{cout << \"B::Fun\" << endl; }\n\t\tB ( int n ) { nBVal = n;}\n};\n{{BLANK}}\nint main() {\n\tB * pb; D * pd;\n\tD d(4); d.Fun();\n\tpb = new B(2); pd = new D(8);\n\tpb -> Fun(); pd->Fun();\n\tpb->Print (); pd->Print ();\n\tpb = & d; pb->Fun();\n\tpb->Print();\n\treturn 0;\n}",
@@ -54,7 +54,7 @@
     {
       "id": 503,
       "chapterId": 5,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "C:这是什么鬼delete",
       "description": "程序填空输出指定结果\n输出：destructor Bdestructor A",
       "codeTemplate": "#include <iostream>\nusing namespace std;\nclass A\n{\npublic:\n\tA() { }\n{{BLANK}}\n};\nclass B:public A {\n\tpublic:\n\t~B() { cout << \"destructor B\" << endl; }\n};\nint main()\n{\n\tA * pa;\n\tpa = new B;\n\tdelete pa;\n\treturn 0;\n}",
@@ -128,7 +128,7 @@
     {
       "id": 506,
       "chapterId": 5,
-      "difficulty": 2,
+      "difficulty": 1,
       "title": "编程填空：还是Fun和Do",
       "description": "填写代码，使输出结果为A::FunB::DoC::FunC::DoA::FunB::Do\n输出：A::FunB::DoC::FunC::DoA::FunB::Do",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass A {\n\tpublic:\n\t\tvirtual void Fun() {\n\t\t\tcout << \"A::Fun\" << endl;\n\t\t};\n\t\tvirtual void Do() {\n\t\t\tcout << \"A::Do\" << endl;\n\t\t}\n};\n{{BLANK}}\n{\n\tp.Fun();\n\tp.Do();\n}\n\nvoid Call2(B p) {\n\tp.Fun();\n\tp.Do();\n}\n\nint main() {\n\tC c;\n\tB b;\n\tCall1(b);\n\tCall1(c);\n\tCall2(c);\n\treturn 0;\n}",
@@ -202,7 +202,7 @@
     {
       "id": 509,
       "chapterId": 5,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：Warrior&Mage",
       "description": "程序填空，使其输出为：\nWarrior::defense()\nWarrior::attack()\nMage::attack()\nMage::defense()\nMage::attack()\nMage::castSpell()\n输出：Warrior::defense()Warrior::attack()Mage::attack()Mage::defense()Mage::attack()Mage::castSpell()",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n\nclass Fighter {\npublic:\n{{BLANK}}\n};\n\nclass Warrior : public Fighter {\npublic:\n    void attack() { cout << \"Warrior::attack()\" << endl; }\n    void defense() { cout << \"Warrior::defense()\" << endl; }\n};\n\nclass Mage : public Fighter {\npublic:\n    void attack() { cout << \"Mage::attack()\" << endl; }\n    void defense() { cout << \"Mage::defense()\" << endl; }\n    void castSpell() { cout << \"Mage::castSpell()\" << endl; }\n};\n\nint main() {\n    Warrior grom;\n    Mage jaina;\n    Fighter *p = &grom;\n    p->defense();\n    p->attack();\n    p = &jaina;\n    p->attack();\n    p->defense();\n    jaina.attack();\n    jaina.castSpell();\n    return 0;\n}",

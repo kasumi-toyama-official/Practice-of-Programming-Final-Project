@@ -12,6 +12,7 @@
 
 #include "managers/WrongBookManager.h"
 #include "managers/QuestionBank.h"
+#include "models/CodeCompletionQuestion.h"
 #include "questionwidget.h"
 
 namespace Ui {
@@ -35,6 +36,8 @@ private slots:
     void onItemClicked(QListWidgetItem *item);
     void onRedoClicked();
     void onDeleteClicked();
+    void onSelectAllClicked();
+    void onBatchDeleteClicked();
 
 private:
     Ui::ErrorBookPage *ui;
@@ -42,24 +45,25 @@ private:
     WrongBookManager m_wrongBookManager;
     QuestionBank m_questionBank;
 
-    // 界面控件
     QComboBox *m_chapterFilter;
     QListWidget *m_errorList;
     QLabel *m_detailLabel;
     QPushButton *m_redoButton;
     QPushButton *m_deleteButton;
+    QPushButton *m_selectAllButton;
+    QPushButton *m_batchDeleteButton;
     QPushButton *m_backButton;
 
-    // 当前选中的错题
     int m_selectedChapterId = -1;
     int m_selectedQuestionId = -1;
 
-    // 重做弹窗
     QDialog *m_redoDialog = nullptr;
     QuestionWidget *m_redoQuestionWidget = nullptr;
     QuestionType m_redoQuestionType = QuestionType::Choice;
     int m_redoCorrectIndex = -1;
     QStringList m_redoOptions;
+    bool m_redoIsCodeCompletion = false;
+    CodeCompletionQuestion m_redoCCQuestion;
 
     void setupUI();
     void loadErrors();

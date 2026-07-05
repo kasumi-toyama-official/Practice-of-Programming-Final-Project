@@ -43,6 +43,23 @@ bool QuestionBank::loadChapter(int chapterId, const QString& jsonPath)
     return true;
 }
 
+void QuestionBank::appendChapter(int chapterId, const QString& jsonPath)
+{
+    auto optObj = JsonUtils::readJsonObject(jsonPath);
+    if (!optObj.has_value()) return;
+
+    QJsonObject rootObj = optObj.value();
+    QJsonArray questionsArr = rootObj["questions"].toArray();
+
+    for (const auto& val : questionsArr) {
+        if (!val.isObject()) continue;
+        QJsonObject qObj = val.toObject();
+        Question q = Question::fromJson(qObj);
+        if (q.chapterId == 0) q.chapterId = chapterId;
+        chapterQuestions[chapterId].append(q);
+    }
+}
+
 void QuestionBank::unloadChapter(int chapterId)
 {
     chapterQuestions.remove(chapterId);

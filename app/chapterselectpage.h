@@ -2,7 +2,9 @@
 #define CHAPTERSELECTPAGE_H
 
 #include <QWidget>
-#include "battlepage.h"
+#include "models/GameConfig.h"
+
+bool showConfigDialog(GameConfig& outConfig, QWidget* parent);
 
 class ChapterSelectPage : public QWidget
 {

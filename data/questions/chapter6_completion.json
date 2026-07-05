@@ -55,7 +55,7 @@
     {
       "id": 603,
       "chapterId": 6,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：流处理器",
       "description": "完善代码，实现一个通用的字符串流解析函数`parse_and_sum()`。该函数接收一个`string`参数，字符串中包含若干由空格分隔的数据。对于整数，返回其累加的结果；对于字符串，返回其首尾拼接的结果。\n输入：第一行为测试组数。后续每组数据包含两行，第一行是以空格分隔的整数（至少1个整数），第二行是以空格分隔的字符串（至少1个字符串）。\n输出：对于每组数据，输出第一行为数字总和，第二行为字符串直接拼接的结果。",
       "codeTemplate": "#include <iostream>\n#include <string>\n#include <sstream>\nusing namespace std;\n{{BLANK}}\nint main() {\n    int t;\n    cin >> t;\n    cin.ignore();\n    while (t--) {\n        string line1, line2;\n        getline(cin, line1);\n        getline(cin, line2);\n\n        cout << parse_and_sum<int>(line1) << endl;\n        cout << parse_and_sum<string>(line2) << endl;\n    }\n    return 0;\n}",

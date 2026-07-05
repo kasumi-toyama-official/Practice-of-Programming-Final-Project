@@ -57,6 +57,15 @@ Question Question::fromJson(const QJsonObject& obj)
     q.difficulty = static_cast<Difficulty>(obj["difficulty"].toInt(0));
     q.type = static_cast<QuestionType>(obj["type"].toInt(0));
     q.questionText = obj["questionText"].toString();
+    if (q.questionText.isEmpty()) {
+        // Compatibility with CodeCompletion format (uses "title" + "description")
+        QString title = obj["title"].toString();
+        QString desc = obj["description"].toString();
+        if (!title.isEmpty() && !desc.isEmpty())
+            q.questionText = title + "\n" + desc;
+        else
+            q.questionText = title.isEmpty() ? desc : title;
+    }
     q.correctOptionIndex = obj["correctOptionIndex"].toInt(0);
     q.explanation = obj["explanation"].toString();
 
@@ -66,6 +75,9 @@ Question Question::fromJson(const QJsonObject& obj)
     }
 
     q.codeTemplate = obj["codeTemplate"].toString();
+    if (!q.codeTemplate.isEmpty() && static_cast<int>(q.type) == static_cast<int>(QuestionType::Choice) && !obj.contains("type")) {
+        q.type = QuestionType::CodeCompletion;
+    }
     q.referenceSolution = obj["referenceSolution"].toString();
     q.blankCount = obj["blankCount"].toInt(1);
 

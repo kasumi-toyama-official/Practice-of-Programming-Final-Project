@@ -20,7 +20,6 @@ public:
         Battle,
         Result,
         ErrorBook,
-        Collection,
         Achievement,
         Settings,
         Ranking

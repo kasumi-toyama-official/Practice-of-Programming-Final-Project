@@ -1,3 +1,5 @@
+TARGET = Game
+DESTDIR = $$PWD/..
 QT += widgets
 
 CONFIG += c++17
@@ -12,7 +14,6 @@ SOURCES += \
     achievementpage.cpp \
     battlepage.cpp \
     chapterselectpage.cpp \
-    collectionpage.cpp \
     errorbookpage.cpp \
     main.cpp \
     mainmenupage.cpp \
@@ -45,7 +46,6 @@ HEADERS += \
     achievementpage.h \
     battlepage.h \
     chapterselectpage.h \
-    collectionpage.h \
     errorbookpage.h \
     mainmenupage.h \
     mainwindow.h \
@@ -61,7 +61,6 @@ FORMS += \
     achievementpage.ui \
     battlepage.ui \
     chapterselectpage.ui \
-    collectionpage.ui \
     errorbookpage.ui \
     mainmenupage.ui \
     mainwindow.ui \

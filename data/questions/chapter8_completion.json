@@ -5,7 +5,7 @@
     {
       "id": 801,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "编程填空：字符串排序",
       "description": "请按照要求对输入的字符串进行排序。\\n输入：第一行是正整数T，表示测试数据的组数；每组测试数据输入共两行，第一行是正整数N，表示字符串个数；第二行是N个字符串，字符串间用空格分离。\\n输出：对于每组测试数据，先输出一行：Case: n；第二行按照字符串长度从小到大排序之后输出N个字符串，字符串之间以空格间隔（不会出现字符串长度相同的情况）；第三行按照字符串首字符ASCII码序从小到大排序之后输出N个字符串，字符串之间以空格间隔（不会出现字符串首字母相同的情况）。",
       "codeTemplate": "#include <iostream>\n#include <string>\n#include <list>\nusing namespace std;\n\nclass A{\nprivate:\n\tstring name;\npublic:\n\tA(string n) :name(n){}\n\tfriend bool operator < (const class A& a1, const class A &a2);\n\tfriend bool operator == (const class A &a1, const class A &a2){\n\t\tif (a1.name.size() == a2.name.size())\n\t\t\treturn true;\n\t\telse\n\t\t\treturn false;\n\t}\n\tfriend ostream & operator << (ostream &o, const A &a){\n\t\to << a.name;\n\t\treturn o;\n\t}\n\tstring get_name() const{\n\t\treturn name;\n\t}\n\tint get_size() const{\n\t\treturn name.size();\n\t}\n};\n{{BLANK}}\n\nint main(int argc, char* argv[])\n{\n\tlist<A> lst;\n\tint ncase, n, i = 1;\n\tstring s;\n\tcin >> ncase;\n\twhile (ncase--){\n\t\tcout << \"Case: \"<<i++ << endl;\n\t\tcin >> n;\n\t\tfor (int i = 0; i < n; i++){\n\t\t\tcin >> s;\n\t\t\tlst.push_back(A(s));\n\t\t}\n\t\tlst.sort();\n\t\tShow(lst.begin(), lst.end(), Print());\n\n\t\tcout << endl;\n\t\tlst.sort(MyLarge<A>());\n\t\tShow(lst.begin(), lst.end(), Print());\n\t\tcout << endl;\n\t\tlst.clear();\n\n\t}\n\treturn 0;\n}",
@@ -56,7 +56,7 @@
     {
       "id": 803,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：回调函数",
       "description": "输入x1 x2 x3 x4 x5，输出y = x5^5 + x4^4 + x3^3 + x2^2 + x1^1 + 1的y的值。\\n输入：多组数据。第一行是数据组数n；每组数据为一行，5个整数x1 x2 x3 x4 x5。数值不大，不必考虑溢出。\\n输出：对每组数据，输出一个整数y。",
       "codeTemplate": "#include <algorithm>\n#include <iostream>\n#include <stack>\n#include <queue>\n#include <vector>\n#include <cstring>\n#include <cstdlib>\n#include <string>\n#include <cmath>\n#include <map>\n#include <set>\n\nusing namespace std;\nclass MyFunc\n{\n{{BLANK}}\n};\nint main()\n{\n\tint n;\n\tcin >> n;\n\twhile(n--) {\n\t\tvector<MyFunc> v;\n\t\tfor (int i = 0; i < 5; ++i)\n\t\t\tv.push_back(MyFunc(i+1));\n\t\tint ans = 1;\n\t\tfor (int i = 0; i < 5; ++i)\n\t\t{\n\t\t\tint m;\n\t\t\tcin >> m;\n\t\t\tans += v[i](m);\n\t\t}\n\t\tcout << ans <<endl;\n\t}\n}",
@@ -80,7 +80,7 @@
     {
       "id": 804,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：Printer",
       "description": "完成以下程序，使得输入的整数x，以及若干正整数，将大于x的正整数输出；然后输入若干字符串，将字符串长度大于x的字符串输出。\\n输入：第一行是整数t，表示一共t组数据；每组数据有三行，第一行是整数x和整数n，第二行是n个整数，第三行是n个不带空格的字符串。\\n输出：对每组数据先按原序输出第一行中大于x的正整数（数据保证会有输出）；再按原序输出第二行中长度大于x的字符串（数据保证会有输出）。",
       "codeTemplate": "#include<iostream>\n#include<algorithm>\n#include<vector>\n#include<bitset>\n\nusing namespace std;\n\nclass Printer{\n{{BLANK}}\n};\n\nint main(){\n\n\tint t;\n\tcin >> t;\n\twhile(t--) {\n\t\tint n,x;\n\t\tcin>>x>>n;\n\n\t\tvector<int> intVec;\n\t\tfor(int i = 0;i < n; ++i) {\n\t\t\tint y;\n\t\t\tcin >> y;\n\t\t\tintVec.push_back(y);\n\t\t}\n\t\tfor_each(intVec.begin(), intVec.end(), Printer(x));\n\t\tcout<<endl;\n\n\t\tvector<string> strVec;\n\t\tfor(int i = 0;i < n; ++i) {\n\t\t\tstring str;\n\t\t\tcin >> str;\n\t\t\tstrVec.push_back(str);\n\t\t}\n\t\tfor_each(strVec.begin(), strVec.end(), Printer(x));\n\t\tcout<<endl;\n\t}\n\treturn 0;\n}",
@@ -152,7 +152,7 @@
     {
       "id": 807,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "输出Fibonacci数列",
       "description": "Fibonacci数列指的是数列第一项和第二项为1，之后每一项是之前两项的和所构成的数列。现有多组数据，每组数据给出一个数字n，请你输出Fibonacci数列的前n-1项。\\n输入：每组数据一行，整数n；输入以0结尾。\\n输出：对每组数据输出前n-1项。",
       "codeTemplate": "#include <iostream>\n#include <iterator>\nusing namespace std;\n\ntemplate<class T1, class T2>\nvoid Copy(T1 s, T1 e, T2 x) {\n    for(; s != e; ++s, ++x)\n        *x = *s;\n}\n{{BLANK}}\nint main() {\n\twhile(true) {\n\t\tint n;\n\t\tcin >> n;\n\t\tif(n == 0)\n\t\t\tbreak;\n\n\t    Fib f1(1), f2(n);\n\t    ostream_iterator<int> it(cout, \" \");\n\t    Copy(f1, f2, it);\n\t    cout << endl;\n\t}\n\treturn 0;\n}",
@@ -301,7 +301,7 @@
     {
       "id": 813,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：单词分组",
       "description": "下面的程序读取了若干单词到vector。要求按照单词长度进行分组，长度相同的单词放入同一个集合（内部按字典序排列），最后按长度从大到小的顺序输出每组单词，每组内的单词以空格分隔。\\n输入：输入两行，第一行为单词数量；第二行为各个单词，以空格分隔。\\n输出：按长度从大到小的顺序输出长度和每组单词（每组一行），每组内的单词以空格分隔。",
       "codeTemplate": "#include <iostream>\n#include <string>\n#include <vector>\n#include <map>\n#include <set>\n#include <algorithm>\n#include <iterator>\nusing namespace std;\n\nint main() {\n    vector<string> words;\n    int n;\n    cin >> n;\n    for (int i = 0; i < n; ++i){\n    \tstring w;\n    \tcin >> w;\n    \twords.push_back(w);\n\t}\n\tmap<int, set<string>, greater<int>> groups;\n{{BLANK}}\nreturn 0;\n}",
@@ -352,7 +352,7 @@
     {
       "id": 815,
       "chapterId": 8,
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "编程填空：奇怪的排序",
       "description": "下面的程序输入n个整数(1<=n<=2000)。要求重新排列这n个整数，按偶数在前、奇数在后的顺序输出，并且偶数内部按降序、奇数内部按升序。请使用priority_queue实现上述逻辑，要求代码不可修改数组a。\\n输入：第一行为整数的数量n(1 ≤ n ≤ 2000)；第二行为具体的n个整数。\\n输出：输出排序后的整数。",
       "codeTemplate": "#include <iostream>\n#include <queue>\n#include <vector>\nusing namespace std;\nint n;\nvector<int> a;\n\nint main() {\n\tcin >> n;\n\tfor (int i = 0, x; i < n; ++i) {\n\t\tcin >> x;\n\t\ta.push_back(x);\n\t}\n{{BLANK}}\nfor (int x : a) pq.push(x);\n    while (!pq.empty()) {\n        cout << pq.top() << \" \";\n        pq.pop();\n    }\n    return 0;\n}",

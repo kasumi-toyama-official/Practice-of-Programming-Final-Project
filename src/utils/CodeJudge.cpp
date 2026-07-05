@@ -3,8 +3,31 @@
 #include <QFile>
 #include <QDir>
 #include <QCoreApplication>
+#include <QLibraryInfo>
 #include <QTemporaryDir>
 #include <QDebug>
+
+static QString findGpp()
+{
+    QDir dir(QCoreApplication::applicationDirPath());
+    for (int i = 0; i < 10; ++i) {
+        QString candidate = dir.filePath("tools/mingw/bin/g++.exe");
+        if (QFile::exists(candidate)) return QFileInfo(candidate).absoluteFilePath();
+        if (!dir.cdUp()) break;
+    }
+    return "g++";
+}
+
+static QString findMingwBin()
+{
+    QDir dir(QCoreApplication::applicationDirPath());
+    for (int i = 0; i < 10; ++i) {
+        QString candidate = dir.filePath("tools/mingw/bin/g++.exe");
+        if (QFile::exists(candidate)) return QFileInfo(candidate).absolutePath();
+        if (!dir.cdUp()) break;
+    }
+    return QString();
+}
 
 CodeJudgeResult CodeJudge::compileAndRun(const CodeCompletionQuestion& question,
                                           const QString& userCode,
@@ -32,9 +55,17 @@ CodeJudgeResult CodeJudge::compileAndRun(const CodeCompletionQuestion& question,
 
     QString exePath = tmpDir.filePath("code.exe");
 
+    QString mingwBin = findMingwBin();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (!mingwBin.isEmpty()) {
+        QString path = mingwBin + ";" + env.value("PATH");
+        env.insert("PATH", path);
+    }
+
     QProcess compiler;
+    compiler.setProcessEnvironment(env);
     compiler.setWorkingDirectory(tmpDir.path());
-    compiler.start("g++", QStringList()
+    compiler.start(findGpp(), QStringList()
         << "-std=c++17" << "-O2"
         << "-o" << exePath
         << cppPath);
@@ -50,6 +81,7 @@ CodeJudgeResult CodeJudge::compileAndRun(const CodeCompletionQuestion& question,
 
     for (const CodeCompletionTestCase& tc : question.testCases) {
         QProcess runner;
+        runner.setProcessEnvironment(env);
         runner.setWorkingDirectory(tmpDir.path());
         runner.start(exePath);
         if (!runner.waitForStarted(3000)) {
@@ -63,8 +95,8 @@ CodeJudgeResult CodeJudge::compileAndRun(const CodeCompletionQuestion& question,
             result.errorMessage = QString("第%1个测试用例运行超时").arg(result.passedCases + 1);
             return result;
         }
-        QString actual = QString::fromUtf8(runner.readAllStandardOutput()).trimmed();
-        QString expected = tc.output.trimmed();
+        QString actual = QString::fromUtf8(runner.readAllStandardOutput()).remove(QChar('\r')).trimmed();
+        QString expected = QString(tc.output).remove(QChar('\r')).trimmed();
         if (actual != expected) {
             result.errorMessage = QString("第%1个测试用例失败\n期望: %2\n实际: %3")
                 .arg(result.passedCases + 1).arg(expected).arg(actual);

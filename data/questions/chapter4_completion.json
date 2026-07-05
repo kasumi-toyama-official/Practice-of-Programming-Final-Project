@@ -55,7 +55,7 @@
     {
       "id": 403,
       "chapterId": 4,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：角色攻击",
       "description": "游戏中有基类 `Hero`（英雄），以及派生类 `Warrior`（战士）和 `Mage`（法师）。请补充完整的 `Hero` 类和 `Warrior` 类，使得主函数能够利用多态正确输出各种职业的攻击伤害。战士的伤害计算公式：基础伤害 + 武器加成法师的伤害计算公式：基础伤害 * 魔法倍率\n输出：Warrior attacks for 15 damage!Mage casts spell for 30 damage!",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nclass Mage : public Hero {\nprivate:\n    int magic_mult;\npublic:\n    Mage(int dmg, int mult) : Hero(dmg), magic_mult(mult) {}\n    void attack() const override {\n        cout << \"Mage casts spell for \" << base_damage * magic_mult << \" damage!\" << endl;\n    }\n};\n\nint main() {\n    Hero* heroes[2];\n\n    // Warrior构造函数参数：(基础伤害, 武器加成)\n    heroes[0] = new Warrior(10, 5);\n\n    // Mage构造函数参数：(基础伤害, 魔法倍率)\n    heroes[1] = new Mage(10, 3);\n\n    for (int i = 0; i < 2; ++i) {\n        heroes[i]->attack();\n        delete heroes[i]; // 确保不会发生内存泄漏\n    }\n    return 0;\n}",

@@ -56,6 +56,8 @@ private:
     QLabel* m_codingDiffLabel;
 
     QString m_storedCodeTemplate;
+    QString m_storedSampleInput;
+    QString m_storedSampleOutput;
     QPlainTextEdit* m_codeCompletionEditor;
     QLabel* m_codeCompletionToleranceLabel;
 

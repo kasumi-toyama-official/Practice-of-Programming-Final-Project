@@ -17,7 +17,7 @@
 class QuestionBank {
 public:
     bool loadChapter(int chapterId, const QString& jsonPath);
-
+    void appendChapter(int chapterId, const QString& jsonPath);
     void unloadChapter(int chapterId);
 
      //

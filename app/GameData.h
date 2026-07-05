@@ -18,6 +18,8 @@ struct QuestionData
     int correctOptionIndex;   // 选择题正确答案索引（0-based），非选择题填 -1
     int id;                   // 题目唯一编号（来自题库）
     QString explanation;      // 题目解析
+    QString testCaseInput;    // 首个样例输入
+    QString testCaseOutput;   // 首个样例输出
 };
 
 struct SkillData

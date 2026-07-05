@@ -58,7 +58,14 @@ bool RankingManager::save() const
 void RankingManager::addRecord(const RankingEntry& entry)
 {
     records.append(entry);
-    sortByTimestampDesc();
+    std::sort(records.begin(), records.end(),
+              [](const RankingEntry& a, const RankingEntry& b) {
+                  if (a.totalDamage != b.totalDamage)
+                      return a.totalDamage > b.totalDamage;
+                  return a.timestamp < b.timestamp;
+              });
+    if (records.size() > 20)
+        records.resize(20);
 }
 
 QVector<RankingEntry> RankingManager::getRecordsByChapter(int chapterId) const

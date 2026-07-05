@@ -26,22 +26,18 @@ protected:
 
 private slots:
     void onBackClicked();
-    void onFilterChanged(int index);
 
 private:
     Ui::RankingPage *ui;
 
     RankingManager m_rankingManager;
 
-    QComboBox *m_chapterFilter;
     QListWidget *m_rankingList;
     QLabel *m_summaryLabel;
     QPushButton *m_backButton;
 
     void setupUI();
     void loadRankings();
-    void refreshChapterFilter();
-    QString chapterNameRead(int chapterId) const;
 };
 
 #endif // RANKINGPAGE_H

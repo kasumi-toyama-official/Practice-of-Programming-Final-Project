@@ -103,7 +103,7 @@
     {
       "id": 705,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：计算数列平方和",
       "description": "请写出sum函数，使其可以计算输入数列的平方和。\n输入：第一行是一个整数 t (t <= 10)，表示数据组数；每组输入数据包含两行，第一行是一个整数 n (n <= 100)，第二行是 n 个用空格分隔开的整数\n输出：对每组输入数据，输出该组数据中 n 个整数的平方和",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n{{BLANK}}\nint sqr(int n) {\n    return n * n;\n}\nint main() {\n    int t, n, a[0x100];\n    cin >> t;\n    for (int c = 0; c < t; ++c) {\n        cin >> n;\n        for (int i = 0; i < n; ++i) cin >> a[i];\n        cout << sum(a, n, sqr) << endl;\n    }\n    return 0;\n}",
@@ -153,7 +153,7 @@
     {
       "id": 707,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：简单的计算",
       "description": "补充代码，使程序按要求输出\n输入：有若干组数据每组数据三行第一行是一个浮点数f和一个整数 n第二行是两个浮点数 x 和 y第三行是两个整数  p 和q\n输出：对每组数据先输出 x + y - f再输出 p + q - n",
       "codeTemplate": "#include <iostream>\nusing namespace std;\ntemplate <class T>\nclass Add{\npublic:\n{{BLANK}}\n};\n\nint main(){\n\tdouble f;\n\tint n;\n\twhile( cin >> f >> n) {\n\n\t\tAdd<double> a1(f);\n\t\tAdd<int> a2(n);\n\t\tdouble x,y;\n\t\tint p,q;\n\t\tcin >> x >> y >> p >> q;\n\t\tcout << a1(x, y) << endl;\n\t\tcout << a2(p, q) << endl;\n\t}\n\treturn 0;\n}",
@@ -177,7 +177,7 @@
     {
       "id": 708,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：反转",
       "description": "补充代码，使得程序输出为50 4 34 21 107.1 8.1 9.1 10.1 11.1 4.1\n输入：-\n输出：50 4 34 21 107.1 8.1 9.1 10.1 11.1 4.1",
       "codeTemplate": "#include<iostream>\nusing namespace std;\ntemplate<class T>\n{{BLANK}}\nint main()\n{\n\tint a[5] = { 10, 21, 34, 4, 50 };\n\tdouble d[6] = { 4.1, 11.1, 10.1, 9.1, 8.1, 7.1 };\n\tf(a, 5);\n\tf(d, 6);\n\tfor (int i = 0; i < 5; i++)\n\t{\n\t\tcout << a[i] << \" \";\n\t}\n\tcout << endl;\n\tfor (int j = 0; j < 6; j++)\n\t{\n\t\tcout << d[j] << \" \";\n\t}\n\tcout << endl;\n\treturn 0;\n}",
@@ -226,7 +226,7 @@
     {
       "id": 710,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "奇怪的container",
       "description": "程序填空：生成指定输出\n输入：第一行是整数n第二行是整数m第三行是字符串s1第四行是字符串s2\n输出：第一行是 n+2*m第二行是 n + m 第三行是 s1+s2+s2第四行是 s1+s2",
       "codeTemplate": "#include <iostream>\n#include <string>\nusing namespace std;\ntemplate <class T>\nclass container{\n{{BLANK}}\n};\nint main(){\n\tint n,m;\n\tcin >> n >> m;\n\tstring s1,s2;\n\tcin >> s1 >> s2;\n    container <int> a = n;\n    container <int> b = m;\n    cout<<a+b<<endl;\n    cout<<a+m<<endl;\n    container <string> sa = string(s1);\n    container <string> sb = string(s2);\n    cout<<sa+sb<<endl;\n    cout<< sa + s2<<endl;\n}",
@@ -251,7 +251,7 @@
     {
       "id": 711,
       "chapterId": 7,
-      "difficulty": 3,
+      "difficulty": 2,
       "title": "很难蒙混过关的CArray3d三维数组模板类",
       "description": "实现一个三维数组模版CArray3D，可以用来生成元素为任意类型变量的三维数组，输出指定结果\n输出：等同于样例",
       "codeTemplate": "#include <iostream>\n#include <iomanip>\n#include <cstring>\nusing namespace std;\ntemplate <class T>\nclass CArray3D\n{\n{{BLANK}}\n};\n\nCArray3D<int> a(3,4,5);\nCArray3D<double> b(3,2,2);\nvoid PrintA()\n{\n\tfor(int i = 0;i < 3; ++i) {\n\t\tcout << \"layer \" << i << \":\" << endl;\n\t\tfor(int j = 0; j < 4; ++j) {\n\t\t\tfor(int k = 0; k < 5; ++k)\n\t\t\t\tcout << a[i][j][k] << \",\" ;\n\t\t\tcout << endl;\n\t\t}\n\t}\n}\nvoid PrintB()\n{\n\tfor(int i = 0;i < 3; ++i) {\n\t\tcout << \"layer \" << i << \":\" << endl;\n\t\tfor(int j = 0; j < 2; ++j) {\n\t\t\tfor(int k = 0; k < 2; ++k)\n\t\t\t\tcout << b[i][j][k] << \",\" ;\n\t\t\tcout << endl;\n\t\t}\n\t}\n}\n\nint main()\n{\n\n\tint No = 0;\n\tfor( int i = 0; i < 3; ++ i ) {\n\t\ta[i];\n\t\tfor( int j = 0; j < 4; ++j ) {\n\t\t\ta[j][i];\n\t\t\tfor( int k = 0; k < 5; ++k )\n\t\t\t\ta[i][j][k] = No ++;\n\t\t\ta[j][i][i];\n\t\t}\n\t}\n\tPrintA();\n\tmemset(a[1],-1 ,20*sizeof(int));\n\tmemset(a[1],-1 ,20*sizeof(int));\n\tPrintA();\n\tmemset(a[1][1],0 ,5*sizeof(int));\n\tPrintA();\n\n\tfor( int i = 0; i < 3; ++ i )\n\t\tfor( int j = 0; j < 2; ++j )\n\t\t\tfor( int k = 0; k < 2; ++k )\n\t\t\t\tb[i][j][k] = 10.0/(i+j+k+1);\n\tPrintB();\n\tint n = a[0][1][2];\n\tdouble f = b[0][1][1];\n\tcout << \"****\" << endl;\n\tcout << n << \",\" << f << endl;\n\n\treturn 0;\n}",
@@ -277,7 +277,7 @@
     {
       "id": 712,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：又是MyClass",
       "description": "补充下列代码，使得程序能够按要求输出\n输入：第一行是整数t表示数据组数 每组数据有两行 第一行开头是整数m，然后后面是m个整数(5 < m < 30)第二行是一个没有空格的字符串，长度不超过50\n输出：对每组数据 先输出m个整数中的第5个，然后输出字符串中的第7个字符。\"第i个\"中的 i 是从0开始算的。",
       "codeTemplate": "#include <iostream>\n#include <cstring>\n#include <vector>\n#include <cstdio>\nusing namespace std;\n{{BLANK}}\nint  a[40];\nint main(int argc, char** argv) {\n\tint t;\n\tscanf(\"%d\",&t);\n\twhile ( t -- ) {\n\t\tint m;\n\t\tscanf(\"%d\",&m);\n\t\tfor (int i = 0;i < m; ++i)\n\t\t\tscanf(\"%d\",a+i);\n\t\tchar s[100];\n\t\tscanf(\"%s\",s);\n\t\tCMyClass<int> b(a, m);\n\t\tCMyClass<char> c(s, strlen(s));\n\t\tprintf(\"%d %c\\n\", b[5], c[7]);\n\t}\n\treturn 0;\n}",
@@ -302,7 +302,7 @@
     {
       "id": 713,
       "chapterId": 7,
-      "difficulty": 3,
+      "difficulty": 2,
       "title": "改良过的CArray3d三维数组模板类",
       "description": "程序填空，按要求输出\n输出：如样例",
       "codeTemplate": "#include <iostream>\n#include <iomanip>\n#include <cstring>\nusing namespace std;\ntemplate <class T>\nclass CArray3D\n{\n{{BLANK}}\n};\n\nCArray3D<int> a(3,4,5);\nCArray3D<double> b(3,2,2);\nvoid PrintA()\n{\n    for(int i = 0;i < 3; ++i) {\n        cout << \"layer \" << i << \":\" << endl;\n        for(int j = 0; j < 4; ++j) {\n            for(int k = 0; k < 5; ++k)\n                cout << a[i][j][k] << \",\" ;\n            cout << endl;\n        }\n    }\n}\nvoid PrintB()\n{\n    for(int i = 0;i < 3; ++i) {\n        cout << \"layer \" << i << \":\" << endl;\n        for(int j = 0; j < 2; ++j) {\n            for(int k = 0; k < 2; ++k)\n                cout << b[i][j][k] << \",\" ;\n            cout << endl;\n        }\n    }\n}\n\nint main()\n{\n\n    int No = 0;\n    for( int i = 0; i < 3; ++ i )\n        for( int j = 0; j < 4; ++j )\n            for( int k = 0; k < 5; ++k )\n                a[i][j][k] = No ++;\n    PrintA();\n    memset(a, -1, 60 * sizeof(int));        //注意这里\n    memset(a[1][1], 0, 5 * sizeof(int));\n    PrintA();\n\n    for( int i = 0; i < 3; ++ i )\n        for( int j = 0; j < 2; ++j )\n            for( int k = 0; k < 2; ++k )\n                b[i][j][k] = 10.0 / (i + j + k + 1);\n    PrintB();\n    int n = a[0][1][2];\n    double f = b[0][1][1];\n    cout << \"****\" << endl;\n    cout << n << \",\" << f << endl;\n\n    return 0;\n}",
@@ -352,7 +352,7 @@
     {
       "id": 715,
       "chapterId": 7,
-      "difficulty": 1,
+      "difficulty": 0,
       "title": "编程填空：模板类 Multiply",
       "description": "要求实现模板类 Multiply，使程序按以下规则运行：\n\n构造对象时保存一个初始值\n调用对象时返回两个参数的乘积加上该初始值\n输入：首先输入一个高精度浮点数和一个整型，之后输入两个高精度浮点数和两个整型。上述输入不超过100，且为正数。\n输出：输出需要转换为整型，向下取整。",
       "codeTemplate": "#include <iostream>\nusing namespace std;\n\ntemplate <class T>\nclass Multiply {\n{{BLANK}}\n};\nint main() {\n    double f;\n    int n;\n    cin >> f >> n;\n    Multiply<double> m1(f);\n    Multiply<int> m2(n);\n    double x, y;\n    int p, q;\n    cin >> x >> y >> p >> q;\n    cout << m1(x, y) << endl;\n    cout << m2(p, q) << endl;\n    return 0;\n}",
@@ -498,7 +498,7 @@
     {
       "id": 721,
       "chapterId": 7,
-      "difficulty": 3,
+      "difficulty": 2,
       "title": "编程填空：神秘的数组类",
       "description": "程序填空，输出指定结果。\n输入：第一行一个整数 n第二行是n个整数\n输出：四行，每行n个整数。输出的内容参看程序注释",
       "codeTemplate": "#include <iostream>\nusing namespace std;\nclass MyArray {\npublic:\n    int *a;\n    int n;\n    MyArray(int _n, int A[]):n(_n) {\n        a = new int[n];\n        for (int i = 0; i < n; i++)\n            a[i] = A[i];\n    }\n    ~MyArray() { delete[] a; }\n{{BLANK}}\n};\n\nint main()\n{\n    int n;\n    cin >> n;\n    int a[105] = {0};\n    for (int i = 0; i < n; i++)\n        cin >> a[i];\n    MyArray arr(n, a);\n\n     cout << arr++ << endl;  // 对数组中所有元素+1，输出修改前的元素\n    cout << ++arr << endl;  // 对数组中所有元素+1，输出修改后的元素\n    arr -= 5;               // 对数组中所有元素-5\n    cout << 3 + arr << endl;    // 输出数组中所有元素+3的值\n    arr.get_first() = arr.get_last(); // 将第一个元素值修改为改为最后一个元素的值\n    cout << arr << endl;\n    return 0;\n}",

@@ -1,0 +1,113 @@
+/* 全局背景和字体 */
+QWidget {
+    background-color: #1a1c2c;
+    color: #e0f0ff;
+    font-family: "PixelFont";  /* 改成你字体家族的实际名字，或者不指定用全局 */
+}
+
+/* 主窗口 */
+QMainWindow {
+    background-image: url(:/images/backgrounds/main_bg.png);  /* 可选 */
+}
+
+/* 按钮 */
+QPushButton {
+    background-color: #2a2d4a;
+    border: 2px solid #5a5d8a;
+    border-radius: 0px;
+    padding: 6px 18px;
+    color: #ffffff;
+    min-height: 24px;
+}
+QPushButton:hover {
+    background-color: #3a3f6a;
+    border-color: #7a7fba;
+}
+QPushButton:pressed {
+    background-color: #1a1d3a;
+    border-color: #8a8fca;
+    padding-top: 8px;   /* 按下时文字下沉，模拟像素位移 */
+    padding-bottom: 4px;
+}
+QPushButton:disabled {
+    background-color: #1a1c2c;
+    border-color: #3a3d5a;
+    color: #5a5d8a;
+}
+
+/* 输入框和文本编辑 */
+QLineEdit, QPlainTextEdit, QTextEdit {
+    background-color: #0a0c1a;
+    border: 2px solid #4a4d7a;
+    color: #ffffff;
+    padding: 4px;
+    selection-background-color: #5a5d8a;
+}
+QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus {
+    border-color: #8a8fca;
+}
+
+/* 标签 */
+QLabel {
+    color: #c0d0ff;
+    background: transparent;
+}
+
+/* 滚动条 */
+QScrollBar:vertical {
+    background: #1a1c2c;
+    width: 12px;
+    border: none;
+}
+QScrollBar::handle:vertical {
+    background: #7a7fba;
+    min-height: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* 列表框和表格 */
+QListWidget, QTableWidget {
+    background-color: #0a0c1a;
+    border: 2px solid #4a4d7a;
+    color: #ffffff;
+    gridline-color: #2a2d4a;
+}
+QListWidget::item, QTableWidget::item {
+    padding: 4px;
+}
+QListWidget::item:selected, QTableWidget::item:selected {
+    background-color: #3a3f6a;
+}
+
+/* 进度条 */
+QProgressBar {
+    background-color: #0a0c1a;
+    border: 2px solid #4a4d7a;
+    text-align: center;
+    color: #ffffff;
+}
+QProgressBar::chunk {
+    background-color: #5a7dba;
+    width: 1px; /* 和 border-radius 配合，这里不设圆角 */
+}
+
+/* 选项卡 */
+QTabWidget::pane {
+    border: 2px solid #4a4d7a;
+    background-color: #1a1c2c;
+}
+QTabBar::tab {
+    background-color: #2a2d4a;
+    border: 2px solid #4a4d7a;
+    padding: 5px 15px;
+    color: #ffffff;
+}
+QTabBar::tab:selected {
+    background-color: #3a3f6a;
+    border-bottom: none;
+}
+QTabBar::tab:hover {
+    background-color: #3a3f6a;
+}

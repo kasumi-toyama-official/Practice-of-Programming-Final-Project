@@ -55,12 +55,15 @@ void QuestionWidget::setupChoicePanel()
         "QScrollBar::handle:vertical { background: #7a7fba; min-height: 20px; }");
     layout->addWidget(descArea, 3);
 
+    QWidget* buddyDummy = new QWidget;
+    buddyDummy->hide();
     for (int i = 0; i < 4; ++i)
     {
         QLabel* label = new QLabel;
         label->setObjectName(QString("choiceLabel_%1").arg(i));
         label->setWordWrap(true);
         label->setMargin(6);
+        label->setBuddy(buddyDummy);
         label->setStyleSheet(
             "QLabel { color: white; background-color: #3a3a6a; border: 1px solid #777;"
             " border-radius: 4px; padding: 6px; font-size: 15px; }"
@@ -84,36 +87,93 @@ void QuestionWidget::setupCodeCompletionPanel()
         " background: transparent; padding: 0; }");
     layout->addWidget(m_codeCompletionDiffLabel);
 
-    QLabel* descLabel = new QLabel("代码补全题描述");
-    descLabel->setObjectName("codeCompletionDescLabel");
-    descLabel->setWordWrap(true);
-    layout->addWidget(descLabel, 1);
+    QTextEdit* descArea = new QTextEdit;
+    descArea->setObjectName("codeCompletionDescLabel");
+    descArea->setReadOnly(true);
+    descArea->setStyleSheet(
+        "QTextEdit { border: none; background: transparent; color: white; font-size: 16px; }"
+        "QScrollBar:vertical { width: 8px; background: #1a1c2c; }"
+        "QScrollBar::handle:vertical { background: #7a7fba; min-height: 20px; }");
+    layout->addWidget(descArea, 2);
 
     m_codeCompletionToleranceLabel = new QLabel("剩余容错次数：0");
     m_codeCompletionToleranceLabel->setObjectName("codeCompletionToleranceLabel");
     layout->addWidget(m_codeCompletionToleranceLabel);
 
-    QPushButton* viewCodeBtn = new QPushButton("查看代码");
+    QPushButton* viewCodeBtn = new QPushButton("查看代码片段与示例");
     connect(viewCodeBtn, &QPushButton::clicked, this, [this]() {
         QDialog* dlg = new QDialog(this);
-        dlg->setWindowTitle("代码模板");
-        dlg->setMinimumSize(900, 600);
+        dlg->setWindowTitle("代码模板与样例");
+        dlg->setMinimumSize(960, 640);
         dlg->setStyleSheet("QDialog { background-color: #1e1e3a; }");
         QVBoxLayout* dl = new QVBoxLayout(dlg);
-        QPushButton* copyBtn = new QPushButton("一键复制");
-        copyBtn->setStyleSheet("QPushButton { color: white; background-color: #3a3a6a;"
+
+        QHBoxLayout* topBar = new QHBoxLayout;
+        QPushButton* copyCodeBtn = new QPushButton("一键复制代码");
+        copyCodeBtn->setStyleSheet("QPushButton { color: white; background-color: #3a3a6a;"
             " border: 1px solid #777; border-radius: 4px; padding: 6px 12px; }");
-        connect(copyBtn, &QPushButton::clicked, this, [this, copyBtn]() {
+        connect(copyCodeBtn, &QPushButton::clicked, this, [this, copyCodeBtn]() {
             QApplication::clipboard()->setText(m_storedCodeTemplate);
-            copyBtn->setText("已复制!");
+            copyCodeBtn->setText("已复制!");
         });
-        dl->addWidget(copyBtn, 0, Qt::AlignLeft);
-        QPlainTextEdit* te = new QPlainTextEdit;
-        te->setReadOnly(true);
-        te->setPlainText(m_storedCodeTemplate);
-        te->setStyleSheet("QPlainTextEdit { color: white; background-color: #2a2a4a;"
+        topBar->addWidget(copyCodeBtn);
+        QPushButton* copyInputBtn = new QPushButton("复制样例输入");
+        copyInputBtn->setStyleSheet("QPushButton { color: white; background-color: #3a3a6a;"
+            " border: 1px solid #777; border-radius: 4px; padding: 6px 12px; }");
+        connect(copyInputBtn, &QPushButton::clicked, this, [this, copyInputBtn]() {
+            QApplication::clipboard()->setText(m_storedSampleInput);
+            copyInputBtn->setText("已复制!");
+        });
+        topBar->addWidget(copyInputBtn);
+        QPushButton* copyOutputBtn = new QPushButton("复制样例输出");
+        copyOutputBtn->setStyleSheet("QPushButton { color: white; background-color: #3a3a6a;"
+            " border: 1px solid #777; border-radius: 4px; padding: 6px 12px; }");
+        connect(copyOutputBtn, &QPushButton::clicked, this, [this, copyOutputBtn]() {
+            QApplication::clipboard()->setText(m_storedSampleOutput);
+            copyOutputBtn->setText("已复制!");
+        });
+        topBar->addWidget(copyOutputBtn);
+        topBar->addStretch();
+        dl->addLayout(topBar);
+
+        QHBoxLayout* split = new QHBoxLayout;
+
+        QVBoxLayout* codeCol = new QVBoxLayout;
+        QLabel* codeHeader = new QLabel("代码模板");
+        codeHeader->setStyleSheet("color: #ffcc00; font-size: 13px; font-weight: bold; background: transparent;");
+        codeCol->addWidget(codeHeader);
+        QPlainTextEdit* codeEdit = new QPlainTextEdit;
+        codeEdit->setReadOnly(true);
+        codeEdit->setPlainText(m_storedCodeTemplate);
+        codeEdit->setStyleSheet("QPlainTextEdit { color: white; background-color: #2a2a4a;"
             " font-family: monospace; font-size: 13px; }");
-        dl->addWidget(te, 1);
+        codeCol->addWidget(codeEdit, 1);
+        split->addLayout(codeCol, 3);
+
+        QVBoxLayout* rightCol = new QVBoxLayout;
+        QLabel* inputHeader = new QLabel("样例输入");
+        inputHeader->setStyleSheet("color: #ffcc00; font-size: 13px; font-weight: bold; background: transparent;");
+        rightCol->addWidget(inputHeader);
+        QPlainTextEdit* inputEdit = new QPlainTextEdit;
+        inputEdit->setReadOnly(true);
+        inputEdit->setPlainText(m_storedSampleInput);
+        inputEdit->setStyleSheet("QPlainTextEdit { color: white; background-color: #2a2a4a;"
+            " font-family: monospace; font-size: 13px; }");
+        rightCol->addWidget(inputEdit, 1);
+
+        QLabel* outputHeader = new QLabel("样例输出");
+        outputHeader->setStyleSheet("color: #ffcc00; font-size: 13px; font-weight: bold; background: transparent;");
+        rightCol->addWidget(outputHeader);
+        QPlainTextEdit* outputEdit = new QPlainTextEdit;
+        outputEdit->setReadOnly(true);
+        outputEdit->setPlainText(m_storedSampleOutput);
+        outputEdit->setStyleSheet("QPlainTextEdit { color: white; background-color: #2a2a4a;"
+            " font-family: monospace; font-size: 13px; }");
+        rightCol->addWidget(outputEdit, 1);
+        split->addLayout(rightCol, 2);
+
+        dl->addLayout(split, 1);
+
         QPushButton* closeBtn = new QPushButton("关闭");
         closeBtn->setStyleSheet("QPushButton { color: white; background-color: #3a3a6a;"
             " border: 1px solid #777; border-radius: 4px; padding: 6px 12px; }");
@@ -255,12 +315,15 @@ void QuestionWidget::setQuestion(const QuestionData &data)
         {
             QString desc = data.description;
             desc.replace("\\n", "\n");
-            m_codeCompletionPanel->findChild<QLabel*>("codeCompletionDescLabel")->setText(desc);
+            m_codeCompletionPanel->findChild<QTextEdit*>("codeCompletionDescLabel")->setPlainText(desc);
         }
         {
             QString tpl = data.codeTemplate;
             tpl.replace("\\n", "\n");
             m_storedCodeTemplate = tpl;
+            m_storedCodeTemplate.replace("{{BLANK}}", "// 在此处补充你的代码");
+            m_storedSampleInput = data.testCaseInput;
+            m_storedSampleOutput = data.testCaseOutput;
         }
         m_codeCompletionEditor->clear();
         break;
