@@ -1,1 +1,182 @@
-[]
+[
+    {
+        "chapterId": 1,
+        "correctCount": 15,
+        "rounds": 12,
+        "timestamp": 1783336510,
+        "totalDamage": 176,
+        "trophyEarned": true,
+        "victory": true
+    },
+    {
+        "chapterId": 1,
+        "correctCount": 24,
+        "rounds": 22,
+        "timestamp": 1783335511,
+        "totalDamage": 172,
+        "trophyEarned": false,
+        "victory": true
+    },
+    {
+        "chapterId": 8,
+        "correctCount": 10,
+        "rounds": 15,
+        "timestamp": 1783333077,
+        "totalDamage": 160,
+        "trophyEarned": false,
+        "victory": true
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783342244,
+        "totalDamage": 17,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783332910,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333143,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333147,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333158,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333170,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333270,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333347,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333487,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333491,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333534,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333558,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333722,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333737,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333742,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783333754,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    },
+    {
+        "chapterId": -1,
+        "correctCount": 0,
+        "rounds": 0,
+        "timestamp": 1783335629,
+        "totalDamage": 0,
+        "trophyEarned": false,
+        "victory": false
+    }
+]
